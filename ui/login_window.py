@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from models.usuarios import autenticar_usuario
+from ui.main_window import MainWindow
 
 #=== Ventana de Login ===
 class LoginWindow:
@@ -32,5 +33,6 @@ class LoginWindow:
         if valido:
             messagebox.showinfo("Acceso concedido", f"Bienvenido, {usuario}! Rol: {rol}")
             self.root.destroy() # Cierra la ventana de login al iniciar sesión correctamente
+            MainWindow(usuario, rol) # Abre la ventana principal pasando el usuario y rol
         else:
             messagebox.showerror("Acceso denegado", "Usuario o contraseña incorrectos.")
