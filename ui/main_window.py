@@ -51,13 +51,13 @@ class MainWindow:
     #Métodos placeholder para las funcionalidades del menú
     def ver_alumnos(self):
         AlumnosWindows(self.root)
-    #def add_alumno(self): messagebox.showinfo("Alumnos", "Agregar Alumno (admin)") Se comenta porque no se usa de momento
+    def add_alumno(self): messagebox.showinfo("Alumnos", "Agregar Alumno (admin)") #Se puede comentar porque no se usa de momento
     def ver_cursos(self):
         CursosWindow(self.root)
-    #def add_curso(self): messagebox.showinfo("Cursos", "Agregar Curso (admin)") Se comenta porque no se usa de momento
+    def add_curso(self): messagebox.showinfo("Cursos", "Agregar Curso (admin)") #Se puede comentar porque no se usa de momento
     def ver_matriculas(self):
         MatriculasWindow(self.root)
-    #def add_matricula(self): messagebox.showinfo("Matrículas", "Agregar Matrícula (admin)") Se comenta porque no se usa de momento
+    def add_matricula(self): messagebox.showinfo("Matrículas", "Agregar Matrícula (admin)") #Se puede comentar porque no se usa de momento
     def export_excel(self): messagebox.showinfo("Exportar", "Exportar a Excel")
     def export_pdf(self): messagebox.showinfo("Exportar", "Exportar a PDF")
     def import_excel(self): messagebox.showinfo("Importar", "Importar desde Excel (admin)")

@@ -19,7 +19,7 @@ class MatriculasWindow(tk.Toplevel):
         self.tree.heading("nif", text="NIF")
         self.tree.heading("alumno", text="Alumno")
         self.tree.heading("codigo_curso", text="Código curso")
-        self.tree.heading("curso", "Curso")
+        self.tree.heading("curso", text="Curso")
         self.tree.heading("fecha", text="Fecha matrícula")
         self.tree.column("nif", width=100)
         self.tree.column("alumno", width=200)
