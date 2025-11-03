@@ -31,8 +31,8 @@ def obtener_matriculas():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT a.nif, a.nombre || ' ' || a.apellidos AS alumno, 
-            c.nombre AS curso, m.fecha_matricula
+        SELECT a.nif, a.nombre || ' ' || a.apellidos as nombre,
+            c.codigo_curso, c.nombre AS curso, m.fecha_matricula
         FROM matriculas m
         JOIN alumnos a ON m.nif_alumno = a.nif
         JOIN cursos c ON m.codigo_curso = c.codigo_curso

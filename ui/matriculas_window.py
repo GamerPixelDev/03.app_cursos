@@ -63,7 +63,7 @@ class MatriculasWindow(tk.Toplevel):
         win.geometry("400x250")
         tk.Label(win, text="Alumno:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
         alumno = alumnos.obtener_alumnos()
-        self.combo_alumnos = ttk.Combobox(win, values=[f"{a[0]} - {a[2]} {a[3]}" for a in alumno], width=30)
+        self.combo_alumnos = ttk.Combobox(win, values=[f"{a[0]} - {a[1]} {a[2]}" for a in alumno], width=30)
         self.combo_alumnos.grid(row=0, column=1, padx=10, pady=5)
         tk.Label(win, text="Curso:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         curso = cursos.obtener_cursos()
