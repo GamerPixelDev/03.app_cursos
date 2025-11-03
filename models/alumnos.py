@@ -40,7 +40,7 @@ def obtener_alumnos():
 def eliminar_alumno(nif_alumno):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM alumnos WHERE nif = ?", (nif_alumno))
+    cursor.execute("DELETE FROM alumnos WHERE nif = ?", (nif_alumno,))
     conn. commit()
     conn.close()
     print(f"🗑️ Alumno con NIF {nif_alumno} eliminado.")

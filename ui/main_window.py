@@ -54,11 +54,9 @@ class MainWindow:
         self.root.config(menu=menu_bar)
         self.root.mainloop()
 
+    #Métodos placeholder para las funcionalidades del menú
     def ver_alumnos(self):
         AlumnosWindows(self.root)
-
-    #Métodos placeholder para las funcionalidades del menú
-    def ver_alumnos(self): messagebox.showinfo("Alumnos", "Ver Alumnos")
     def add_alumno(self): messagebox.showinfo("Alumnos", "Agregar Alumno (admin)")
     def ver_cursos(self): messagebox.showinfo("Cursos", "Ver Cursos")
     def add_curso(self): messagebox.showinfo("Cursos", "Agregar Curso (admin)")

@@ -24,7 +24,7 @@ class AlumnosWindows(tk.Toplevel):
             ("sexo", "Sexo", 60),
             ("edad", "Edad", 60),
             ("estudios", "Estudios", 100),
-            ("estado_labora", "Estado labora", 120)
+            ("estado_laboral", "Estado laboral", 120)
         ]
         for col, texto, ancho in columnas:
             self.tree.heading(col, text=texto)
