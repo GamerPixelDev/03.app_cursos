@@ -2,7 +2,10 @@ import sqlite3
 import os
 
 #=== Ruta de la base de datos ===
-DB_PATH = os.path.join("data", "database.db")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(BASE_DIR)
+DATA_DIR = os.path.join(ROOT_DIR, "data")
+DB_PATH = os.path.join(DATA_DIR, "database.db")
 #Crear la carpeta data si no existe
 if not os.path.exists("data"):
     os.makedirs("data")
