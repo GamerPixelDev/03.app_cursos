@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from ui.alumnos_window import AlumnosWindows
 
 class MainWindow:
     def __init__(self, usuario, rol):
@@ -52,6 +53,9 @@ class MainWindow:
 
         self.root.config(menu=menu_bar)
         self.root.mainloop()
+
+    def ver_alumnos(self):
+        AlumnosWindows(self.root)
 
     #Métodos placeholder para las funcionalidades del menú
     def ver_alumnos(self): messagebox.showinfo("Alumnos", "Ver Alumnos")

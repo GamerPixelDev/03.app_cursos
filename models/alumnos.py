@@ -12,14 +12,14 @@ def get_connection():
     return conn
 
 #Crear alumno
-def crear_alumno(nif, nombre, apellidos, localidad, codigo_postal, correo, telefono, sexo, edad, estudios, estado_laboral):
+def crear_alumno(nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral):
     conn = get_connection()
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            INSERT INTO alumnos (nif, nombre, apellidos, localidad, codigo_postal, correo, telefono, sexo, edad, estudios, estado_laboral)
+            INSERT INTO alumnos (nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (nif, nombre, apellidos, localidad, codigo_postal, correo, telefono, sexo, edad, estudios, estado_laboral))
+        """, (nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral))
         conn.commit()
         print(f"✅ Alumno '{nombre} {apellidos}' añadido correctamente.")
     except sqlite3.IntegrityError:
