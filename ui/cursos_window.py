@@ -9,6 +9,9 @@ class CursosWindow(tk.Toplevel):
         self.title("Gestión de cursos")
         self.geometry("900x500")
         self.resizable(True, True)
+        self.transient(parent) #La asocia visualmente a la ventana principal
+        self.grab_set() # Bloquea interacción con otras ventanas hasta cerrar esta
+        self.focus_set() # Trae el foco a la ventana actual
         # ----- Tabla -----
         self.tree = ttk.Treeview(self, columns=(
             "codigo_curso", "nombre", "fecha_inicio", "fecha_fin",

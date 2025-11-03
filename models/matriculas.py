@@ -19,8 +19,10 @@ def crear_matricula(nif_alumno, codigo_curso, fecha_matricula):
         """, (nif_alumno, codigo_curso, fecha_matricula))
         conn.commit()
         print(f"✅ Matrícula creada: alumno {nif_alumno} → curso {codigo_curso}")
+        return True
     except sqlite3.IntegrityError:
         print("⚠️ Error: posible duplicado o datos inválidos.")
+        return False
     finally:
         conn.close()
 
@@ -29,7 +31,7 @@ def obtener_matriculas():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT m.id, a.nombre || ' ' || a.apellidos AS alumno, 
+        SELECT a.nif, a.nombre || ' ' || a.apellidos AS alumno, 
             c.nombre AS curso, m.fecha_matricula
         FROM matriculas m
         JOIN alumnos a ON m.nif_alumno = a.nif

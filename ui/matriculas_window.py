@@ -1,9 +1,9 @@
 import tkinter as tk
+import sqlite3
 from tkinter import ttk, messagebox
 from models import matriculas as model
 from models import alumnos, cursos
 from datetime import datetime
-
 
 class MatriculasWindow(tk.Toplevel):
     def __init__(self, parent):
@@ -11,14 +11,19 @@ class MatriculasWindow(tk.Toplevel):
         self.title("Gestión de matrículas")
         self.geometry("800x500")
         self.resizable(True, True)
+        self.transient(parent) #La asocia visualmente a la ventana principal
+        self.grab_set() # Bloquea interacción con otras ventanas hasta cerrar esta
+        self.focus_set() # Trae el foco a la ventana actual
         # ----- Tabla -----
-        self.tree = ttk.Treeview(self, columns=("id", "alumno", "curso", "fecha"), show="headings", height=15)
-        self.tree.heading("id", text="ID")
+        self.tree = ttk.Treeview(self, columns=("nif", "alumno","codigo_curso", "curso", "fecha"), show="headings", height=15)
+        self.tree.heading("nif", text="NIF")
         self.tree.heading("alumno", text="Alumno")
-        self.tree.heading("curso", text="Curso")
+        self.tree.heading("codigo_curso", text="Código curso")
+        self.tree.heading("curso", "Curso")
         self.tree.heading("fecha", text="Fecha matrícula")
-        self.tree.column("id", width=40)
+        self.tree.column("nif", width=100)
         self.tree.column("alumno", width=200)
+        self.tree.column("codigo_curso", width=120)
         self.tree.column("curso", width=200)
         self.tree.column("fecha", width=120)
         self.tree.pack(pady=10, fill=tk.BOTH, expand=True)
@@ -76,10 +81,21 @@ class MatriculasWindow(tk.Toplevel):
         nif_alumno = alumno_sel.split(" - ")[0]
         codigo_curso = curso_sel.split(" - ")[0]
         fecha_matricula = datetime.now().strftime("%Y-%m-%d")
-        try:
-            model.crear_matricula(nif_alumno, codigo_curso, fecha_matricula)
-            messagebox.showinfo("Éxito", "Matrícula creada correctamente.")
+        exito = model.crear_matricula(nif_alumno, codigo_curso, fecha_matricula)
+        if exito:
+            messagebox.showinfo("Éxito", "Matrícula creeada correctamente.")
             ventana.destroy()
             self.cargar_datos()
+        else:
+            messagebox.showwarning("Duplicado", "⚠️ Este alumno ya está matriculado en este curso.")
+        #Se comenta lo de abajo porque se ha implementado por un if/else
+        """try:
+            model.crear_matricula(nif_alumno, codigo_curso, fecha_matricula)
+        except sqlite3.IntegrityError:
+            messagebox.showwarning("Duplicado", "⚠️ Este alumno ya está matriculado en este curso.")
         except Exception as e:
             messagebox.showerror("Error", str(e))
+        else:
+            messagebox.showinfo("Éxito", "Matrícula creada correctamente.")
+            ventana.destroy()
+            self.cargar_datos()"""

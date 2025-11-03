@@ -6,8 +6,11 @@ class AlumnosWindows(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Gestión de alumnos")
-        self.geometry("900x500")
+        self.geometry("1100x600")
         self.resizable(True, True)
+        self.transient(parent) #La asocia visualmente a la ventana principal
+        self.grab_set() # Bloquea interacción con otras ventanas hasta cerrar esta
+        self.focus_set() # Trae el foco a la ventana actual
 
         #--- Tabla ---
         self.tree = ttk.Treeview(self, columns=("nif", "nombre", "apellidos", "localidad", "codigo_postal", "email", "telefono", "sexo", "edad", "estudios", "estado_laboral"),
@@ -29,7 +32,7 @@ class AlumnosWindows(tk.Toplevel):
         for col, texto, ancho in columnas:
             self.tree.heading(col, text=texto)
             self.tree.column(col, width=ancho)
-        self.tree.pack(pady=10, fill=tk.BOTH, expand=True)
+        self.tree.pack(fill=tk.BOTH, expand=True)
         #--- Botones ---
         frame_btns = tk.Frame(self)
         frame_btns.pack(pady=10)
