@@ -53,7 +53,7 @@ class CursosWindow(tk.Toplevel):
             return
         curso = self.tree.item(item, "values")
         codigo_curso = curso[0]
-        confirmar = messagebox.askyesno("Confirmar", f"¿Eliminar el curso {curso[2]}?")
+        confirmar = messagebox.askyesno("Confirmar", f"¿Eliminar el curso {curso[1]}?")
         if confirmar:
             model.eliminar_curso(codigo_curso)
             self.cargar_datos()

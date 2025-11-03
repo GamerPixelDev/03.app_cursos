@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from ui.alumnos_window import AlumnosWindows
+from ui.cursos_window import CursosWindow
 
 class MainWindow:
     def __init__(self, usuario, rol):
@@ -58,7 +59,8 @@ class MainWindow:
     def ver_alumnos(self):
         AlumnosWindows(self.root)
     def add_alumno(self): messagebox.showinfo("Alumnos", "Agregar Alumno (admin)")
-    def ver_cursos(self): messagebox.showinfo("Cursos", "Ver Cursos")
+    def ver_cursos(self):
+        CursosWindow(self.root)
     def add_curso(self): messagebox.showinfo("Cursos", "Agregar Curso (admin)")
     def ver_matriculas(self): messagebox.showinfo("Matrículas", "Ver Matrículas")
     def add_matricula(self): messagebox.showinfo("Matrículas", "Agregar Matrícula (admin)")
