@@ -26,7 +26,7 @@ cursor.execute('''
         localidad TEXT,
         codigo_postal TEXT,
         telefono TEXT,
-        email TEXT UNIQUE
+        email TEXT UNIQUE,
         sexo TEXT,
         edad INTEGER,
         estudios TEXT,
