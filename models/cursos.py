@@ -51,3 +51,16 @@ def actualizar_curso(codigo_curso, campo, nuevo_valor):
     conn.commit()
     conn.close()
     print(f"✏️ Curso {codigo_curso} actualizado: {campo} = {nuevo_valor}")
+
+#--- Obtener datos de un curso ---
+def obtener_datos_curso(codigo_curso):
+    conn = get_conection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT nombre, fecha_inicio, fecha_fin, lugar, modalidad, horas, responsable
+        FROM cursos
+        WHERE codigo_curso = ?
+    """, (codigo_curso,))
+    datos = cursor.fetchone()
+    conn.close()
+    return datos

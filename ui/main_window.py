@@ -4,6 +4,7 @@ from ui.alumnos_window import AlumnosWindows
 from ui.cursos_window import CursosWindow
 from ui.matriculas_window import MatriculasWindow
 from ui.buscar_alumno_window import BuscarAlumnoWindow
+from ui.buscar_curso_window import BuscarCursoWindow
 
 class MainWindow:
     def __init__(self, usuario, rol):

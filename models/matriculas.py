@@ -55,7 +55,6 @@ def eliminar_matricula(id_matricula):
 def obtener_cursos_por_alumno(nif_alumno):
     conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("""
         SELECT 
             c.codigo_curso,
@@ -72,7 +71,32 @@ def obtener_cursos_por_alumno(nif_alumno):
         WHERE m.nif_alumno = ?
         ORDER BY c.fecha_inicio DESC
     """, (nif_alumno,))
-
     datos = cursor.fetchall()
     conn.close()
     return datos
+
+#--- Buscar alumnos por curso ---
+def obtener_alumnos_por_curso(codigo_curso):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT 
+            a.nif,
+            a.nombre || ' ' || a.apellidos AS alumno,
+            a.email,
+            a.telefono,
+            CASE 
+                WHEN date(c.fecha_fin) < date('now') THEN 'Finalizado'
+                WHEN date(c.fecha_inicio) > date('now') THEN 'Pendiente'
+                ELSE 'En curso'
+            END AS estado_curso
+        FROM matriculas m
+        JOIN alumnos a ON m.nif_alumno = a.nif
+        JOIN cursos c ON m.codigo_curso = c.codigo_curso
+        WHERE m.id_curso = ?
+        ORDER BY a.apellidos, a.nombre
+    """, (codigo_curso,))
+    datos = cursor.fetchall()
+    conn.close()
+    return datos
+
