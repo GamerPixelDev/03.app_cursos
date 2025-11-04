@@ -59,7 +59,7 @@ def obtener_datos_alumno(nif):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT nombre, apellidos, localidad, codigo_postal, correo, telefono, sexo, edad, estudios, estado_laboral
+        SELECT nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral
         FROM alumnos
         WHERE nif = ?
     """, (nif,))

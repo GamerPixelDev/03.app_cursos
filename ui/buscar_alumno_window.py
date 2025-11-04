@@ -2,8 +2,6 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from models import matriculas as model
 from models import alumnos
-
-
 class BuscarAlumnoWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
