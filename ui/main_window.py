@@ -17,7 +17,7 @@ class MainWindow:
         # --- Banner superior ---
         banner = tk.Frame(self.root, bg="#3E64FF", height=60)
         banner.pack(fill="x", side="top")
-        titulo = tk.Label(banner, text="📘 Gestor de Cursos", bg="#3E64FF", fg="white", font=("Segoe UI", 14, "bold"))
+        titulo = tk.Label(banner, text="💼 Gestor de Cursos", bg="#3E64FF", fg="white", font=("Segoe UI", 14, "bold"))
         titulo.pack(side="left", padx=5)
         usuario_label = tk.Label(banner, text=f"👤 {usuario} ({rol})", bg="#3E64FF", fg="white", font=("Segoe UI", 10, "italic"))
         usuario_label.pack(side="right", padx=20)
