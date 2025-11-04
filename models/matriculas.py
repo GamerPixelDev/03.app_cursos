@@ -93,7 +93,7 @@ def obtener_alumnos_por_curso(codigo_curso):
         FROM matriculas m
         JOIN alumnos a ON m.nif_alumno = a.nif
         JOIN cursos c ON m.codigo_curso = c.codigo_curso
-        WHERE m.id_curso = ?
+        WHERE m.codigo_curso = ?
         ORDER BY a.apellidos, a.nombre
     """, (codigo_curso,))
     datos = cursor.fetchall()
