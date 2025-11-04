@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from models import matriculas as model
+from models import alumnos
 
 
 class BuscarAlumnoWindow(tk.Toplevel):
@@ -15,6 +16,11 @@ class BuscarAlumnoWindow(tk.Toplevel):
         self.entry_nif = tk.Entry(frame_buscar, width=20)
         self.entry_nif.grid(row=0, column=1, padx=5)
         tk.Button(frame_buscar, text="Buscar", command=self.buscar).grid(row=0, column=2, padx=5)
+        # --- Información del alumno ---
+        self.frame_info = tk.LabelFrame(self, text="Datos del alumno", padx=10, pady=5)
+        self.frame_info.pack(fill="x", padx=10, pady=5)
+        self.label_info = tk.Label(self.frame_info, text="", justify="left", anchor="w")
+        self.label_info.pack(fill="x")
         # --- Tabla de resultados ---
         self.tree = ttk.Treeview(self, columns=("codigo", "nombre", "inicio", "fin", "estado"),
                                     show="headings", height=15)
@@ -38,11 +44,30 @@ class BuscarAlumnoWindow(tk.Toplevel):
         if not nif:
             messagebox.showwarning("Aviso", "Introduce el NIF del alumno.")
             return
-        cursos = model.obtener_cursos_por_alumno(nif)
+        # Limpiar tabla y datos previos
         for row in self.tree.get_children():
             self.tree.delete(row)
+        self.label_info.config(text="")
+        # --- Obtener datos del alumno ---
+        datos_alumno = alumnos.obtener_datos_alumno(nif)
+        if not datos_alumno:
+            messagebox.showinfo("Resultado", "No se encontró ningún alumno con ese NIF.")
+            return
+        nombre, apellidos, localidad, codigo_postal, correo, telefono, sexo, edad, estudios, estado_laboral = datos_alumno
+        texto_info = (
+            f"Nombre: {nombre} {apellidos}\n"
+            f"Localidad: {localidad} ({codigo_postal})\n"
+            f"Correo: {correo} | Tel: {telefono}\n"
+            f"Sexo: {sexo} | Edad: {edad}\n"
+            f"Estudios: {estudios}\n"
+            f"Estado laboral: {estado_laboral}"
+        )
+        self.label_info.config(text=texto_info)
+        # --- Obtener cursos del alumno ---
+        cursos = model.obtener_cursos_por_alumno(nif)
         if not cursos:
-            messagebox.showinfo("Resultado", "No se encontraron cursos para este alumno.")
+            messagebox.showinfo("Cursos", "Este alumno no tiene cursos registrados.")
             return
         for curso in cursos:
             self.tree.insert("", tk.END, values=curso)
+

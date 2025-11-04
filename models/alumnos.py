@@ -53,3 +53,16 @@ def actualizar_alumno(nif_alumno, campo, nuevo_valor):
     conn.commit()
     conn.close()
     print(f"✏️ Alumno {nif_alumno} actualizado: {campo} = {nuevo_valor}")
+
+#Obtener datos
+def obtener_datos_alumno(nif):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT nombre, apellidos, localidad, codigo_postal, correo, telefono, sexo, edad, estudios, estado_laboral
+        FROM alumnos
+        WHERE nif = ?
+    """, (nif,))
+    datos = cursor.fetchone()
+    conn.close()
+    return datos
