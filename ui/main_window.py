@@ -3,6 +3,7 @@ from tkinter import messagebox
 from ui.alumnos_window import AlumnosWindows
 from ui.cursos_window import CursosWindow
 from ui.matriculas_window import MatriculasWindow
+from ui.buscar_alumno_window import BuscarAlumnoWindow
 
 class MainWindow:
     def __init__(self, usuario, rol):
@@ -30,6 +31,10 @@ class MainWindow:
         if rol == "admin":
             menu_matriculas.add_command(label="Agregar Matrícula", command=self.add_matricula)
         menu_bar.add_cascade(label="Matrículas", menu=menu_matriculas)
+        #Menú Consultas
+        menu_consultas = tk.Menu(menu_bar, tearoff=0)
+        menu_consultas.add_command(label="Buscar alumno", command=self.buscar_alumno)
+        menu_bar.add_cascade(label="Consultas", menu=menu_consultas)
         #Menú Exportar / Importar
         menu_export = tk.Menu(menu_bar, tearoff=0)
         menu_export.add_command(label="Exportar a Excel", command=self.export_excel)
@@ -58,6 +63,8 @@ class MainWindow:
     def ver_matriculas(self):
         MatriculasWindow(self.root)
     def add_matricula(self): messagebox.showinfo("Matrículas", "Agregar Matrícula (admin)") #Se puede comentar porque no se usa de momento
+    def buscar_alumno(self):
+        BuscarAlumnoWindow(self.root)
     def export_excel(self): messagebox.showinfo("Exportar", "Exportar a Excel")
     def export_pdf(self): messagebox.showinfo("Exportar", "Exportar a PDF")
     def import_excel(self): messagebox.showinfo("Importar", "Importar desde Excel (admin)")

@@ -50,3 +50,29 @@ def eliminar_matricula(id_matricula):
     conn.commit()
     conn.close()
     print(f"🗑️ Matrícula {id_matricula} eliminada.")
+
+#--- Buscar cursos por alumno ---
+def obtener_cursos_por_alumno(nif_alumno):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT 
+            c.codigo_curso,
+            c.nombre,
+            c.fecha_inicio,
+            c.fecha_fin,
+            CASE 
+                WHEN date(c.fecha_fin) < date('now') THEN 'Finalizado'
+                WHEN date(c.fecha_inicio) > date('now') THEN 'Abierto'
+                ELSE 'En curso'
+            END AS estado
+        FROM matriculas m
+        JOIN cursos c ON m.codigo_curso = c.codigo_curso
+        WHERE m.nif_alumno = ?
+        ORDER BY c.fecha_inicio DESC
+    """, (nif_alumno,))
+
+    datos = cursor.fetchall()
+    conn.close()
+    return datos
