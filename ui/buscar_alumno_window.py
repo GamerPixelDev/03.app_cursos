@@ -13,7 +13,7 @@ class BuscarAlumnoWindow(tk.Toplevel):
         tk.Label(frame_buscar, text="NIF del alumno:").grid(row=0, column=0, padx=5)
         self.entry_nif = tk.Entry(frame_buscar, width=20)
         self.entry_nif.grid(row=0, column=1, padx=5)
-        tk.Button(frame_buscar, text="Buscar", command=self.buscar).grid(row=0, column=2, padx=5)
+        ttk.Button(frame_buscar, text="Buscar", command=self.buscar).grid(row=0, column=2, padx=5)
         # --- Información del alumno ---
         self.frame_info = tk.LabelFrame(self, text="Datos del alumno", padx=10, pady=5)
         self.frame_info.pack(fill="x", padx=10, pady=5)
@@ -32,10 +32,11 @@ class BuscarAlumnoWindow(tk.Toplevel):
         for col, texto, ancho in columnas:
             self.tree.heading(col, text=texto)
             self.tree.column(col, width=ancho)
-        self.tree.pack(fill=tk.BOTH, expand=True, pady=10)
+        self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         self.transient(parent)
         self.grab_set()
         self.focus_set()
+    
     # --- Función de búsqueda ---
     def buscar(self):
         nif = self.entry_nif.get().strip()

@@ -1,14 +1,14 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk 
 from ui.alumnos_window import AlumnosWindows
 from ui.cursos_window import CursosWindow
 from ui.matriculas_window import MatriculasWindow
 from ui.buscar_alumno_window import BuscarAlumnoWindow
 from ui.buscar_curso_window import BuscarCursoWindow
-
 class MainWindow:
     def __init__(self, usuario, rol):
         self.root = tk.Tk()
+        self._setup_style()
         self.root.title(f"Gestión ed Cursos - Usuario: {usuario} - Rol: {rol}")
         self.root.geometry("800x600")
         self.root.resizable(True, True)
@@ -55,6 +55,43 @@ class MainWindow:
         menu_bar.add_command(label="Salir", command=self.root.quit)
         self.root.config(menu=menu_bar)
         self.root.mainloop()
+
+    def _setup_style(self):
+        style = ttk.Style()
+        # Tema un poco más moderno que el default
+        try:
+            style.theme_use("clam")
+        except Exception:
+            pass  # si no existe, sigue con el tema por defecto
+        # ---- Treeview (tabla)
+        style.configure(
+            "Treeview",
+            background="#fdfdfd",
+            foreground="#222222",
+            rowheight=24,
+            fieldbackground="#fdfdfd",
+            font=("Segoe UI", 10)
+        )
+        style.configure(
+            "Treeview.Heading",
+            background="#3E64FF",
+            foreground="#ffffff",
+            font=("Segoe UI", 10, "bold")
+        )
+        style.map(
+            "Treeview",
+            background=[("selected", "#4A90E2")]
+        )
+        # ---- Botones
+        style.configure(
+            "TButton",
+            font=("Segoe UI", 10),
+            padding=6
+        )
+        style.map(
+            "TButton",
+            relief=[("pressed", "sunken"), ("!pressed", "raised")]
+        )
 
     #=== Métodos placeholder para las funcionalidades del menú ===
     #--- Menu alumnos ---

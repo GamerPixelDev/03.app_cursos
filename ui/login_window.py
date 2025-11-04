@@ -14,14 +14,11 @@ class LoginWindow:
         tk.Label(self.root, text="Usuario:").pack(pady=5)
         self.entry_usuario = tk.Entry(self.root)
         self.entry_usuario.pack()
-
         tk.Label(self.root, text="Contraseña:").pack(pady=5)
         self.entry_contraseña = tk.Entry(self.root, show="*")
         self.entry_contraseña.pack()
-
         #Botón de inicio de sesión
         tk.Button(self.root, text="Iniciar sesión", command=self.iniciar_sesion).pack(pady=10) # Llama al método iniciar_sesion al hacer clic
-
         #Ejecutar la ventana
         self.root.mainloop()
     

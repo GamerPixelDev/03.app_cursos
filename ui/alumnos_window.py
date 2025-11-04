@@ -11,7 +11,6 @@ class AlumnosWindows(tk.Toplevel):
         self.transient(parent) #La asocia visualmente a la ventana principal
         self.grab_set() # Bloquea interacción con otras ventanas hasta cerrar esta
         self.focus_set() # Trae el foco a la ventana actual
-
         #--- Tabla ---
         self.tree = ttk.Treeview(self, columns=("nif", "nombre", "apellidos", "localidad", "codigo_postal", "email", "telefono", "sexo", "edad", "estudios", "estado_laboral"),
                                 show="headings", height=15
@@ -32,13 +31,20 @@ class AlumnosWindows(tk.Toplevel):
         for col, texto, ancho in columnas:
             self.tree.heading(col, text=texto)
             self.tree.column(col, width=ancho)
-        self.tree.pack(fill=tk.BOTH, expand=True)
+        #--- Barras de desplazamiento ---
+        scroll_y = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+        scroll_x = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
+        self.tree.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
+
+        scroll_y.pack(side="right", fill="y")
+        scroll_x.pack(side="bottom", fill="x")
+        self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         #--- Botones ---
         frame_btns = tk.Frame(self)
         frame_btns.pack(pady=10)
-        tk.Button(frame_btns, text="Actualizar lista", command=self.cargar_datos).grid(row=0, column=0, padx=5)
-        tk.Button(frame_btns, text="Añadir alumno", command=self.ventana_nuevo_alumno).grid(row=0, column=1, padx=5)
-        tk.Button(frame_btns, text="Eliminar seleccionado", command=self.eliminar_seleccionado).grid(row=0, column=2, padx=5)
+        ttk.Button(frame_btns, text="Actualizar lista", command=self.cargar_datos).grid(row=0, column=0, padx=5)
+        ttk.Button(frame_btns, text="Añadir alumno", command=self.ventana_nuevo_alumno).grid(row=0, column=1, padx=5)
+        ttk.Button(frame_btns, text="Eliminar seleccionado", command=self.eliminar_seleccionado).grid(row=0, column=2, padx=5)
         self.cargar_datos()
 
     #--- Cargar datos en tabla ---
@@ -65,7 +71,7 @@ class AlumnosWindows(tk.Toplevel):
     #--- Ventana para añadir alumno ---
     def ventana_nuevo_alumno(self):
         win = tk.Toplevel(self)
-        win.title("NUevo alumno")
+        win.title("Nuevo alumno")
         win.geometry("400x550")
         campos = [
             "nif", "nombre", "apellidos", "localidad", "codigo_postal",

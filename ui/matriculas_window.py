@@ -9,7 +9,7 @@ class MatriculasWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Gestión de matrículas")
-        self.geometry("800x500")
+        self.geometry("1100x600")
         self.resizable(True, True)
         self.transient(parent) #La asocia visualmente a la ventana principal
         self.grab_set() # Bloquea interacción con otras ventanas hasta cerrar esta
@@ -26,13 +26,13 @@ class MatriculasWindow(tk.Toplevel):
         self.tree.column("codigo_curso", width=120)
         self.tree.column("curso", width=200)
         self.tree.column("fecha", width=120)
-        self.tree.pack(pady=10, fill=tk.BOTH, expand=True)
+        self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         # ----- Botones -----
         frame_btns = tk.Frame(self)
         frame_btns.pack(pady=10)
-        tk.Button(frame_btns, text="Actualizar lista", command=self.cargar_datos).grid(row=0, column=0, padx=5)
-        tk.Button(frame_btns, text="Nueva matrícula", command=self.ventana_nueva_matricula).grid(row=0, column=1, padx=5)
-        tk.Button(frame_btns, text="Eliminar seleccionada", command=self.eliminar_seleccionada).grid(row=0, column=2, padx=5)
+        ttk.Button(frame_btns, text="Actualizar lista", command=self.cargar_datos).grid(row=0, column=0, padx=5)
+        ttk.Button(frame_btns, text="Nueva matrícula", command=self.ventana_nueva_matricula).grid(row=0, column=1, padx=5)
+        ttk.Button(frame_btns, text="Eliminar seleccionada", command=self.eliminar_seleccionada).grid(row=0, column=2, padx=5)
         self.cargar_datos()
 
     # ----- Cargar datos -----
@@ -69,7 +69,7 @@ class MatriculasWindow(tk.Toplevel):
         curso = cursos.obtener_cursos()
         self.combo_cursos = ttk.Combobox(win, values=[f"{c[0]} - {c[2]}" for c in curso], width=30)
         self.combo_cursos.grid(row=1, column=1, padx=10, pady=5)
-        tk.Button(win, text="Guardar", command=lambda: self.guardar_matricula(win)).grid(row=3, columnspan=2, pady=20)
+        ttk.Button(win, text="Guardar", command=lambda: self.guardar_matricula(win)).grid(row=3, columnspan=2, pady=20)
 
     # ----- Guardar matrícula -----
     def guardar_matricula(self, ventana):

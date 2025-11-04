@@ -7,7 +7,7 @@ class CursosWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Gestión de cursos")
-        self.geometry("900x500")
+        self.geometry("1100x600")
         self.resizable(True, True)
         self.transient(parent) #La asocia visualmente a la ventana principal
         self.grab_set() # Bloquea interacción con otras ventanas hasta cerrar esta
@@ -31,13 +31,21 @@ class CursosWindow(tk.Toplevel):
         for col, texto, ancho in columnas:
             self.tree.heading(col, text=texto)
             self.tree.column(col, width=ancho)
-        self.tree.pack(pady=10, fill=tk.BOTH, expand=True)
+        #--- Barras de desplazamiento ---
+        scroll_y = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+        scroll_x = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
+        self.tree.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
+
+        scroll_y.pack(side="right", fill="y")
+        scroll_x.pack(side="bottom", fill="x")
+
+        self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         # ----- Botones -----
         frame_btns = tk.Frame(self)
         frame_btns.pack(pady=10)
-        tk.Button(frame_btns, text="Actualizar lista", command=self.cargar_datos).grid(row=0, column=0, padx=5)
-        tk.Button(frame_btns, text="Añadir curso", command=self.ventana_nuevo_curso).grid(row=0, column=1, padx=5)
-        tk.Button(frame_btns, text="Eliminar seleccionado", command=self.eliminar_seleccionado).grid(row=0, column=2, padx=5)
+        ttk.Button(frame_btns, text="Actualizar lista", command=self.cargar_datos).grid(row=0, column=0, padx=5)
+        ttk.Button(frame_btns, text="Añadir curso", command=self.ventana_nuevo_curso).grid(row=0, column=1, padx=5)
+        ttk.Button(frame_btns, text="Eliminar seleccionado", command=self.eliminar_seleccionado).grid(row=0, column=2, padx=5)
         self.cargar_datos()
 
     # ----- Cargar datos -----
@@ -77,7 +85,7 @@ class CursosWindow(tk.Toplevel):
             entry = tk.Entry(win)
             entry.grid(row=i, column=1, padx=10, pady=5)
             self.entries[campo] = entry
-        tk.Button(win, text="Guardar", command=lambda: self.guardar_curso(win)).grid(row=len(campos), columnspan=2, pady=10)
+        ttk.Button(win, text="Guardar", command=lambda: self.guardar_curso(win)).grid(row=len(campos), columnspan=2, pady=10)
 
     # ----- Guardar curso -----
     def guardar_curso(self, ventana):
