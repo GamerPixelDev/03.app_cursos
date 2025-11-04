@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 from models.usuarios import autenticar_usuario
 from ui.main_window import MainWindow
+from ui.estilos import aplicar_estilo
 
 #=== Ventana de Login ===
 class LoginWindow:
     def __init__(self):
         self.root = tk.Tk()
+        aplicar_estilo()
         self.root.title("Inicio de sesión")
         self.root.geometry("300x200")
         self.root.resizable(False, False)
@@ -28,7 +30,7 @@ class LoginWindow:
         contraseña = self.entry_contraseña.get()
         valido, rol = autenticar_usuario(usuario, contraseña)
         if valido:
-            messagebox.showinfo("Acceso concedido", f"Bienvenido, {usuario}! Rol: {rol}")
+            #messagebox.showinfo("Acceso concedido", f"Bienvenido, {usuario}! Rol: {rol}")
             self.root.destroy() # Cierra la ventana de login al iniciar sesión correctamente
             MainWindow(usuario, rol) # Abre la ventana principal pasando el usuario y rol
         else:

@@ -34,6 +34,13 @@ class BuscarCursoWindow(tk.Toplevel):
         for col, texto, ancho in columnas:
             self.tree.heading(col, text=texto)
             self.tree.column(col, width=ancho)
+        #--- Barras de desplazamiento ---
+        scroll_y = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+        scroll_x = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
+        self.tree.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
+
+        scroll_y.pack(side="right", fill="y")
+        scroll_x.pack(side="bottom", fill="x")
         self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         self.transient(parent)
         self.grab_set()

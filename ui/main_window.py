@@ -1,17 +1,28 @@
 import tkinter as tk
-from tkinter import messagebox, ttk 
+import os
+from tkinter import messagebox, ttk, PhotoImage
 from ui.alumnos_window import AlumnosWindows
 from ui.cursos_window import CursosWindow
 from ui.matriculas_window import MatriculasWindow
 from ui.buscar_alumno_window import BuscarAlumnoWindow
 from ui.buscar_curso_window import BuscarCursoWindow
+from datetime import datetime
 class MainWindow:
     def __init__(self, usuario, rol):
         self.root = tk.Tk()
         self._setup_style()
-        self.root.title(f"Gestión ed Cursos - Usuario: {usuario} - Rol: {rol}")
-        self.root.geometry("800x600")
+        self.root.title(f"Gestión de Cursos - Usuario: {usuario} ({rol})")
+        self.root.geometry("1000x650")
         self.root.resizable(True, True)
+        # --- Banner superior ---
+        banner = tk.Frame(self.root, bg="#3E64FF", height=60)
+        banner.pack(fill="x", side="top")
+        titulo = tk.Label(banner, text="📘 Gestor de Cursos", bg="#3E64FF", fg="white", font=("Segoe UI", 14, "bold"))
+        titulo.pack(side="left", padx=5)
+        usuario_label = tk.Label(banner, text=f"👤 {usuario} ({rol})", bg="#3E64FF", fg="white", font=("Segoe UI", 10, "italic"))
+        usuario_label.pack(side="right", padx=20)
+        separator = ttk.Separator(self.root, orient="horizontal")
+        separator.pack(fill="x")
         #Menu principal
         menu_bar = tk.Menu(self.root)
         #Menú alumnos
@@ -20,20 +31,20 @@ class MainWindow:
         menu_alumnos.add_command(label="Buscar alumno", command=self.buscar_alumno)
         if rol == "admin":
             menu_alumnos.add_command(label="Añadir alumno", command=self.add_alumno)
-        menu_bar.add_cascade(label="Alumnos", menu=menu_alumnos)
+        menu_bar.add_cascade(label="🎓 Alumnos", menu=menu_alumnos)
         #Menú cursos
         menu_cursos = tk.Menu(menu_bar, tearoff=0)
         menu_cursos.add_command(label="Ver cursos", command=self.ver_cursos)
         menu_cursos.add_command(label="Buscar curso", command=self.buscar_curso)
         if rol == "admin":
             menu_cursos.add_command(label="Añadir curso", command=self.add_curso)
-        menu_bar.add_cascade(label="Cursos", menu=menu_cursos)
+        menu_bar.add_cascade(label="📚 Cursos", menu=menu_cursos)
         #Menú matrículas
         menu_matriculas = tk.Menu(menu_bar, tearoff=0)
         menu_matriculas.add_command(label="Ver Matrículas", command=self.ver_matriculas)
         if rol == "admin":
             menu_matriculas.add_command(label="Agregar Matrícula", command=self.add_matricula)
-        menu_bar.add_cascade(label="Matrículas", menu=menu_matriculas)
+        menu_bar.add_cascade(label="📜 Matrículas", menu=menu_matriculas)
         #Menú Consultas (Está comentando porque de momento no se va a usar este menú)
         """menu_consultas = tk.Menu(menu_bar, tearoff=0)
         menu_consultas.add_command(label="Buscar alumno", command=self.buscar_alumno)
@@ -54,6 +65,17 @@ class MainWindow:
         #Menú salir
         menu_bar.add_command(label="Salir", command=self.root.quit)
         self.root.config(menu=menu_bar)
+        #--- footer ---
+        footer = tk.Frame(self.root, bg="#E9ECEF", height=25)
+        footer.pack(fill="x", side="bottom")
+        texto_footer = tk.Label(
+            footer,
+            text=f"Versión 1.0 · {datetime.now().strftime('%d/%m/%Y %H:%M')}",
+            bg="#E9ECEF",
+            fg="#555555",
+            font=("Segoe UI", 9)
+        )
+        texto_footer.pack(side="right", padx=10)
         self.root.mainloop()
 
     def _setup_style(self):
