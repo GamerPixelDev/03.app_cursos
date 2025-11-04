@@ -79,11 +79,11 @@ class AlumnosWindows(tk.Toplevel):
         ]
         self.entries = {}
         for i, campo in enumerate(campos):
-            tk.Label(win, text=campo.capitalize()).grid(row=i, column=0, sticky="w", padx=10, pady=5)
-            entry = tk.Entry(win)
+            ttk.Label(win, text=campo.capitalize()).grid(row=i, column=0, sticky="w", padx=10, pady=5)
+            entry = ttk.Entry(win)
             entry.grid(row=i, column=1, padx=10, pady=5)
             self.entries[campo] = entry
-        tk.Button(win, text="Guardar", command=lambda: self.guardar_alumno(win)).grid(row=len(campos), columnspan=2, pady=10)
+        ttk.Button(win, text="Guardar", command=lambda: self.guardar_alumno(win)).grid(row=len(campos), columnspan=2, pady=10)
 
     #--- Guardar alumno ---
     def guardar_alumno(self, ventana):

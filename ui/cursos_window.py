@@ -74,15 +74,14 @@ class CursosWindow(tk.Toplevel):
         win = tk.Toplevel(self)
         win.title("Nuevo curso")
         win.geometry("400x400")
-
         campos = [
             "codigo_curso", "nombre", "fecha_inicio", "fecha_fin",
             "lugar", "modalidad", "horas", "responsable"
         ]
         self.entries = {}
         for i, campo in enumerate(campos):
-            tk.Label(win, text=campo.replace("_", " ").capitalize()).grid(row=i, column=0, sticky="w", padx=10, pady=5)
-            entry = tk.Entry(win)
+            ttk.Label(win, text=campo.replace("_", " ").capitalize()).grid(row=i, column=0, sticky="w", padx=10, pady=5)
+            entry = ttk.Entry(win)
             entry.grid(row=i, column=1, padx=10, pady=5)
             self.entries[campo] = entry
         ttk.Button(win, text="Guardar", command=lambda: self.guardar_curso(win)).grid(row=len(campos), columnspan=2, pady=10)
