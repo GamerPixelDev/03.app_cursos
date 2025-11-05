@@ -1,6 +1,7 @@
 import tkinter  as tk
 from tkinter import ttk, messagebox
 from models import alumnos as model
+from ui.detalle_alumno_window import DetalleAlumnoWindow
 
 class AlumnosWindows(tk.Toplevel):
     def __init__(self, parent):
@@ -15,6 +16,7 @@ class AlumnosWindows(tk.Toplevel):
         self.tree = ttk.Treeview(self, columns=("nif", "nombre", "apellidos", "localidad", "codigo_postal", "email", "telefono", "sexo", "edad", "estudios", "estado_laboral"),
                                 show="headings", height=15
                                 )
+        self.tree.bind("<Double-1>", self.ver_detalle_alumno)
         columnas = [
             ("nif", "NIF", 90),
             ("nombre", "Nombre", 100),
@@ -98,3 +100,11 @@ class AlumnosWindows(tk.Toplevel):
             self.cargar_datos()
         except Exception as e:
             messagebox.showerror("Error", str(e))
+
+    def ver_detalle_alumno(self, event):
+        selection = self.tree.selection()
+        if not selection:
+            return
+        item = self.tree.item(selection[0])
+        nif = item["values"][0] #asumiendo que la primera columna es NIF
+        DetalleAlumnoWindow(self.root, nif)
