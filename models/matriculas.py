@@ -1,5 +1,6 @@
 import sqlite3
 import os
+from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
@@ -9,9 +10,12 @@ def get_connection():
     return sqlite3.connect(DB_PATH)
 
 # --- Crear matrícula ---
-def crear_matricula(nif_alumno, codigo_curso, fecha_matricula):
+def crear_matricula(nif_alumno, codigo_curso, fecha_matricula=None):
     conn = get_connection()
     cursor = conn.cursor()
+    # Si no se indica fecha, usamos la actual
+    if fecha_matricula is None:
+        fecha_matricula = datetime.now().strftime("%Y-%m-%d")
     # comprobamos si ya existe la matrícula
     cursor.execute("""
         SELECT COUNT(*) FROM matriculas
