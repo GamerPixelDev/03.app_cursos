@@ -192,15 +192,24 @@ class MainWindow:
             return
         try:
             if tipo == "alumnos":
-                import_utils.importar_alumnos_desde_excel(ruta)
+                resumen = import_utils.importar_alumnos_desde_excel(ruta)
             elif tipo == "cursos":
-                import_utils.importar_cursos_desde_excel(ruta)
+                resumen = import_utils.importar_cursos_desde_excel(ruta)
             elif tipo == "matriculas":
-                import_utils.importar_matriculas_desde_excel(ruta)
+                resumen = import_utils.importar_matriculas_desde_excel(ruta)
             else:
                 messagebox.showwarning("Aviso", "Tipo no reconocido.")
                 return
-            messagebox.showinfo("Importación completada", f"Datos importados correctamente desde:\n{ruta}")
+            nuevos = resumen["nuevos"]
+            duplicados = resumen["duplicados"]
+            entidad = resumen["entidad"].capitalize()
+            mensaje = (
+                f"Importación de {entidad} completada.\n\n"
+                f"📥 Nuevos registros añadidos: {nuevos}\n"
+                f"⚠️ Duplicados ignorados: {duplicados}\n\n"
+                f"Origen del archivo:\n{ruta}"
+            )
+            messagebox.showinfo("Importación completada", mensaje)
         except Exception as e:
             messagebox.showerror("Error en importación", f"No se pudo importar el archivo:\n{e}")
     #--- Menú usuarios ---
