@@ -68,7 +68,7 @@ class MainWindow:
         #--- Submenú Importar
         submenu_import_matriculas = tk.Menu(menu_matriculas, tearoff=0)
         submenu_import_matriculas.add_command(label="Desde Excel", command=lambda: self.import_excel("matriculas"))
-        menu_cursos.add_cascade(label="Importar", menu=submenu_import_matriculas)
+        menu_matriculas.add_cascade(label="Importar", menu=submenu_import_matriculas)
         menu_bar.add_cascade(label="📜 Matrículas", menu=menu_matriculas)
         #Menú Consultas (Está comentando porque de momento no se va a usar este menú)
         """menu_consultas = tk.Menu(menu_bar, tearoff=0)
