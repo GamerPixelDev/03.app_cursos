@@ -7,13 +7,13 @@ class AlumnosWindows(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Gestión de alumnos")
-        self.geometry("1100x600")
+        self.geometry("1500x600")
         self.resizable(True, True)
         self.transient(parent) #La asocia visualmente a la ventana principal
         self.grab_set() # Bloquea interacción con otras ventanas hasta cerrar esta
         self.focus_set() # Trae el foco a la ventana actual
         #--- Tabla ---
-        self.tree = ttk.Treeview(self, columns=("nif", "nombre", "apellidos", "localidad", "codigo_postal", "email", "telefono", "sexo", "edad", "estudios", "estado_laboral"),
+        self.tree = ttk.Treeview(self, columns=("nif", "nombre", "apellidos", "localidad", "codigo_postal", "telefono", "email", "sexo", "edad", "estudios", "estado_laboral"),
                                 show="headings", height=15
                                 )
         self.tree.bind("<Double-1>", self.ver_detalle_alumno)
@@ -23,8 +23,8 @@ class AlumnosWindows(tk.Toplevel):
             ("apellidos", "Apellidos", 120),
             ("localidad", "Localidad", 100),
             ("codigo_postal", "CP", 60),
-            ("email", "Email", 150),
             ("telefono", "Teléfono", 100),
+            ("email", "Email", 150),
             ("sexo", "Sexo", 60),
             ("edad", "Edad", 60),
             ("estudios", "Estudios", 100),
@@ -107,4 +107,4 @@ class AlumnosWindows(tk.Toplevel):
             return
         item = self.tree.item(selection[0])
         nif = item["values"][0] #asumiendo que la primera columna es NIF
-        DetalleAlumnoWindow(self.root, nif)
+        DetalleAlumnoWindow(self, nif)
