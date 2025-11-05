@@ -5,29 +5,29 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 DB_PATH = os.path.join(ROOT_DIR, "data", "database.db")
 
-def get_conection():
+def get_connection():
     return sqlite3.connect(DB_PATH)
 
 #--- Crear curso ---
 def crear_curso(codigo_curso, nombre, fecha_inicio, fecha_fin, lugar, modalidad, horas, responsable):
-    conn = get_conection()
+    conn = get_connection()
     cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            INSERT INTO cursos (codigo_curso, nombre, fecha_inicio, fecha_fin, lugar, modalidad, horas, responsable)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (codigo_curso, nombre, fecha_inicio, fecha_fin, lugar, modalidad, horas, responsable)
-        )
-        conn.commit()
-        print(f"✅ Curso '{nombre}' añadido correctamente.")
-    except sqlite3.IntegrityError:
-        print(f"⚠️ El código de curso '{codigo_curso}' ya existe.")
-    finally:
+    # comprobamos si el código de curso ya existe
+    cursor.execute("SELECT COUNT(*) FROM cursos WHERE codigo_curso = ?", (codigo_curso,))
+    if cursor.fetchone()[0] > 0:
         conn.close()
+        return False
+    cursor.execute("""
+        INSERT INTO cursos (codigo_curso, nombre, fecha_inicio, fecha_fin, lugar, modalidad, horas, responsable)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (codigo_curso, nombre, fecha_inicio, fecha_fin, lugar, modalidad, horas, responsable))
+    conn.commit()
+    conn.close()
+    return True
 
 #--- Ontener todos los cursos ---
 def obtener_cursos():
-    conn = get_conection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM cursos ORDER BY codigo_curso DESC")
     datos = cursor.fetchall()
@@ -36,7 +36,7 @@ def obtener_cursos():
 
 #--- Eliminar curso por el código ---
 def eliminar_curso(codigo_curso):
-    conn = get_conection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM cursos WHERE codigo_curso = ?", (codigo_curso,))
     conn.commit()
@@ -45,7 +45,7 @@ def eliminar_curso(codigo_curso):
 
 #--- Actualizar curso ---
 def actualizar_curso(codigo_curso, campo, nuevo_valor):
-    conn = get_conection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(f"UPDATE cursos SET {campo} = ? WHERE codigo_curso = ?", (nuevo_valor, codigo_curso))
     conn.commit()
@@ -54,7 +54,7 @@ def actualizar_curso(codigo_curso, campo, nuevo_valor):
 
 #--- Obtener datos de un curso ---
 def obtener_datos_curso(codigo_curso):
-    conn = get_conection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         SELECT nombre, fecha_inicio, fecha_fin, lugar, modalidad, horas, responsable

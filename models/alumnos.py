@@ -15,17 +15,18 @@ def get_connection():
 def crear_alumno(nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral):
     conn = get_connection()
     cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            INSERT INTO alumnos (nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral))
-        conn.commit()
-        print(f"✅ Alumno '{nombre} {apellidos}' añadido correctamente.")
-    except sqlite3.IntegrityError:
-        print(f"⚠️ El NIF '{nif}' ya existe.")
-    finally:
+    # comprobamos si el NIF ya existe
+    cursor.execute("SELECT COUNT(*) FROM alumnos WHERE nif = ?", (nif,))
+    if cursor.fetchone()[0] > 0:
         conn.close()
+        return False  # ya existe, no insertamos
+    cursor.execute("""
+        INSERT INTO alumnos (nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral))
+    conn.commit()
+    conn.close()
+    return True
 
 #Obtener todos los alumnos
 def obtener_alumnos():

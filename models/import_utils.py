@@ -5,31 +5,45 @@ from models import alumnos, cursos, matriculas
 def importar_alumnos_desde_excel(ruta):
     wb = load_workbook(ruta)
     ws = wb.active
-    filas = list(ws.iter_rows(values_only=True))
-    encabezado = filas[0]
-    datos = filas[1:]
-    for fila in datos:
-        nif, nombre, apellidos, localidad, cod_postal, correo, telefono, sexo, edad, estudios, estado_lab = fila
-        alumnos.insertar_alumno(
-            nif, nombre, apellidos, localidad, cod_postal, correo, telefono, sexo, edad, estudios, estado_lab
-        )
+    filas = list(ws.iter_rows(values_only=True))[1:]  # saltar cabecera
+    total, duplicados = 0, 0
+    for fila in filas:
+        if not fila or not fila[0]:
+            continue
+        ok = alumnos.crear_alumno(*fila)
+        if ok:
+            total += 1
+        else:
+            duplicados += 1
+    return {"entidad": "alumnos", "nuevos": total, "duplicados": duplicados}
 
 def importar_cursos_desde_excel(ruta):
     wb = load_workbook(ruta)
     ws = wb.active
-    filas = list(ws.iter_rows(values_only=True))
-    encabezado = filas[0]
-    datos = filas[1:]
-    for fila in datos:
-        codigo, nombre, fecha_inicio, fecha_fin, lugar, modalidad, horas, responsable = fila
-        cursos.insertar_curso(codigo, nombre, fecha_inicio, fecha_fin, lugar, modalidad, horas, responsable)
+    filas = list(ws.iter_rows(values_only=True))[1:]
+    total, duplicados = 0, 0
+    for fila in filas:
+        if not fila or not fila[0]:
+            continue
+        ok = cursos.crear_curso(*fila)
+        if ok:
+            total += 1
+        else:
+            duplicados += 1
+    return {"entidad": "cursos", "nuevos": total, "duplicados": duplicados}
 
 def importar_matriculas_desde_excel(ruta):
     wb = load_workbook(ruta)
     ws = wb.active
-    filas = list(ws.iter_rows(values_only=True))
-    encabezado = filas[0]
-    datos = filas[1:]
-    for fila in datos:
-        nif_alumno, codigo_curso = fila[:2]
-        matriculas.guardar_matricula(nif_alumno, codigo_curso)
+    filas = list(ws.iter_rows(values_only=True))[1:]
+    total, duplicados = 0, 0
+    for fila in filas:
+        if not fila or not fila[0]:
+            continue
+        ok = matriculas.crear_matricula(*fila[:2])
+        if ok:
+            total += 1
+        else:
+            duplicados += 1
+    return {"entidad": "matrículas", "nuevos": total, "duplicados": duplicados}
+

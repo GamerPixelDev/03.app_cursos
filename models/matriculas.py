@@ -12,19 +12,18 @@ def get_connection():
 def crear_matricula(nif_alumno, codigo_curso, fecha_matricula):
     conn = get_connection()
     cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            INSERT INTO matriculas (nif_alumno, codigo_curso, fecha_matricula)
-            VALUES (?, ?, ?)
-        """, (nif_alumno, codigo_curso, fecha_matricula))
-        conn.commit()
-        print(f"✅ Matrícula creada: alumno {nif_alumno} → curso {codigo_curso}")
-        return True
-    except sqlite3.IntegrityError:
-        print("⚠️ Error: posible duplicado o datos inválidos.")
-        return False
-    finally:
+    # comprobamos si ya existe la matrícula
+    cursor.execute("""
+        SELECT COUNT(*) FROM matriculas
+        WHERE nif_alumno = ? AND codigo_curso = ?
+    """, (nif_alumno, codigo_curso))
+    if cursor.fetchone()[0] > 0:
         conn.close()
+        return False
+    cursor.execute("INSERT INTO matriculas (nif_alumno, codigo_curso) VALUES (?, ?)", (nif_alumno, codigo_curso))
+    conn.commit()
+    conn.close()
+    return True
 
 # --- Obtener todas las matrículas (con JOINs para mostrar nombres) ---
 def obtener_matriculas():
