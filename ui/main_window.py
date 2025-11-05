@@ -32,6 +32,10 @@ class MainWindow:
         menu_alumnos.add_command(label="Buscar alumno", command=self.buscar_alumno)
         if rol == "admin":
             menu_alumnos.add_command(label="Añadir alumno", command=self.add_alumno)
+        submenu_export_alumnos = tk.Menu(menu_alumnos, tearoff=0)
+        submenu_export_alumnos.add_command(label="A Excel", command=lambda: self.export_excel("alumnos"))
+        submenu_export_alumnos.add_command(label="A PDF", command=lambda: self.export_pdf("alumnos"))
+        menu_alumnos.add_cascade(label="Exportar", menu=submenu_export_alumnos)
         menu_bar.add_cascade(label="🎓 Alumnos", menu=menu_alumnos)
         #Menú cursos
         menu_cursos = tk.Menu(menu_bar, tearoff=0)
@@ -39,25 +43,30 @@ class MainWindow:
         menu_cursos.add_command(label="Buscar curso", command=self.buscar_curso)
         if rol == "admin":
             menu_cursos.add_command(label="Añadir curso", command=self.add_curso)
+        submenu_export_cursos = tk.Menu(menu_cursos, tearoff=0)
+        submenu_export_cursos.add_command(label="A Excel", command=lambda: self.export_excel("cursos"))
+        submenu_export_cursos.add_command(label="A PDF", command=lambda: self.export_pdf("cursos"))
+        menu_cursos.add_cascade(label="Exportar", menu=submenu_export_cursos)
         menu_bar.add_cascade(label="📚 Cursos", menu=menu_cursos)
         #Menú matrículas
         menu_matriculas = tk.Menu(menu_bar, tearoff=0)
         menu_matriculas.add_command(label="Ver Matrículas", command=self.ver_matriculas)
         if rol == "admin":
             menu_matriculas.add_command(label="Agregar Matrícula", command=self.add_matricula)
+        submenu_export_matriculas = tk.Menu(menu_matriculas, tearoff=0)
+        submenu_export_matriculas.add_command(label="A Excel", command=lambda: self.export_excel("matriculas"))
+        submenu_export_matriculas.add_command(label="A PDF", command=lambda: self.export_pdf("matriculas"))
+        menu_matriculas.add_cascade(label="Exportar", menu=submenu_export_matriculas)
         menu_bar.add_cascade(label="📜 Matrículas", menu=menu_matriculas)
         #Menú Consultas (Está comentando porque de momento no se va a usar este menú)
         """menu_consultas = tk.Menu(menu_bar, tearoff=0)
         menu_consultas.add_command(label="Buscar alumno", command=self.buscar_alumno)
         menu_bar.add_cascade(label="Consultas", menu=menu_consultas)"""
-        #Menú Exportar / Importar
-        menu_export = tk.Menu(menu_bar, tearoff=0)
-        menu_export.add_command(label="Exportar a Excel", command=self.export_excel)
-        menu_export.add_command(label="Exportar a PDF", command=self.export_pdf)
+        #Menú Importar (sólo admin)
         if rol == "admin":
-            menu_export.add_separator()
-            menu_export.add_command(label="Importar desde Excel", command=self.import_excel)
-        menu_bar.add_cascade(label="Exportar / Importar", menu=menu_export)
+            menu_import = tk.Menu(menu_bar, tearoff=0)
+            menu_import.add_command(label="Importar desde Excel", command=self.import_excel)
+            menu_bar.add_cascade(label="Exportar / Importar", menu=menu_import)
         #Menu usuarios (sólo admin)
         if rol == "admin":
             menu_usuarios = tk.Menu(menu_bar, tearoff=0)
@@ -134,25 +143,30 @@ class MainWindow:
         MatriculasWindow(self.root)
     def add_matricula(self): messagebox.showinfo("Matrículas", "Agregar Matrícula (admin)") #Se puede comentar porque no se usa de momento
     #--- Menú Exportar/Importar ---
-    def export_excel(self):
+    def export_excel(self, tipo):
         try:
-            ruta = export_utils.exportar_alumnos_excel()
+            if tipo == "alumnos":
+                ruta = export_utils.exportar_alumnos_excel()
+            elif tipo == "cursos":
+                ruta = export_utils.exportar_cursos_excel()
+            elif tipo == "matriculas":
+                ruta = export_utils.exportar_matriculas_excel()
+            else:
+                messagebox.showwarning("Aviso", "Tipo no reconocido.")
+                return
             messagebox.showinfo("Exportar a Excel", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
             messagebox.showerror("Error al exportar", f"No se pudo generar el Excel:\n{e}")
-    def export_pdf(self):
-        opcion = simpledialog.askstring("Exportar PDF", "¿Qué desea exportar? (alumnos / cursos / matriculas)")
-        if not opcion:
-            return
+    def export_pdf(self, tipo):
         try:
-            if opcion.lower() == "alumnos":
+            if tipo == "alumnos":
                 ruta = export_pdf.exportar_alumnos_pdf()
-            elif opcion.lower() == "cursos":
+            elif tipo == "cursos":
                 ruta = export_pdf.exportar_cursos_pdf()
-            elif opcion.lower() == "matriculas":
+            elif tipo == "matriculas":
                 ruta = export_pdf.exportar_matriculas_pdf()
             else:
-                messagebox.showwarning("Aviso", "Opción no válida.")
+                messagebox.showwarning("Aviso", "Tipo no reconocido.")
                 return
             messagebox.showinfo("Exportar a PDF", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
