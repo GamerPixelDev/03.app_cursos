@@ -55,8 +55,10 @@ class AlumnosWindows(tk.Toplevel):
         for row in self.tree.get_children():
             self.tree.delete(row)
         alumnos = model.obtener_alumnos()
-        for alumno in alumnos:
-            self.tree.insert("", tk.END, values=alumno)
+        for a in alumnos:
+            # Orden correcto: nif, nombre, apellidos, localidad, codigo_postal, telefono, email, sexo, edad, estudios, estado_laboral
+            self.tree.insert("", tk.END, values=a)
+        self.update_idletasks()
         self.ajustar_columnas()
 
     #--- Eliminar alumno seleccionado ---
@@ -79,7 +81,7 @@ class AlumnosWindows(tk.Toplevel):
         win.geometry("400x550")
         campos = [
             "nif", "nombre", "apellidos", "localidad", "codigo_postal",
-            "email", "telefono", "sexo", "edad", "estudios", "estado_laboral"
+            "telefono", "email", "sexo", "edad", "estudios", "estado_laboral"
         ]
         self.entries = {}
         for i, campo in enumerate(campos):
@@ -113,15 +115,19 @@ class AlumnosWindows(tk.Toplevel):
 
     #--- Ajustar columnas ---
     def ajustar_columnas(self):
-        #Ajusta automáticamente el ancho de cada columna al contenido
-        font = tkfont.Font()  # Fuente actual del Treeview
+        """Ajusta cada columna al texto más largo (encabezado o celdas)."""
+        self.update_idletasks()
+        font = tkfont.nametofont(self.tree.cget("font"))
         for col in self.tree["columns"]:
-            # Calcula el ancho máximo entre cabecera y celdas
-            max_len = font.measure(col)
-            for item in self.tree.get_children():
-                text = str(self.tree.set(item, col))
-                ancho = font.measure(text)
-                if ancho > max_len:
-                    max_len = ancho
-            # Añadimos un pequeño margen visual
-            self.tree.column(col, width=max_len + 20)
+            header_text = self.tree.heading(col)["text"]
+            max_width = font.measure(header_text)
+            for item_id in self.tree.get_children():
+                text = str(self.tree.set(item_id, col))
+                w = font.measure(text)
+                if w > max_width:
+                    max_width = w
+            self.tree.column(col, width=max_width + 25)
+
+
+
+

@@ -12,7 +12,7 @@ def get_connection():
     return conn
 
 #Crear alumno
-def crear_alumno(nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral):
+def crear_alumno(nif, nombre, apellidos, localidad, codigo_postal, telefono, email, sexo, edad, estudios, estado_laboral):
     conn = get_connection()
     cursor = conn.cursor()
     # comprobamos si el NIF ya existe
@@ -21,9 +21,9 @@ def crear_alumno(nif, nombre, apellidos, localidad, codigo_postal, email, telefo
         conn.close()
         return False  # ya existe, no insertamos
     cursor.execute("""
-        INSERT INTO alumnos (nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral)
+        INSERT INTO alumnos (nif, nombre, apellidos, localidad, codigo_postal, telefono, email, sexo, edad, estudios, estado_laboral)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (nif, nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral))
+    """, (nif, nombre, apellidos, localidad, codigo_postal, telefono, email, sexo, edad, estudios, estado_laboral))
     conn.commit()
     conn.close()
     return True
@@ -60,7 +60,7 @@ def obtener_datos_alumno(nif):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT nombre, apellidos, localidad, codigo_postal, email, telefono, sexo, edad, estudios, estado_laboral
+        SELECT nombre, apellidos, localidad, codigo_postal, telefono, email, sexo, edad, estudios, estado_laboral
         FROM alumnos
         WHERE nif = ?
     """, (nif,))

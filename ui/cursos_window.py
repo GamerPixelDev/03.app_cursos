@@ -1,7 +1,7 @@
 import tkinter as tk
+import tkinter.font as tkfont
 from tkinter import ttk, messagebox
 from models import cursos as model
-
 
 class CursosWindow(tk.Toplevel):
     def __init__(self, parent):
@@ -55,6 +55,7 @@ class CursosWindow(tk.Toplevel):
         cursos = model.obtener_cursos()
         for curso in cursos:
             self.tree.insert("", tk.END, values=curso)
+            self.ajustar_columnas()
 
     # ----- Eliminar curso -----
     def eliminar_seleccionado(self):
@@ -99,3 +100,25 @@ class CursosWindow(tk.Toplevel):
             self.cargar_datos()
         except Exception as e:
             messagebox.showerror("Error", str(e))
+
+    #--- Ajustar columnas ---
+    def ajustar_columnas(self):
+        #Ajusta automáticamente el ancho de cada columna al contenido
+        font = tkfont.Font()
+        # Reiniciamos los anchos a un mínimo para permitir que se reduzcan
+        for col in self.tree["columns"]:
+            self.tree.column(col, width=10)
+        for col in self.tree["columns"]:
+            # Calculamos el ancho del encabezado
+            max_len = font.measure(self.tree.heading(col)["text"])
+            # Calculamos el ancho máximo entre celdas
+            for item in self.tree.get_children():
+                texto = str(self.tree.set(item, col))
+                ancho = font.measure(texto)
+                if ancho > max_len:
+                    max_len = ancho
+            # Márgenes personalizados
+            extra = 18
+            if col in ("email", "estudios", "nombre", "lugar", "responsable"):
+                extra = 50
+        self.tree.column(col, width=max_len + extra)
