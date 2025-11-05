@@ -183,7 +183,7 @@ def exportar_matriculas_pdf():
     elementos.append(titulo)
     elementos.append(fecha)
     elementos.append(Spacer(1, 12))
-    columnas = ["ID", "NIF Alumno", "Nombre Alumno", "Curso", "Código Curso", "Estado"]
+    columnas = ["NIF", "Nombre Alumno", "Código Curso", "Curso", "Fecha Insc."]
     cell_style = ParagraphStyle('CellStyle', fontName='Helvetica', fontSize=8, leading=10, alignment=0)
     tabla_datos = [columnas]
     for fila in datos:
