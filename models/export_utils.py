@@ -40,7 +40,7 @@ def exportar_alumnos_excel():
 
 #=== CURSOS ===
 def exportar_cursos_excel():
-    datos = cursos.obtenercursos()
+    datos = cursos.obtener_cursos()
     if not datos:
         raise ValueError("No hay cursos para exportar.")
     wb = Workbook()
@@ -76,7 +76,7 @@ def exportar_matriculas_excel():
     ws = wb.active
     ws.title = "Matrículas"
     columnas = [
-        "NIF", "Nombre Alumno", "Código Curso", "Curso"
+        "NIF", "Nombre Alumno", "Código Curso", "Curso", "Fecha Insc."
     ]
     ws.append(columnas)
     for col in ws[1]:
