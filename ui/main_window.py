@@ -7,7 +7,7 @@ from ui.matriculas_window import MatriculasWindow
 from ui.buscar_alumno_window import BuscarAlumnoWindow
 from ui.buscar_curso_window import BuscarCursoWindow
 from datetime import datetime
-from models import export_utils
+from models import export_utils, export_pdf
 class MainWindow:
     def __init__(self, usuario, rol):
         self.root = tk.Tk()
@@ -140,7 +140,12 @@ class MainWindow:
             messagebox.showinfo("Exportar a Excel", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
             messagebox.showerror("Error al exportar", f"No se pudo generar el Excel:\n{e}")
-    def export_pdf(self): messagebox.showinfo("Exportar", "Exportar a PDF")
+    def export_pdf(self):
+        try:
+            ruta = export_pdf.exportar_alumnos_pdf()
+            messagebox.showinfo("Exportar a PDF", f"Archivo generado correctamente:\n{ruta}")
+        except Exception as e:
+            messagebox.showerror("Error al exportar", f"No se pudo generar el PDF:\n{e}")
     def import_excel(self): messagebox.showinfo("Importar", "Importar desde Excel (admin)")
     #--- Menú usuarios ---
     def manage_users(self): messagebox.showinfo("Usuarios", "Gestión de Usuarios (admin)")
