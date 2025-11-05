@@ -1,4 +1,5 @@
 import tkinter  as tk
+import tkinter.font as tkfont
 from tkinter import ttk, messagebox
 from models import alumnos as model
 from ui.detalle_alumno_window import DetalleAlumnoWindow
@@ -56,6 +57,7 @@ class AlumnosWindows(tk.Toplevel):
         alumnos = model.obtener_alumnos()
         for alumno in alumnos:
             self.tree.insert("", tk.END, values=alumno)
+        self.ajustar_columnas()
 
     #--- Eliminar alumno seleccionado ---
     def eliminar_seleccionado(self):
@@ -108,3 +110,18 @@ class AlumnosWindows(tk.Toplevel):
         item = self.tree.item(selection[0])
         nif = item["values"][0] #asumiendo que la primera columna es NIF
         DetalleAlumnoWindow(self, nif)
+
+    #--- Ajustar columnas ---
+    def ajustar_columnas(self):
+        #Ajusta automáticamente el ancho de cada columna al contenido
+        font = tkfont.Font()  # Fuente actual del Treeview
+        for col in self.tree["columns"]:
+            # Calcula el ancho máximo entre cabecera y celdas
+            max_len = font.measure(col)
+            for item in self.tree.get_children():
+                text = str(self.tree.set(item, col))
+                ancho = font.measure(text)
+                if ancho > max_len:
+                    max_len = ancho
+            # Añadimos un pequeño margen visual
+            self.tree.column(col, width=max_len + 20)
