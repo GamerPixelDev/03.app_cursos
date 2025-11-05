@@ -1,6 +1,6 @@
 import tkinter as tk
 import os
-from tkinter import messagebox, ttk, PhotoImage
+from tkinter import messagebox, ttk, simpledialog
 from ui.alumnos_window import AlumnosWindows
 from ui.cursos_window import CursosWindow
 from ui.matriculas_window import MatriculasWindow
@@ -141,8 +141,19 @@ class MainWindow:
         except Exception as e:
             messagebox.showerror("Error al exportar", f"No se pudo generar el Excel:\n{e}")
     def export_pdf(self):
+        opcion = simpledialog.askstring("Exportar PDF", "¿Qué desea exportar? (alumnos / cursos / matriculas)")
+        if not opcion:
+            return
         try:
-            ruta = export_pdf.exportar_alumnos_pdf()
+            if opcion.lower() == "alumnos":
+                ruta = export_pdf.exportar_alumnos_pdf()
+            elif opcion.lower() == "cursos":
+                ruta = export_pdf.exportar_cursos_pdf()
+            elif opcion.lower() == "matriculas":
+                ruta = export_pdf.exportar_matriculas_pdf()
+            else:
+                messagebox.showwarning("Aviso", "Opción no válida.")
+                return
             messagebox.showinfo("Exportar a PDF", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
             messagebox.showerror("Error al exportar", f"No se pudo generar el PDF:\n{e}")
