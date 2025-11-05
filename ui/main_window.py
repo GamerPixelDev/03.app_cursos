@@ -7,6 +7,7 @@ from ui.matriculas_window import MatriculasWindow
 from ui.buscar_alumno_window import BuscarAlumnoWindow
 from ui.buscar_curso_window import BuscarCursoWindow
 from datetime import datetime
+from models import export_utils
 class MainWindow:
     def __init__(self, usuario, rol):
         self.root = tk.Tk()
@@ -133,7 +134,12 @@ class MainWindow:
         MatriculasWindow(self.root)
     def add_matricula(self): messagebox.showinfo("Matrículas", "Agregar Matrícula (admin)") #Se puede comentar porque no se usa de momento
     #--- Menú Exportar/Importar ---
-    def export_excel(self): messagebox.showinfo("Exportar", "Exportar a Excel")
+    def export_excel(self):
+        try:
+            ruta = export_utils.exportar_alumnos_excel()
+            messagebox.showinfo("Exportar a Excel", f"Archivo generado correctamente:\n{ruta}")
+        except Exception as e:
+            messagebox.showerror("Error al exportar", f"No se pudo generar el Excel:\n{e}")
     def export_pdf(self): messagebox.showinfo("Exportar", "Exportar a PDF")
     def import_excel(self): messagebox.showinfo("Importar", "Importar desde Excel (admin)")
     #--- Menú usuarios ---
