@@ -7,7 +7,7 @@ from ui.matriculas_window import MatriculasWindow
 from ui.buscar_alumno_window import BuscarAlumnoWindow
 from ui.buscar_curso_window import BuscarCursoWindow
 from datetime import datetime
-from models import export_utils, export_pdf
+from models import export_utils, export_pdf, import_utils
 class MainWindow:
     def __init__(self, usuario, rol):
         self.root = tk.Tk()
@@ -26,37 +26,49 @@ class MainWindow:
         separator.pack(fill="x")
         #Menu principal
         menu_bar = tk.Menu(self.root)
-        #Menú alumnos
+        #=== Menú alumnos ===
         menu_alumnos = tk.Menu(menu_bar, tearoff=0)
         menu_alumnos.add_command(label="Ver alumnos", command=self.ver_alumnos)
         menu_alumnos.add_command(label="Buscar alumno", command=self.buscar_alumno)
-        if rol == "admin":
-            menu_alumnos.add_command(label="Añadir alumno", command=self.add_alumno)
+        menu_alumnos.add_command(label="Añadir alumno", command=self.add_alumno)
+        #--- Submenú Exportar ---
         submenu_export_alumnos = tk.Menu(menu_alumnos, tearoff=0)
         submenu_export_alumnos.add_command(label="Excel", command=lambda: self.export_excel("alumnos"))
         submenu_export_alumnos.add_command(label="PDF", command=lambda: self.export_pdf("alumnos"))
         menu_alumnos.add_cascade(label="Exportar", menu=submenu_export_alumnos)
+        #--- Submenú Importar ---
+        submenu_import_alumnos = tk.Menu(menu_alumnos, tearoff=0)
+        submenu_import_alumnos.add_command(label="Desde Excel", command=lambda: self.import_excel("alumnos"))
+        menu_alumnos.add_cascade(label="Importar", menu=submenu_import_alumnos)
         menu_bar.add_cascade(label="🎓 Alumnos", menu=menu_alumnos)
-        #Menú cursos
+        #=== Menú cursos ===
         menu_cursos = tk.Menu(menu_bar, tearoff=0)
         menu_cursos.add_command(label="Ver cursos", command=self.ver_cursos)
         menu_cursos.add_command(label="Buscar curso", command=self.buscar_curso)
-        if rol == "admin":
-            menu_cursos.add_command(label="Añadir curso", command=self.add_curso)
+        menu_cursos.add_command(label="Añadir curso", command=self.add_curso)
+        #--- Submenú Exportar ---
         submenu_export_cursos = tk.Menu(menu_cursos, tearoff=0)
         submenu_export_cursos.add_command(label="Excel", command=lambda: self.export_excel("cursos"))
         submenu_export_cursos.add_command(label="PDF", command=lambda: self.export_pdf("cursos"))
         menu_cursos.add_cascade(label="Exportar", menu=submenu_export_cursos)
+        #--- Submenú Importar ---
+        submenu_import_cursos = tk.Menu(menu_cursos, tearoff=0)
+        submenu_import_cursos.add_command(label="Desde Excel", command=lambda: self.import_excel("cursos"))
+        menu_cursos.add_cascade(label="Importar", menu=submenu_import_cursos)
         menu_bar.add_cascade(label="📚 Cursos", menu=menu_cursos)
-        #Menú matrículas
+        #=== Menú matrículas ===
         menu_matriculas = tk.Menu(menu_bar, tearoff=0)
         menu_matriculas.add_command(label="Ver Matrículas", command=self.ver_matriculas)
-        if rol == "admin":
-            menu_matriculas.add_command(label="Agregar Matrícula", command=self.add_matricula)
+        menu_matriculas.add_command(label="Agregar Matrícula", command=self.add_matricula)
+        #--- Submenú Exportar ---
         submenu_export_matriculas = tk.Menu(menu_matriculas, tearoff=0)
         submenu_export_matriculas.add_command(label="Excel", command=lambda: self.export_excel("matriculas"))
         submenu_export_matriculas.add_command(label="PDF", command=lambda: self.export_pdf("matriculas"))
         menu_matriculas.add_cascade(label="Exportar", menu=submenu_export_matriculas)
+        #--- Submenú Importar
+        submenu_import_matriculas = tk.Menu(menu_matriculas, tearoff=0)
+        submenu_import_matriculas.add_command(label="Desde Excel", command=lambda: self.import_excel("matriculas"))
+        menu_cursos.add_cascade(label="Importar", menu=submenu_import_matriculas)
         menu_bar.add_cascade(label="📜 Matrículas", menu=menu_matriculas)
         #Menú Consultas (Está comentando porque de momento no se va a usar este menú)
         """menu_consultas = tk.Menu(menu_bar, tearoff=0)
@@ -171,6 +183,25 @@ class MainWindow:
             messagebox.showinfo("Exportar a PDF", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
             messagebox.showerror("Error al exportar", f"No se pudo generar el PDF:\n{e}")
-    def import_excel(self): messagebox.showinfo("Importar", "Importar desde Excel (admin)")
+    def import_excel(self, tipo):
+        ruta = filedialog.askopenfilename(
+            title="Seleccionar archivo Excel",
+            filetypes=[("Archivos Excel", "*.xlsx")]
+        )
+        if not ruta:
+            return
+        try:
+            if tipo == "alumnos":
+                import_utils.importar_alumnos_desde_excel(ruta)
+            elif tipo == "cursos":
+                import_utils.importar_cursos_desde_excel(ruta)
+            elif tipo == "matriculas":
+                import_utils.importar_matriculas_desde_excel(ruta)
+            else:
+                messagebox.showwarning("Aviso", "Tipo no reconocido.")
+                return
+            messagebox.showinfo("Importación completada", f"Datos importados correctamente desde:\n{ruta}")
+        except Exception as e:
+            messagebox.showerror("Error en importación", f"No se pudo importar el archivo:\n{e}")
     #--- Menú usuarios ---
     def manage_users(self): messagebox.showinfo("Usuarios", "Gestión de Usuarios (admin)")
