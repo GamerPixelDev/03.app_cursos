@@ -19,21 +19,24 @@ class AlumnosWindows(tk.Toplevel):
                                 )
         self.tree.bind("<Double-1>", self.ver_detalle_alumno)
         columnas = [
-            ("nif", "NIF", 90),
+            ("nif", "NIF", 40),
             ("nombre", "Nombre", 100),
             ("apellidos", "Apellidos", 120),
             ("localidad", "Localidad", 100),
-            ("codigo_postal", "CP", 60),
-            ("telefono", "Teléfono", 100),
+            ("codigo_postal", "CP", 20),
+            ("telefono", "Teléfono", 60),
             ("email", "Email", 150),
-            ("sexo", "Sexo", 60),
-            ("edad", "Edad", 60),
+            ("sexo", "Sexo", 5),
+            ("edad", "Edad", 5),
             ("estudios", "Estudios", 100),
-            ("estado_laboral", "Estado laboral", 120)
+            ("estado_laboral", "Estado laboral", 30)
         ]
         for col, texto, ancho in columnas:
             self.tree.heading(col, text=texto)
-            self.tree.column(col, width=ancho)
+            if col in ("nif", "codigo_postal", "telefono", "sexo", "edad"):  # centrados
+                self.tree.column(col, width=ancho, anchor="center")
+            else:
+                self.tree.column(col, width=ancho)
         #--- Barras de desplazamiento ---
         scroll_y = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
         scroll_x = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
@@ -114,18 +117,18 @@ class AlumnosWindows(tk.Toplevel):
 
     #--- Ajustar columnas ---
     def ajustar_columnas(self):
-        """Ajusta cada columna al texto más largo (encabezado o celdas)."""
-        self.update_idletasks()
+        self.update_idletasks()  # asegura pintado real
         font = tkfont.nametofont(self.tree.cget("font"))
         for col in self.tree["columns"]:
-            header_text = self.tree.heading(col)["text"]
-            max_width = font.measure(header_text)
-            for item_id in self.tree.get_children():
-                text = str(self.tree.set(item_id, col))
-                w = font.measure(text)
-                if w > max_width:
-                    max_width = w
-            self.tree.column(col, width=max_width + 25)
+            header = self.tree.heading(col)["text"]
+            max_w = font.measure(header)
+            for iid in self.tree.get_children():
+                txt = str(self.tree.set(iid, col))
+                w = font.measure(txt)
+                if w > max_w:
+                    max_w = w
+            #self.tree.column(col, width=max_w + 25)  # margen
+
 
 
 
