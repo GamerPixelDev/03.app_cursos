@@ -16,7 +16,7 @@ def exportar_alumnos_excel():
     # Encabezados
     columnas = [
         "NIF", "Nombre", "Apellidos", "Localidad", "Código Postal",
-        "Email", "Teléfono", "Sexo", "Edad", "Estudios", "Estado Laboral"
+        "Teléfono", "Email", "Sexo", "Edad", "Estudios", "Estado Laboral"
     ]
     ws.append(columnas)
     # Estilos de encabezado

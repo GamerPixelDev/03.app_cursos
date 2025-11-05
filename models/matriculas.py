@@ -86,8 +86,8 @@ def obtener_alumnos_por_curso(codigo_curso):
         SELECT 
             a.nif,
             a.nombre || ' ' || a.apellidos AS alumno,
-            a.email,
             a.telefono,
+            a.email,
             CASE 
                 WHEN date(c.fecha_fin) < date('now') THEN 'Finalizado'
                 WHEN date(c.fecha_inicio) > date('now') THEN 'Pendiente'

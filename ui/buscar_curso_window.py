@@ -22,13 +22,13 @@ class BuscarCursoWindow(tk.Toplevel):
         self.label_info = tk.Label(self.frame_info, text="", justify="left", anchor="w")
         self.label_info.pack(fill="x")
         # --- Tabla de alumnos ---
-        self.tree = ttk.Treeview(self, columns=("nif", "alumno", "email", "telefono", "estado"),
+        self.tree = ttk.Treeview(self, columns=("nif", "alumno", "telefono", "email", "estado"),
                                     show="headings", height=15)
         columnas = [
             ("nif", "NIF", 100),
             ("alumno", "Alumno", 200),
-            ("email", "Correo", 200),
-            ("telefono", "Teléfono", 100),
+            ("telefono", "Teléfono", 200),
+            ("email", "Email", 100),
             ("estado", "Estado del curso", 120)
         ]
         for col, texto, ancho in columnas:

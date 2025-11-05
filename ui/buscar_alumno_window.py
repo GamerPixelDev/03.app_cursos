@@ -59,11 +59,11 @@ class BuscarAlumnoWindow(tk.Toplevel):
         if not datos_alumno:
             messagebox.showinfo("Resultado", "No se encontró ningún alumno con ese NIF.")
             return
-        nombre, apellidos, localidad, codigo_postal, correo, telefono, sexo, edad, estudios, estado_laboral = datos_alumno
+        nombre, apellidos, localidad, codigo_postal, telefono, email, sexo, edad, estudios, estado_laboral = datos_alumno
         texto_info = (
             f"Nombre: {nombre} {apellidos}\n"
             f"Localidad: {localidad} ({codigo_postal})\n"
-            f"Correo: {correo} | Tel: {telefono}\n"
+            f"Email: {email} | Tel: {telefono}\n"
             f"Sexo: {sexo} | Edad: {edad}\n"
             f"Estudios: {estudios}\n"
             f"Estado laboral: {estado_laboral}"

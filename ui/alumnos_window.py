@@ -58,7 +58,6 @@ class AlumnosWindows(tk.Toplevel):
         for a in alumnos:
             # Orden correcto: nif, nombre, apellidos, localidad, codigo_postal, telefono, email, sexo, edad, estudios, estado_laboral
             self.tree.insert("", tk.END, values=a)
-        self.update_idletasks()
         self.ajustar_columnas()
 
     #--- Eliminar alumno seleccionado ---
