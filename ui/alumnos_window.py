@@ -95,19 +95,45 @@ class AlumnosWindows(tk.Toplevel):
     # === Ventana para añadir alumno ===
     def ventana_nuevo_alumno(self):
         win = tk.Toplevel(self)
-        win.title("Nuevo alumno")
-        win.geometry("400x550")
+        win.title("➕ Nuevo alumno")
+        win.geometry("420x560")
+        win.resizable(False, False)
+        win.configure(bg=self.bg_color)
+        win.transient(self)
+        win.grab_set()
+        # === Encabezado ===
+        tk.Label(
+            win,
+            text="Registro de nuevo alumno",
+            font=("Segoe UI", 12, "bold"),
+            fg="#3E64FF",
+            bg=self.bg_color
+        ).pack(pady=(10, 15))
+        # === Contenedor principal ===
+        frame = tk.Frame(win, bg=self.bg_color)
+        frame.pack(padx=15, pady=10, fill="both", expand=True)
         campos = [
+            "NIF", "Nombre", "Apellidos", "Localidad", "Código postal",
+            "Teléfono", "Email", "Sexo", "Edad", "Estudios", "Estado laboral"
+        ]
+        claves = [
             "nif", "nombre", "apellidos", "localidad", "codigo_postal",
             "telefono", "email", "sexo", "edad", "estudios", "estado_laboral"
         ]
         self.entries = {}
-        for i, campo in enumerate(campos):
-            ttk.Label(win, text=campo.capitalize()).grid(row=i, column=0, sticky="w", padx=10, pady=5)
-            entry = ttk.Entry(win)
-            entry.grid(row=i, column=1, padx=10, pady=5)
-            self.entries[campo] = entry
-        ttk.Button(win, text="Guardar", command=lambda: self.guardar_alumno(win)).grid(row=len(campos), columnspan=2, pady=10)
+        for i, (label, clave) in enumerate(zip(campos, claves)):
+            ttk.Label(frame, text=label + ":", background=self.bg_color).grid(
+                row=i, column=0, sticky="w", padx=5, pady=5
+            )
+            entry = ttk.Entry(frame, width=28)
+            entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
+            self.entries[clave] = entry
+        # === Botón de guardar ===
+        ttk.Button(
+            win,
+            text="💾 Guardar alumno",
+            command=lambda: self.guardar_alumno(win)
+        ).pack(pady=(15, 10))
 
     # === Guardar alumno ===
     def guardar_alumno(self, ventana):
