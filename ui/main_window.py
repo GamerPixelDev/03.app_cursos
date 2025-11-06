@@ -115,19 +115,19 @@ class MainWindow:
     #=== Métodos placeholder para las funcionalidades del menú ===
     #--- Menu alumnos ---
     def ver_alumnos(self):
-        AlumnosWindows(self.root)
+        AlumnosWindows(self.root, self.modo)
     def buscar_alumno(self):
-        BuscarAlumnoWindow(self.root)
+        BuscarAlumnoWindow(self.root, self.modo)
     def add_alumno(self): messagebox.showinfo("Alumnos", "Agregar Alumno (admin)") #Se puede comentar porque no se usa de momento
     #--- Menú cursos ---
     def ver_cursos(self):
-        CursosWindow(self.root)
+        CursosWindow(self.root, self.modo)
     def buscar_curso(self):
-        BuscarCursoWindow(self.root)
+        BuscarCursoWindow(self.root, self.modo)
     def add_curso(self): messagebox.showinfo("Cursos", "Agregar Curso (admin)") #Se puede comentar porque no se usa de momento
     #--- Menú matrículas ---
     def ver_matriculas(self):
-        MatriculasWindow(self.root)
+        MatriculasWindow(self.root, self.modo)
     def add_matricula(self): messagebox.showinfo("Matrículas", "Agregar Matrícula (admin)") #Se puede comentar porque no se usa de momento
     #--- Menú Exportar/Importar ---
     def export_excel(self, tipo):

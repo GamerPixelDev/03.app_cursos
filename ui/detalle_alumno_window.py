@@ -1,9 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
 from models import matriculas, alumnos
+from ui.utils_style import aplicar_estilo_global
 
 class DetalleAlumnoWindow:
-    def __init__(self, master, nif):
+    def __init__(self, master, nif, modo="claro"):
+        self.style, self.bg_color = aplicar_estilo_global(modo)
+        self.configure(bg=self.bg_color)
         self.top = tk.Toplevel(master)
         self.top.title(f"Cursos de alumno {nif}")
         self.top.geometry("750x450")

@@ -2,11 +2,14 @@ import tkinter as tk
 import tkinter.font as tkfont
 from tkinter import ttk, messagebox
 from models import cursos as model
+from ui.utils_style import aplicar_estilo_global
 from ui.utils_treeview import auto_ajustar_columnas
 
 class CursosWindow(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, modo="claro"):
         super().__init__(parent)
+        self.style, self.bg_color = aplicar_estilo_global(modo)
+        self.configure(bg=self.bg_color)
         self.title("Gestión de cursos")
         self.geometry("1100x600")
         self.resizable(True, True)

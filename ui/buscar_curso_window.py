@@ -1,12 +1,15 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+from ui.utils_style import aplicar_estilo_global
 from models import matriculas as model
 from models import cursos
 
 
 class BuscarCursoWindow(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, modo="claro"):
         super().__init__(parent)
+        self.style, self.bg_color = aplicar_estilo_global(modo)
+        self.configure(bg=self.bg_color)
         self.title("Buscar curso")
         self.geometry("850x450")
         # --- Campo de búsqueda ---
