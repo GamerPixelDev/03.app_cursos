@@ -1,48 +1,71 @@
 import sqlite3
-import bcrypt # Asegúrate de tener bcrypt instalado: pip install bcrypt
+import bcrypt
 import os
 
-#=== CONEXIÓN A LA BASE DE DATOS ===
+# === CONEXIÓN A LA BASE DE DATOS ===
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
-DB_PATH = os.path.join(ROOT_DIR, "data", "database.db") # Ruta absoluta a la base de datos
+DB_PATH = os.path.join(ROOT_DIR, "data", "database.db")
 
 def get_connection():
-    return sqlite3.connect(DB_PATH) #Devuelve una conexión a la base de datos
+    return sqlite3.connect(DB_PATH)
 
-#=== FUNCIÓN PARA CREAR UN NUEVO USUARIO ===
-def crear_usuario(nombre, contraseña, rol):
+# === Crear hash seguro ===
+def _hash_password(contrasena: str) -> bytes:
+    return bcrypt.hashpw(contrasena.encode("utf-8"), bcrypt.gensalt())
+
+# === Crear usuario ===
+def crear_usuario(usuario, contrasena, rol):
     conn = get_connection()
-    cursor = conn.cursor()
-    #Ciframos la contraseña antes de guardarla
-    hashed = bcrypt.hashpw(contraseña.encode('utf-8'), bcrypt.gensalt())
+    cur = conn.cursor()
+    hashed = _hash_password(contrasena)
     try:
-        cursor.execute("INSERT INTO usuarios (nombre, contraseña, rol) VALUES (?, ?, ?)", (nombre, hashed, rol))
+        cur.execute(
+            "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (?, ?, ?)",
+            (usuario, hashed, rol)
+        )
         conn.commit()
-        print(f"Usuario '{nombre}' creado correctamente.")
+        print(f"✅ Usuario '{usuario}' creado correctamente ({rol}).")
     except sqlite3.IntegrityError:
-        print(f"Error: El usuario '{nombre}' ya existe.")
+        print(f"⚠️  El usuario '{usuario}' ya existe.")
     finally:
         conn.close()
 
-#=== FUNCIÓN PARA AUTENTICAR UN USUARIO ===
-def autenticar_usuario(nombre, contraseña):
-    #COmprobamos si el usuario y la contraseña son correctos
+# === Autenticar usuario (login) ===
+def autenticar_usuario(usuario, contrasena):
     conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT contraseña, rol FROM usuarios WHERE nombre = ?", (nombre,))
-    result = cursor.fetchone()
+    cur = conn.cursor()
+    cur.execute("SELECT contrasena, rol FROM usuarios WHERE usuario = ?", (usuario,))
+    fila = cur.fetchone()
     conn.close()
-    if result:
-        hashed, rol = result
-        if bcrypt.checkpw(contraseña.encode('utf-8'), hashed):
-            return True, rol
+    if fila:
+        hashed, rol = fila
+        try:
+            if bcrypt.checkpw(contrasena.encode("utf-8"), hashed):
+                return True, rol
+        except Exception:
+            pass
     return False, None
 
-#=== CREAR USUARIO ADMIN POR DEFECTO SI NO EXISTE ===
-def iniciar_admin():
-    crear_usuario("admin", "admin123", "admin")
+# === Verificar contraseña actual (para MiCuentaWindow) ===
+def verificar_contrasena(usuario, contrasena):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT contrasena FROM usuarios WHERE usuario = ?", (usuario,))
+    fila = cur.fetchone()
+    conn.close()
+    return fila and bcrypt.checkpw(contrasena.encode("utf-8"), fila[0])
 
+# === Cambiar contraseña ===
+def cambiar_contrasena(usuario, nueva_contrasena):
+    conn = get_connection()
+    cur = conn.cursor()
+    hashed = _hash_password(nueva_contrasena)
+    cur.execute("UPDATE usuarios SET contrasena = ? WHERE usuario = ?", (hashed, usuario))
+    conn.commit()
+    conn.close()
+
+# === Obtener usuarios (para ventana admin/GOD) ===
 def obtener_usuarios():
     conn = get_connection()
     cur = conn.cursor()
@@ -51,6 +74,7 @@ def obtener_usuarios():
     conn.close()
     return usuarios
 
+# === Eliminar usuario ===
 def eliminar_usuario(usuario):
     conn = get_connection()
     cur = conn.cursor()
@@ -58,21 +82,19 @@ def eliminar_usuario(usuario):
     conn.commit()
     conn.close()
 
-def cambiar_contrasena(usuario, nueva_contrasena):
+# === Crear admin por defecto si no existe ===
+def iniciar_admin():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("UPDATE usuarios SET contrasena = ? WHERE usuario = ?", (nueva_contrasena, usuario))
-    conn.commit()
+    cur.execute("SELECT 1 FROM usuarios WHERE usuario = 'admin'")
+    existe = cur.fetchone()
     conn.close()
+    if not existe:
+        crear_usuario("admin", "admin123", "admin")
+        print("🛠️  Usuario 'admin' creado (contraseña: admin123)")
+    else:
+        print("Admin ya existe, no se recrea.")
 
-def verificar_contrasena(usuario, contrasena):
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT contrasena FROM usuarios WHERE usuario = ?", (usuario,))
-    fila = cur.fetchone()
-    conn.close()
-    return fila and fila[0] == contrasena
-
-#=== EJECUCIÓN INICIAL ===
+# === Ejecución directa ===
 if __name__ == "__main__":
     iniciar_admin()
