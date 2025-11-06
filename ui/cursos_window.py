@@ -4,10 +4,12 @@ from tkinter import ttk, messagebox
 from models import cursos as model
 from ui.utils_style import aplicar_estilo_global
 from ui.utils_treeview import auto_ajustar_columnas
+from ui.detalle_curso_window import DetalleCursoWindow
 
 class CursosWindow(tk.Toplevel):
     def __init__(self, parent, modo="claro"):
         super().__init__(parent)
+        self.modo = modo
         self.style, self.bg_color = aplicar_estilo_global(modo)
         self.configure(bg=self.bg_color)
         self.title("Gestión de cursos")
@@ -22,6 +24,7 @@ class CursosWindow(tk.Toplevel):
             "lugar", "modalidad", "horas", "responsable"),
             show="headings", height=15
         )
+        self.tree.bind("<Double-1>", self.ver_detalle_curso)
         columnas = [
             ("codigo_curso", "Código", 100),
             ("nombre", "Nombre", 160),
@@ -107,3 +110,12 @@ class CursosWindow(tk.Toplevel):
             self.cargar_datos()
         except Exception as e:
             messagebox.showerror("Error", str(e))
+
+    #--- Detalles de curso ---
+    def ver_detalle_curso(self, event):
+        selection = self.tree.selection()
+        if not selection:
+            return
+        item = self.tree.item(selection[0])
+        codigo_curso = item["values"][0]  # o el índice donde esté el código
+        DetalleCursoWindow(self, codigo_curso, modo=self.modo)
