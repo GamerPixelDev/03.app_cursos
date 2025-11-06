@@ -8,6 +8,7 @@ from ui.matriculas_window import MatriculasWindow
 from ui.buscar_alumno_window import BuscarAlumnoWindow
 from ui.buscar_curso_window import BuscarCursoWindow
 from ui.usuarios_window import UsuariosWindow
+from ui.mi_cuenta_window import MiCuentaWindow
 from datetime import datetime
 from models import export_utils, export_pdf, import_utils
 
@@ -115,6 +116,15 @@ class MainWindow:
         submenu_import_matriculas.add_command(label="Desde Excel", command=lambda: self.import_excel("matriculas"))
         menu_matriculas.add_cascade(label="Importar", menu=submenu_import_matriculas)
         menu_bar.add_cascade(label="📜 Matrículas", menu=menu_matriculas)
+        #=== Menú Cuenta ===
+        menu_cuenta = tk.Menu(menu_bar, tearoff=0)
+        if self.rol == "usuario":
+            menu_cuenta.add_command(label="Cambiar contraseña", command=self.mi_cuenta)
+        elif self.rol == "admin":
+            menu_cuenta.add_command(label="Gestionar usuarios", command=self.manage_users)
+        elif self.rol == "god":
+            menu_cuenta.add_command(label="Gestión completa de usuarios", command=self.manage_users)
+        menu_bar.add_cascade(label="👤 Cuenta", menu=menu_cuenta)        
         # === Usuarios (solo admin) ===
         if self.rol == "admin":
             menu_usuarios = tk.Menu(menu_bar, tearoff=0)
@@ -122,9 +132,7 @@ class MainWindow:
             menu_bar.add_cascade(label="👥 Usuarios", menu=menu_usuarios)
         # === Salir ===
         menu_bar.add_command(label="Salir", command=self.root.quit)
-
         self.root.config(menu=menu_bar)
-
     # -------------------------------------------------
     # Footer
     # -------------------------------------------------
@@ -138,7 +146,6 @@ class MainWindow:
             fg="#555555",
             font=("Segoe UI", 9)
         ).pack(side="right", padx=10)
-
     # -------------------------------------------------
     # Métodos de acción
     # -------------------------------------------------
@@ -218,6 +225,10 @@ class MainWindow:
     # Gestión de usuarios
     # -------------------------------------------------
     def manage_users(self): UsuariosWindow(self.root, self.modo, rol_actual=self.rol)
+    # -------------------------------------------------
+    # Cuenta
+    # -------------------------------------------------
+    def mi_cuenta(self): MiCuentaWindow(self.root, self.usuario, self.modo)
     # -------------------------------------------------
     # Tema claro / oscuro
     # -------------------------------------------------

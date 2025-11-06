@@ -65,6 +65,14 @@ def cambiar_contrasena(usuario, nueva_contrasena):
     conn.commit()
     conn.close()
 
+def verificar_contrasena(usuario, contrasena):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT contrasena FROM usuarios WHERE usuario = ?", (usuario,))
+    fila = cur.fetchone()
+    conn.close()
+    return fila and fila[0] == contrasena
+
 #=== EJECUCIÓN INICIAL ===
 if __name__ == "__main__":
     iniciar_admin()
