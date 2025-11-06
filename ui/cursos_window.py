@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.font as tkfont
 from tkinter import ttk, messagebox
 from models import cursos as model
+from ui.utils_treeview import auto_ajustar_columnas
 
 class CursosWindow(tk.Toplevel):
     def __init__(self, parent):
@@ -58,7 +59,7 @@ class CursosWindow(tk.Toplevel):
         cursos = model.obtener_cursos()
         for curso in cursos:
             self.tree.insert("", tk.END, values=curso)
-        self.ajustar_columnas()
+        auto_ajustar_columnas(self.tree)
 
     # ----- Eliminar curso -----
     def eliminar_seleccionado(self):
@@ -103,19 +104,3 @@ class CursosWindow(tk.Toplevel):
             self.cargar_datos()
         except Exception as e:
             messagebox.showerror("Error", str(e))
-
-    #--- Ajustar columnas ---
-    def ajustar_columnas(self):
-        """Ajusta cada columna al texto más largo y bloquea el estiramiento."""
-        self.update_idletasks()
-        font = tkfont.Font()
-        for col in self.tree["columns"]:
-            header_text = self.tree.heading(col)["text"]
-            max_width = font.measure(header_text)
-            for item_id in self.tree.get_children():
-                text = str(self.tree.set(item_id, col))
-                w = font.measure(text)
-                if w > max_width:
-                    max_width = w
-            self.tree.column(col, width=max_width + 25, stretch=False)
-        self.update_idletasks()

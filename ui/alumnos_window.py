@@ -3,6 +3,7 @@ import tkinter.font as tkfont
 from tkinter import ttk, messagebox
 from models import alumnos as model
 from ui.detalle_alumno_window import DetalleAlumnoWindow
+from ui.utils_treeview import auto_ajustar_columnas
 
 class AlumnosWindows(tk.Toplevel):
     def __init__(self, parent):
@@ -61,7 +62,7 @@ class AlumnosWindows(tk.Toplevel):
         for a in alumnos:
             # Orden correcto: nif, nombre, apellidos, localidad, codigo_postal, telefono, email, sexo, edad, estudios, estado_laboral
             self.tree.insert("", tk.END, values=a)
-        self.ajustar_columnas()
+        auto_ajustar_columnas(self.tree)
 
     #--- Eliminar alumno seleccionado ---
     def eliminar_seleccionado(self):
@@ -114,42 +115,6 @@ class AlumnosWindows(tk.Toplevel):
         item = self.tree.item(selection[0])
         nif = item["values"][0] #asumiendo que la primera columna es NIF
         DetalleAlumnoWindow(self, nif)
-
-    def ajustar_columnas(self):
-        """Ajusta cada columna al texto más largo y fuerza el repintado."""
-        self.update_idletasks()
-        font = tkfont.Font()
-        for col in self.tree["columns"]:
-            header_text = self.tree.heading(col)["text"]
-            max_width = font.measure(header_text)
-            for item_id in self.tree.get_children():
-                text = str(self.tree.set(item_id, col))
-                w = font.measure(text)
-                if w > max_width:
-                    max_width = w
-            # Aplica ancho y bloquea estiramiento
-            self.tree.column(col, width=max_width + 10, stretch=False)
-        # Fuerza redibujo tras aplicar todos los anchos
-        self.update_idletasks()
-
-    #=== Funcion usada para comprobar que anchos se dibujaban al mostrar alumnos ===
-    def ajustar_columnas_debug(self):
-        """Versión de depuración: muestra por consola las medidas."""
-        self.update_idletasks()
-        font = tkfont.Font()
-        print("=== Ajuste de columnas ===")
-        for col in self.tree["columns"]:
-            header_text = self.tree.heading(col)["text"]
-            max_width = font.measure(header_text)
-            print(f"Encabezado {header_text}: {max_width}px")
-            for item_id in self.tree.get_children():
-                text = str(self.tree.set(item_id, col))
-                w = font.measure(text)
-                if w > max_width:
-                    max_width = w
-            print(f"  -> Máx. {col}: {max_width}px")
-            self.tree.column(col, width=max_width + 25)
-        print("=== Fin de ajuste ===")
 
 
 

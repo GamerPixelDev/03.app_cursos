@@ -4,6 +4,7 @@ from tkinter import ttk, messagebox
 from models import matriculas as model
 from models import alumnos, cursos
 from datetime import datetime
+from ui.utils_treeview import auto_ajustar_columnas
 
 class MatriculasWindow(tk.Toplevel):
     def __init__(self, parent):
@@ -18,7 +19,7 @@ class MatriculasWindow(tk.Toplevel):
         self.tree = ttk.Treeview(self, columns=("nif", "alumno","codigo_curso", "curso", "fecha"), show="headings", height=15)
         self.tree.heading("nif", text="NIF")
         self.tree.heading("alumno", text="Alumno")
-        self.tree.heading("codigo_curso", text="Código curso")
+        self.tree.heading("codigo_curso", text="Código")
         self.tree.heading("curso", text="Curso")
         self.tree.heading("fecha", text="Fecha matrícula")
         self.tree.column("nif", width=100)
@@ -29,7 +30,7 @@ class MatriculasWindow(tk.Toplevel):
         columnas = [
             ("nif", "NIF Alumno", 100),
             ("alumno", "Alumno", 150),
-            ("codigo_curso", "Código Curso", 120),
+            ("codigo_curso", "Código", 120),
             ("curso", "Curso", 180),
             ("fecha", "Fecha Matrícula", 120)
         ]
@@ -56,7 +57,7 @@ class MatriculasWindow(tk.Toplevel):
         matriculas = model.obtener_matriculas()
         for m in matriculas:
             self.tree.insert("", tk.END, values=m)
-        self.ajustar_columnas()
+        auto_ajustar_columnas(self.tree)
 
     # ----- Eliminar matrícula -----
     def eliminar_seleccionada(self):
@@ -114,19 +115,3 @@ class MatriculasWindow(tk.Toplevel):
             messagebox.showinfo("Éxito", "Matrícula creada correctamente.")
             ventana.destroy()
             self.cargar_datos()"""
-        
-    def ajustar_columnas(self):
-        """Ajusta cada columna al texto más largo y bloquea el estiramiento."""
-        self.update_idletasks()
-        font = tkfont.Font()
-        for col in self.tree["columns"]:
-            header_text = self.tree.heading(col)["text"]
-            max_width = font.measure(header_text)
-            for item_id in self.tree.get_children():
-                text = str(self.tree.set(item_id, col))
-                w = font.measure(text)
-                if w > max_width:
-                    max_width = w
-            # Desactiva stretch y añade margen visual
-            self.tree.column(col, width=max_width + 25, stretch=False)
-        self.update_idletasks()
