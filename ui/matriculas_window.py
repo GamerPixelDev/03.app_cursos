@@ -74,7 +74,6 @@ class MatriculasWindow(tk.Toplevel):
             messagebox.showwarning("Aviso", "Selecciona una matrícula para eliminar.")
             return
         matricula = self.tree.item(item, "values")
-
         nif = matricula[0]
         codigo_curso = matricula[2]
         confirmar = messagebox.askyesno(
@@ -88,28 +87,54 @@ class MatriculasWindow(tk.Toplevel):
     # === Ventana nueva matrícula ===
     def ventana_nueva_matricula(self):
         win = tk.Toplevel(self)
-        win.title("Nueva matrícula")
-        win.geometry("420x250")
+        win.title("➕ Nueva matrícula")
+        win.geometry("420x320")
+        win.resizable(False, False)
+        win.configure(bg=self.bg_color)
+        win.transient(self)
+        win.grab_set()
 
-        ttk.Label(win, text="Alumno:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        alumnos_lista = alumnos.obtener_alumnos()
+        # === Encabezado ===
+        tk.Label(
+            win,
+            text="Registro de nueva matrícula",
+            font=("Segoe UI", 12, "bold"),
+            fg="#3E64FF",
+            bg=self.bg_color
+        ).pack(pady=(10, 15))
+        # === Contenedor principal ===
+        frame = tk.Frame(win, bg=self.bg_color)
+        frame.pack(padx=15, pady=10, fill="both", expand=True)
+        # --- Campo Alumno ---
+        ttk.Label(frame, text="Alumno:", background=self.bg_color).grid(
+            row=0, column=0, sticky="w", padx=5, pady=5
+        )
+        alumno = alumnos.obtener_alumnos()
         self.combo_alumnos = ttk.Combobox(
-            win,
-            values=[f"{a[0]} - {a[1]} {a[2]}" for a in alumnos_lista],
-            width=35
+            frame,
+            values=[f"{a[0]} - {a[1]} {a[2]}" for a in alumno],
+            width=35,
+            state="readonly"
         )
-        self.combo_alumnos.grid(row=0, column=1, padx=10, pady=5)
-
-        ttk.Label(win, text="Curso:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
-        cursos_lista = cursos.obtener_cursos()
+        self.combo_alumnos.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+        # --- Campo Curso ---
+        ttk.Label(frame, text="Curso:", background=self.bg_color).grid(
+            row=1, column=0, sticky="w", padx=5, pady=5
+        )
+        curso = cursos.obtener_cursos()
         self.combo_cursos = ttk.Combobox(
-            win,
-            values=[f"{c[0]} - {c[1]}" for c in cursos_lista],  # nombre en lugar de fecha
-            width=35
+            frame,
+            values=[f"{c[0]} - {c[2]}" for c in curso],
+            width=35,
+            state="readonly"
         )
-        self.combo_cursos.grid(row=1, column=1, padx=10, pady=5)
-
-        ttk.Button(win, text="Guardar", command=lambda: self.guardar_matricula(win)).grid(row=3, columnspan=2, pady=20)
+        self.combo_cursos.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+        # --- Botón de guardar ---
+        ttk.Button(
+            win,
+            text="💾 Guardar matrícula",
+            command=lambda: self.guardar_matricula(win)
+        ).pack(pady=(25, 10))
 
     # === Guardar matrícula ===
     def guardar_matricula(self, ventana):
