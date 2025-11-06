@@ -13,34 +13,39 @@ from ui.god_panel_window import GodPanelWindow
 from datetime import datetime
 from models import export_utils, export_pdf, import_utils
 
+
 class MainWindow:
     def __init__(self, usuario, rol):
-        # === Configuración inicial ===
         self.root = tk.Tk()
         self.usuario = usuario
         self.rol = rol
-        self.modo = "claro"  # modo por defecto
-        # === Estilo global ===
+        self.modo = "claro"
+
+        # === Estilo ===
         self.style, self.bg_color = aplicar_estilo_global(self.modo)
         self.root.configure(bg=self.bg_color)
         self.root.title(f"Gestión de Cursos - Usuario: {usuario} ({rol})")
         self.root.geometry("1100x700")
         self.root.resizable(True, True)
-        # === Banner superior ===
+
+        # === Banner ===
         self._crear_banner_superior()
-        # === Menú principal ===
+        # === Menús ===
         self._crear_menus()
         # === Separador ===
         ttk.Separator(self.root, orient="horizontal").pack(fill="x")
         # === Footer ===
         self._crear_footer()
+
         self.root.mainloop()
+
     # -------------------------------------------------
     # Banner superior
     # -------------------------------------------------
     def _crear_banner_superior(self):
         banner = tk.Frame(self.root, bg="#3E64FF", height=60)
         banner.pack(fill="x", side="top")
+
         # Título
         tk.Label(
             banner,
@@ -49,6 +54,7 @@ class MainWindow:
             fg="white",
             font=("Segoe UI", 14, "bold")
         ).pack(side="left", padx=10)
+
         # Usuario
         tk.Label(
             banner,
@@ -57,84 +63,85 @@ class MainWindow:
             fg="white",
             font=("Segoe UI", 10, "italic")
         ).pack(side="right", padx=15)
-        # Botón cambio modo (🌞 / 🌙)
-        self.icon_modo = tk.Label(
-            banner,
-            text="🌞",
-            bg="#3E64FF",
-            fg="white",
-            font=("Segoe UI", 16)
-        )
+
+        # Botón modo claro/oscuro
+        self.icon_modo = tk.Label(banner, text="🌞", bg="#3E64FF", fg="white", font=("Segoe UI", 16))
         self.icon_modo.pack(side="right", padx=10)
         self.icon_modo.bind("<Button-1>", self.toggle_modo)
         self.icon_modo.config(cursor="hand2")
+
     # -------------------------------------------------
-    # Menús
+    # Menús principales
     # -------------------------------------------------
     def _crear_menus(self):
         menu_bar = tk.Menu(self.root)
-        # === Alumnos ===
+
+        # === ALUMNOS ===
         menu_alumnos = tk.Menu(menu_bar, tearoff=0)
         menu_alumnos.add_command(label="Ver alumnos", command=self.ver_alumnos)
         menu_alumnos.add_command(label="Buscar alumno", command=self.buscar_alumno)
-        menu_alumnos.add_command(label="Añadir alumno", command=self.add_alumno)
-        # Submenú Exportar
+
         submenu_export_alumnos = tk.Menu(menu_alumnos, tearoff=0)
         submenu_export_alumnos.add_command(label="Excel", command=lambda: self.export_excel("alumnos"))
         submenu_export_alumnos.add_command(label="PDF", command=lambda: self.export_pdf("alumnos"))
         menu_alumnos.add_cascade(label="Exportar", menu=submenu_export_alumnos)
-        # Submenú Importar
+
         submenu_import_alumnos = tk.Menu(menu_alumnos, tearoff=0)
         submenu_import_alumnos.add_command(label="Desde Excel", command=lambda: self.import_excel("alumnos"))
         menu_alumnos.add_cascade(label="Importar", menu=submenu_import_alumnos)
+
         menu_bar.add_cascade(label="🎓 Alumnos", menu=menu_alumnos)
-        # === Cursos ===
+
+        # === CURSOS ===
         menu_cursos = tk.Menu(menu_bar, tearoff=0)
         menu_cursos.add_command(label="Ver cursos", command=self.ver_cursos)
         menu_cursos.add_command(label="Buscar curso", command=self.buscar_curso)
-        menu_cursos.add_command(label="Añadir curso", command=self.add_curso)
-        # Submenú Exportar
+
         submenu_export_cursos = tk.Menu(menu_cursos, tearoff=0)
         submenu_export_cursos.add_command(label="Excel", command=lambda: self.export_excel("cursos"))
         submenu_export_cursos.add_command(label="PDF", command=lambda: self.export_pdf("cursos"))
         menu_cursos.add_cascade(label="Exportar", menu=submenu_export_cursos)
-        # Submenú Importar
+
         submenu_import_cursos = tk.Menu(menu_cursos, tearoff=0)
         submenu_import_cursos.add_command(label="Desde Excel", command=lambda: self.import_excel("cursos"))
         menu_cursos.add_cascade(label="Importar", menu=submenu_import_cursos)
+
         menu_bar.add_cascade(label="📚 Cursos", menu=menu_cursos)
-        # === Matrículas ===
+
+        # === MATRÍCULAS ===
         menu_matriculas = tk.Menu(menu_bar, tearoff=0)
-        menu_matriculas.add_command(label="Ver Matrículas", command=self.ver_matriculas)
-        menu_matriculas.add_command(label="Agregar Matrícula", command=self.add_matricula)
-        # Submenú Exportar
+        menu_matriculas.add_command(label="Ver matrículas", command=self.ver_matriculas)
+
         submenu_export_matriculas = tk.Menu(menu_matriculas, tearoff=0)
         submenu_export_matriculas.add_command(label="Excel", command=lambda: self.export_excel("matriculas"))
         submenu_export_matriculas.add_command(label="PDF", command=lambda: self.export_pdf("matriculas"))
         menu_matriculas.add_cascade(label="Exportar", menu=submenu_export_matriculas)
-        # Submenú Importar
+
         submenu_import_matriculas = tk.Menu(menu_matriculas, tearoff=0)
         submenu_import_matriculas.add_command(label="Desde Excel", command=lambda: self.import_excel("matriculas"))
         menu_matriculas.add_cascade(label="Importar", menu=submenu_import_matriculas)
+
         menu_bar.add_cascade(label="📜 Matrículas", menu=menu_matriculas)
-        #=== Menú Cuenta ===
+
+        # === USUARIOS / CUENTA ===
         menu_usuarios = tk.Menu(menu_bar, tearoff=0)
-        if self.rol in ("admin", "god", "usuario"):
-            menu_usuarios = tk.Menu(menu_bar, tearoff=0)
-            menu_usuarios.add_command(label="Mi cuenta", command=self.mi_cuenta)
+        menu_usuarios.add_command(label="Mi cuenta", command=self.mi_cuenta)
+
         if self.rol in ("admin", "god"):
+            menu_usuarios.add_separator()
             menu_usuarios.add_command(label="Gestionar usuarios", command=self.gestion_usuarios)
+
         if self.rol == "god":
+            menu_usuarios.add_separator()
             menu_usuarios.add_command(label="Panel GOD", command=self.panel_god)
-        menu_bar.add_cascade(label="Usuarios", menu=menu_usuarios)        
-        # === Usuarios (solo admin) ===
-        if self.rol == "admin":
-            menu_usuarios = tk.Menu(menu_bar, tearoff=0)
-            menu_usuarios.add_command(label="Gestionar Usuarios", command=self.manage_users)
-            menu_bar.add_cascade(label="👥 Usuarios", menu=menu_usuarios)
-        # === Salir ===
+
+        menu_bar.add_cascade(label="👥 Usuarios", menu=menu_usuarios)
+
+        # === SALIR ===
         menu_bar.add_command(label="Salir", command=self.root.quit)
+
         self.root.config(menu=menu_bar)
+
     # -------------------------------------------------
     # Footer
     # -------------------------------------------------
@@ -148,19 +155,21 @@ class MainWindow:
             fg="#555555",
             font=("Segoe UI", 9)
         ).pack(side="right", padx=10)
+
     # -------------------------------------------------
     # Métodos de acción
     # -------------------------------------------------
     def ver_alumnos(self): AlumnosWindows(self.root, self.modo)
     def buscar_alumno(self): BuscarAlumnoWindow(self.root, self.modo)
-    def add_alumno(self): messagebox.showinfo("Alumnos", "Agregar Alumno (admin)")
-
     def ver_cursos(self): CursosWindow(self.root, self.modo)
     def buscar_curso(self): BuscarCursoWindow(self.root, self.modo)
-    def add_curso(self): messagebox.showinfo("Cursos", "Agregar Curso (admin)")
-
     def ver_matriculas(self): MatriculasWindow(self.root, self.modo)
-    def add_matricula(self): messagebox.showinfo("Matrículas", "Agregar Matrícula (admin)")
+
+    # --- Usuarios / Roles ---
+    def mi_cuenta(self): MiCuentaWindow(self.root, self.usuario, self.modo)
+    def gestion_usuarios(self): UsuariosWindow(self.root, self.modo, rol_actual=self.rol)
+    def panel_god(self): GodPanelWindow(self.root, self.modo)
+
     # -------------------------------------------------
     # Exportar / Importar
     # -------------------------------------------------
@@ -171,13 +180,10 @@ class MainWindow:
                 "cursos": export_utils.exportar_cursos_excel,
                 "matriculas": export_utils.exportar_matriculas_excel
             }
-            if tipo in rutas:
-                ruta = rutas[tipo]()
-                messagebox.showinfo("Exportar a Excel", f"Archivo generado correctamente:\n{ruta}")
-            else:
-                messagebox.showwarning("Aviso", "Tipo no reconocido.")
+            ruta = rutas[tipo]()
+            messagebox.showinfo("Exportar a Excel", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
-            messagebox.showerror("Error al exportar", f"No se pudo generar el Excel:\n{e}")
+            messagebox.showerror("Error al exportar", str(e))
 
     def export_pdf(self, tipo):
         try:
@@ -186,19 +192,13 @@ class MainWindow:
                 "cursos": export_pdf.exportar_cursos_pdf,
                 "matriculas": export_pdf.exportar_matriculas_pdf
             }
-            if tipo in rutas:
-                ruta = rutas[tipo]()
-                messagebox.showinfo("Exportar a PDF", f"Archivo generado correctamente:\n{ruta}")
-            else:
-                messagebox.showwarning("Aviso", "Tipo no reconocido.")
+            ruta = rutas[tipo]()
+            messagebox.showinfo("Exportar a PDF", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
-            messagebox.showerror("Error al exportar", f"No se pudo generar el PDF:\n{e}")
+            messagebox.showerror("Error al exportar", str(e))
 
     def import_excel(self, tipo):
-        ruta = filedialog.askopenfilename(
-            title="Seleccionar archivo Excel",
-            filetypes=[("Archivos Excel", "*.xlsx")]
-        )
+        ruta = filedialog.askopenfilename(title="Seleccionar archivo Excel", filetypes=[("Archivos Excel", "*.xlsx")])
         if not ruta:
             return
         try:
@@ -207,33 +207,19 @@ class MainWindow:
                 "cursos": import_utils.importar_cursos_desde_excel,
                 "matriculas": import_utils.importar_matriculas_desde_excel
             }
-            if tipo in funciones:
-                resumen = funciones[tipo](ruta)
-                nuevos = resumen["nuevos"]
-                duplicados = resumen["duplicados"]
-                entidad = resumen["entidad"].capitalize()
-                mensaje = (
-                    f"Importación de {entidad} completada.\n\n"
-                    f"📥 Nuevos registros añadidos: {nuevos}\n"
-                    f"⚠️ Duplicados ignorados: {duplicados}\n\n"
-                    f"Origen del archivo:\n{ruta}"
-                )
-                messagebox.showinfo("Importación completada", mensaje)
-            else:
-                messagebox.showwarning("Aviso", "Tipo no reconocido.")
+            resumen = funciones[tipo](ruta)
+            mensaje = (
+                f"Importación completada.\n\n"
+                f"📥 Nuevos: {resumen['nuevos']}\n"
+                f"⚠️ Duplicados: {resumen['duplicados']}\n\n"
+                f"Origen: {ruta}"
+            )
+            messagebox.showinfo("Importación completada", mensaje)
         except Exception as e:
-            messagebox.showerror("Error en importación", f"No se pudo importar el archivo:\n{e}")
+            messagebox.showerror("Error en importación", str(e))
+
     # -------------------------------------------------
-    # Cuentas
-    # -------------------------------------------------
-    #--- Usuarios ---
-    def mi_cuenta(self): MiCuentaWindow(self.root, self.usuario, self.modo)
-    #--- Admins ---
-    def manage_users(self): UsuariosWindow(self.root, self.modo, rol_actual=self.rol)
-    #--- GOD ---
-    def panel_god(self): GodPanelWindow(self.root, self.modo)
-    # -------------------------------------------------
-    # Tema claro / oscuro
+    # Modo claro / oscuro
     # -------------------------------------------------
     def toggle_modo(self, event=None):
         self.modo = "oscuro" if self.modo == "claro" else "claro"
