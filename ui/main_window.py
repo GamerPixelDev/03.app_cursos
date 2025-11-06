@@ -9,7 +9,7 @@ from ui.buscar_alumno_window import BuscarAlumnoWindow
 from ui.buscar_curso_window import BuscarCursoWindow
 from ui.usuarios_window import UsuariosWindow
 from ui.mi_cuenta_window import MiCuentaWindow
-from ui.panel_god_window import PanelGodWindow
+from ui.god_panel_window import GodPanelWindow
 from datetime import datetime
 from models import export_utils, export_pdf, import_utils
 
@@ -231,7 +231,7 @@ class MainWindow:
     #--- Admins ---
     def manage_users(self): UsuariosWindow(self.root, self.modo, rol_actual=self.rol)
     #--- GOD ---
-    def panel_god(self): PanelGodWindow(self.root, self.modo)
+    def panel_god(self): GodPanelWindow(self.root, self.modo)
     # -------------------------------------------------
     # Tema claro / oscuro
     # -------------------------------------------------
