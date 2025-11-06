@@ -3,7 +3,7 @@ import tkinter.font as tkfont
 from tkinter import ttk, messagebox
 from models import cursos as model
 from ui.utils_style import aplicar_estilo_global
-from ui.utils_treeview import auto_ajustar_columnas
+from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 from ui.detalle_curso_window import DetalleCursoWindow
 
 class CursosWindow(tk.Toplevel):
@@ -45,10 +45,8 @@ class CursosWindow(tk.Toplevel):
         scroll_y = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
         scroll_x = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
         self.tree.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
-
         scroll_y.pack(side="right", fill="y")
         scroll_x.pack(side="bottom", fill="x")
-
         self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         # ----- Botones -----
         frame_btns = tk.Frame(self)
@@ -66,6 +64,7 @@ class CursosWindow(tk.Toplevel):
         for curso in cursos:
             self.tree.insert("", tk.END, values=curso)
         auto_ajustar_columnas(self.tree)
+        ajustar_tamano_ventana(self.tree, self)
 
     # ----- Eliminar curso -----
     def eliminar_seleccionado(self):

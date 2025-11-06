@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from models import matriculas, alumnos
 from ui.utils_style import aplicar_estilo_global
-from ui.utils_treeview import auto_ajustar_columnas  # si ya tienes esta utilidad
+from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 
 class DetalleAlumnoWindow(tk.Toplevel):
     def __init__(self, parent, nif, modo="claro"):
@@ -60,7 +60,8 @@ class DetalleAlumnoWindow(tk.Toplevel):
             if cursos:
                 for c in cursos:
                     self.tree.insert("", "end", values=c)
-                auto_ajustar_columnas(self.tree)  # si tienes la función común
+                auto_ajustar_columnas(self.tree)
+                ajustar_tamano_ventana(self.tree, self)
             else:
                 messagebox.showinfo("Sin cursos", "Este alumno no tiene matrículas registradas.")
         except Exception as e:

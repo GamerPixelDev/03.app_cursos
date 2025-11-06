@@ -5,7 +5,7 @@ from models import matriculas as model
 from models import alumnos, cursos
 from datetime import datetime
 from ui.utils_style import aplicar_estilo_global
-from ui.utils_treeview import auto_ajustar_columnas
+from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 
 class MatriculasWindow(tk.Toplevel):
     def __init__(self, parent, modo="claro"):
@@ -61,6 +61,7 @@ class MatriculasWindow(tk.Toplevel):
         for m in matriculas:
             self.tree.insert("", tk.END, values=m)
         auto_ajustar_columnas(self.tree)
+        ajustar_tamano_ventana(self.tree, self)
 
     # ----- Eliminar matrícula -----
     def eliminar_seleccionada(self):

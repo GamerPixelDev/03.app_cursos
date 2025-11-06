@@ -4,7 +4,7 @@ from tkinter import ttk, messagebox
 from models import alumnos as model
 from ui.detalle_alumno_window import DetalleAlumnoWindow
 from ui.utils_style import aplicar_estilo_global
-from ui.utils_treeview import auto_ajustar_columnas
+from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 
 class AlumnosWindows(tk.Toplevel):
     def __init__(self, parent, modo="claro"):
@@ -66,6 +66,7 @@ class AlumnosWindows(tk.Toplevel):
             # Orden correcto: nif, nombre, apellidos, localidad, codigo_postal, telefono, email, sexo, edad, estudios, estado_laboral
             self.tree.insert("", tk.END, values=a)
         auto_ajustar_columnas(self.tree)
+        ajustar_tamano_ventana(self.tree, self)    
 
     #--- Eliminar alumno seleccionado ---
     def eliminar_seleccionado(self):

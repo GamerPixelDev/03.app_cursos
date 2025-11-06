@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from models import matriculas, cursos
 from ui.utils_style import aplicar_estilo_global
-from ui.utils_treeview import auto_ajustar_columnas  # misma función que usas en alumnos
+from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 
 class DetalleCursoWindow(tk.Toplevel):
     def __init__(self, parent, codigo_curso, modo="claro"):
@@ -42,7 +42,6 @@ class DetalleCursoWindow(tk.Toplevel):
             bg=self.bg_color
         )
         sublabel.pack(pady=(0, 6))
-
         # === Contador de alumnos (ahora debajo del detalle del curso) ===
         try:
             alumnos_curso = matriculas.obtener_alumnos_por_curso(codigo_curso)
@@ -94,9 +93,12 @@ class DetalleCursoWindow(tk.Toplevel):
             if alumnos_curso:
                 for a in alumnos_curso:
                     self.tree.insert("", "end", values=a)
-                auto_ajustar_columnas(self.tree)
+                try:
+                    auto_ajustar_columnas(self.tree)
+                    ajustar_tamano_ventana(self.tree, self)
+                except Exception as e:
+                    print("Error ajustando ventana:", e)
             else:
                 messagebox.showinfo("Sin alumnos", "Este curso no tiene alumnos matriculados.")
         except Exception as e:
             messagebox.showerror("Error", f"No se pudieron cargar los alumnos: {e}")
-
