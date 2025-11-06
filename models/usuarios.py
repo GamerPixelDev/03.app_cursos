@@ -66,10 +66,13 @@ def cambiar_contrasena(usuario, nueva_contrasena):
     conn.close()
 
 # === Obtener usuarios (para ventana admin/GOD) ===
-def obtener_usuarios():
+def obtener_usuarios(incluir_god=False):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT usuario, rol FROM usuarios")
+    if incluir_god:
+        cur.execute("SELECT nombre, rol FROM usuarios")
+    else:
+        cur.execute("SELECT nombre, rol FROM usuarios WHERE rol != 'god'")
     usuarios = cur.fetchall()
     conn.close()
     return usuarios

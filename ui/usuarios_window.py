@@ -27,11 +27,9 @@ class UsuariosWindow(tk.Toplevel):
             fg="#3E64FF",
             bg=self.bg_color
         ).pack(pady=(10, 8))
-
         # === Frame principal (tabla + scroll) ===
         frame_tabla = tk.Frame(self, bg=self.bg_color)
         frame_tabla.pack(fill="both", expand=True, padx=10, pady=(0, 10))
-
         self.tree = ttk.Treeview(
             frame_tabla,
             columns=("usuario", "rol"),
@@ -41,41 +39,33 @@ class UsuariosWindow(tk.Toplevel):
         self.tree.heading("rol", text="Rol", anchor="center")
         self.tree.column("usuario", width=280, anchor="center")
         self.tree.column("rol", width=150, anchor="center")
-
         # Scrollbar vertical
         scroll_y = ttk.Scrollbar(frame_tabla, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scroll_y.set)
-
         # Distribución con grid
         self.tree.grid(row=0, column=0, sticky="nsew")
         scroll_y.grid(row=0, column=1, sticky="ns")
-
         frame_tabla.grid_rowconfigure(0, weight=1)
         frame_tabla.grid_columnconfigure(0, weight=1)
-
         # === Frame inferior (botones centrados) ===
         frame_btns = tk.Frame(self, bg=self.bg_color)
         frame_btns.pack(pady=10)
-
         ttk.Button(frame_btns, text="🔄 Actualizar", command=self.cargar_usuarios).pack(side="left", padx=8)
-
         if self.rol_actual in ("admin", "god"):
             ttk.Button(frame_btns, text="➕ Añadir usuario", command=self.ventana_nuevo_usuario).pack(side="left", padx=8)
             ttk.Button(frame_btns, text="🗑️ Eliminar", command=self.eliminar_usuario).pack(side="left", padx=8)
-
         if self.rol_actual == "god":
             ttk.Button(frame_btns, text="🔐 Cambiar contraseña", command=self.cambiar_contrasena).pack(side="left", padx=8)
-
         # Centramos todo el grupo
         frame_btns.pack_configure(anchor="center")
-
         self.cargar_usuarios()
 
     # --- Cargar usuarios ---
     def cargar_usuarios(self):
         for row in self.tree.get_children():
             self.tree.delete(row)
-        usuarios = model.obtener_usuarios()
+        incluir_god = self.rol_actual == "god"
+        usuarios = model.obtener_usuarios(incluir_god=incluir_god)
         for u in usuarios:
             self.tree.insert("", "end", values=u)
         auto_ajustar_columnas(self.tree)
