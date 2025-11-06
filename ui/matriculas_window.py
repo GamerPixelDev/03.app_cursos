@@ -1,5 +1,5 @@
 import tkinter as tk
-import sqlite3
+import tkinter.font as tkfont
 from tkinter import ttk, messagebox
 from models import matriculas as model
 from models import alumnos, cursos
@@ -26,6 +26,20 @@ class MatriculasWindow(tk.Toplevel):
         self.tree.column("codigo_curso", width=120)
         self.tree.column("curso", width=200)
         self.tree.column("fecha", width=120)
+        columnas = [
+            ("nif", "NIF Alumno", 100),
+            ("alumno", "Alumno", 150),
+            ("codigo_curso", "Código Curso", 120),
+            ("curso", "Curso", 180),
+            ("fecha", "Fecha Matrícula", 120)
+        ]
+        for col, texto, ancho in columnas:
+            self.tree.heading(col, text=texto, anchor="center")
+            if col in ("nif", "codigo_curso", "fecha"):
+                self.tree.column(col, anchor="center", width=ancho)
+            else:
+                self.tree.column(col, anchor="w", width=ancho)
+
         self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         # ----- Botones -----
         frame_btns = tk.Frame(self)
@@ -42,6 +56,7 @@ class MatriculasWindow(tk.Toplevel):
         matriculas = model.obtener_matriculas()
         for m in matriculas:
             self.tree.insert("", tk.END, values=m)
+        self.ajustar_columnas()
 
     # ----- Eliminar matrícula -----
     def eliminar_seleccionada(self):
@@ -99,3 +114,19 @@ class MatriculasWindow(tk.Toplevel):
             messagebox.showinfo("Éxito", "Matrícula creada correctamente.")
             ventana.destroy()
             self.cargar_datos()"""
+        
+    def ajustar_columnas(self):
+        """Ajusta cada columna al texto más largo y bloquea el estiramiento."""
+        self.update_idletasks()
+        font = tkfont.Font()
+        for col in self.tree["columns"]:
+            header_text = self.tree.heading(col)["text"]
+            max_width = font.measure(header_text)
+            for item_id in self.tree.get_children():
+                text = str(self.tree.set(item_id, col))
+                w = font.measure(text)
+                if w > max_width:
+                    max_width = w
+            # Desactiva stretch y añade margen visual
+            self.tree.column(col, width=max_width + 25, stretch=False)
+        self.update_idletasks()

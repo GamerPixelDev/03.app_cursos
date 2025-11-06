@@ -29,8 +29,11 @@ class CursosWindow(tk.Toplevel):
             ("responsable", "Responsable", 120)
         ]
         for col, texto, ancho in columnas:
-            self.tree.heading(col, text=texto)
-            self.tree.column(col, width=ancho)
+            self.tree.heading(col, text=texto, anchor="center")
+            if col in ("codigo_curso", "fecha_inicio", "fecha_fin", "horas"):
+                self.tree.column(col, anchor="center", width=ancho)
+            else:
+                self.tree.column(col, anchor="w", width=ancho)
         #--- Barras de desplazamiento ---
         scroll_y = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
         scroll_x = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
@@ -55,7 +58,7 @@ class CursosWindow(tk.Toplevel):
         cursos = model.obtener_cursos()
         for curso in cursos:
             self.tree.insert("", tk.END, values=curso)
-            self.ajustar_columnas()
+        self.ajustar_columnas()
 
     # ----- Eliminar curso -----
     def eliminar_seleccionado(self):
@@ -103,22 +106,16 @@ class CursosWindow(tk.Toplevel):
 
     #--- Ajustar columnas ---
     def ajustar_columnas(self):
-        #Ajusta automáticamente el ancho de cada columna al contenido
+        """Ajusta cada columna al texto más largo y bloquea el estiramiento."""
+        self.update_idletasks()
         font = tkfont.Font()
-        # Reiniciamos los anchos a un mínimo para permitir que se reduzcan
         for col in self.tree["columns"]:
-            self.tree.column(col, width=10)
-        for col in self.tree["columns"]:
-            # Calculamos el ancho del encabezado
-            max_len = font.measure(self.tree.heading(col)["text"])
-            # Calculamos el ancho máximo entre celdas
-            for item in self.tree.get_children():
-                texto = str(self.tree.set(item, col))
-                ancho = font.measure(texto)
-                if ancho > max_len:
-                    max_len = ancho
-            # Márgenes personalizados
-            extra = 18
-            if col in ("email", "estudios", "nombre", "lugar", "responsable"):
-                extra = 50
-        self.tree.column(col, width=max_len + extra)
+            header_text = self.tree.heading(col)["text"]
+            max_width = font.measure(header_text)
+            for item_id in self.tree.get_children():
+                text = str(self.tree.set(item_id, col))
+                w = font.measure(text)
+                if w > max_width:
+                    max_width = w
+            self.tree.column(col, width=max_width + 25, stretch=False)
+        self.update_idletasks()
