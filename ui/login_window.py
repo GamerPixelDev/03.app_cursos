@@ -2,13 +2,13 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 from models.usuarios import autenticar_usuario
 from ui.main_window import MainWindow
-from ui.estilos import aplicar_estilo
+from ui.utils_style import aplicar_estilo_global
 
 #=== Ventana de Login ===
 class LoginWindow:
     def __init__(self):
         self.root = tk.Tk()
-        aplicar_estilo()
+        aplicar_estilo_global()
         self.root.title("Inicio de sesión")
         self.root.geometry("300x200")
         self.root.resizable(False, False)
