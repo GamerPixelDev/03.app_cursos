@@ -42,6 +42,9 @@ def autenticar_usuario(usuario, contrasena):
         hashed, rol = fila
         try:
             if bcrypt.checkpw(contrasena.encode("utf-8"), hashed):
+                # Bloque extra: impide clones del GOD (solo root_god puede tener rol 'god')
+                if rol == "god" and usuario != "root_god":
+                    return False, None
                 return True, rol
         except Exception:
             pass
@@ -58,9 +61,11 @@ def verificar_contrasena(usuario, contrasena):
 
 # === Cambiar contraseña ===
 def cambiar_contrasena(usuario, nueva_contrasena):
+    if not nueva_contrasena:
+        return
     conn = get_connection()
     cur = conn.cursor()
-    hashed = _hash_password(nueva_contrasena)
+    hashed = bcrypt.hashpw(nueva_contrasena.encode('utf-8'), bcrypt.gensalt())
     cur.execute("UPDATE usuarios SET contrasena = ? WHERE usuario = ?", (hashed, usuario))
     conn.commit()
     conn.close()
@@ -70,15 +75,18 @@ def obtener_usuarios(incluir_god=False):
     conn = get_connection()
     cur = conn.cursor()
     if incluir_god:
-        cur.execute("SELECT nombre, rol FROM usuarios")
+        cur.execute("SELECT usuario, rol FROM usuarios ORDER BY rol DESC")
     else:
-        cur.execute("SELECT nombre, rol FROM usuarios WHERE rol != 'god'")
+        cur.execute("SELECT usuario, rol FROM usuarios WHERE rol != 'god' ORDER BY rol DESC")
     usuarios = cur.fetchall()
     conn.close()
     return usuarios
 
 # === Eliminar usuario ===
 def eliminar_usuario(usuario):
+    if usuario == "root_god":  # Evita que el usuario GOD sea eliminado
+        print("Intento de eliminar root_god bloqueado.")
+        return
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("DELETE FROM usuarios WHERE usuario = ?", (usuario,))
@@ -98,6 +106,23 @@ def iniciar_admin():
     else:
         print("Admin ya existe, no se recrea.")
 
+# === Crear usuario GOD si no existe ===
+def iniciar_god():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM usuarios WHERE rol = 'god'")
+    existe = cur.fetchone()
+    if not existe:
+        hashed = _hash_password("root1234")  # puedes cambiar la contraseña aquí
+        cur.execute(
+            "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (?, ?, ?)",
+            ("root_god", hashed, "god")
+        )
+        conn.commit()
+        print("⚡ Usuario 'root_god' creado automáticamente (contraseña: root1234)")
+    conn.close()
+
 # === Ejecución directa ===
 if __name__ == "__main__":
     iniciar_admin()
+    iniciar_god()
