@@ -7,9 +7,9 @@ from ui.cursos_window import CursosWindow
 from ui.matriculas_window import MatriculasWindow
 from ui.buscar_alumno_window import BuscarAlumnoWindow
 from ui.buscar_curso_window import BuscarCursoWindow
+from ui.usuarios_window import UsuariosWindow
 from datetime import datetime
 from models import export_utils, export_pdf, import_utils
-
 
 class MainWindow:
     def __init__(self, usuario, rol):
@@ -215,7 +215,7 @@ class MainWindow:
         except Exception as e:
             messagebox.showerror("Error en importación", f"No se pudo importar el archivo:\n{e}")
 
-    def manage_users(self): messagebox.showinfo("Usuarios", "Gestión de Usuarios (admin)")
+    def manage_users(self): UsuariosWindow(self.root, self.modo)
 
     # -------------------------------------------------
     # Tema claro / oscuro

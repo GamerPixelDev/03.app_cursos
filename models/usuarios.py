@@ -43,6 +43,21 @@ def autenticar_usuario(nombre, contraseña):
 def iniciar_admin():
     crear_usuario("admin", "admin123", "admin")
 
+def obtener_usuarios():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT usuario, rol FROM usuarios")
+    usuarios = cur.fetchall()
+    conn.close()
+    return usuarios
+
+def eliminar_usuario(usuario):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM usuarios WHERE usuario = ?", (usuario,))
+    conn.commit()
+    conn.close()
+
 #=== EJECUCIÓN INICIAL ===
 if __name__ == "__main__":
     iniciar_admin()
