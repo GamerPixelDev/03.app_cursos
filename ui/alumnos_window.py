@@ -8,7 +8,7 @@ class AlumnosWindows(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Gestión de alumnos")
-        self.geometry("1500x600")
+        self.geometry("1100x600")
         self.resizable(True, True)
         self.transient(parent) #La asocia visualmente a la ventana principal
         self.grab_set() # Bloquea interacción con otras ventanas hasta cerrar esta
@@ -115,21 +115,41 @@ class AlumnosWindows(tk.Toplevel):
         nif = item["values"][0] #asumiendo que la primera columna es NIF
         DetalleAlumnoWindow(self, nif)
 
-    #--- Ajustar columnas ---
     def ajustar_columnas(self):
-        self.update_idletasks()  # asegura pintado real
-        font = tkfont.nametofont(self.tree.cget("font"))
+        """Ajusta cada columna al texto más largo y fuerza el repintado."""
+        self.update_idletasks()
+        font = tkfont.Font()
         for col in self.tree["columns"]:
-            header = self.tree.heading(col)["text"]
-            max_w = font.measure(header)
-            for iid in self.tree.get_children():
-                txt = str(self.tree.set(iid, col))
-                w = font.measure(txt)
-                if w > max_w:
-                    max_w = w
-            #self.tree.column(col, width=max_w + 25)  # margen
+            header_text = self.tree.heading(col)["text"]
+            max_width = font.measure(header_text)
+            for item_id in self.tree.get_children():
+                text = str(self.tree.set(item_id, col))
+                w = font.measure(text)
+                if w > max_width:
+                    max_width = w
+            # Aplica ancho y bloquea estiramiento
+            self.tree.column(col, width=max_width + 10, stretch=False)
+        # Fuerza redibujo tras aplicar todos los anchos
+        self.update_idletasks()
 
-
+    #=== Funcion usada para comprobar que anchos se dibujaban al mostrar alumnos ===
+    def ajustar_columnas_debug(self):
+        """Versión de depuración: muestra por consola las medidas."""
+        self.update_idletasks()
+        font = tkfont.Font()
+        print("=== Ajuste de columnas ===")
+        for col in self.tree["columns"]:
+            header_text = self.tree.heading(col)["text"]
+            max_width = font.measure(header_text)
+            print(f"Encabezado {header_text}: {max_width}px")
+            for item_id in self.tree.get_children():
+                text = str(self.tree.set(item_id, col))
+                w = font.measure(text)
+                if w > max_width:
+                    max_width = w
+            print(f"  -> Máx. {col}: {max_width}px")
+            self.tree.column(col, width=max_width + 25)
+        print("=== Fin de ajuste ===")
 
 
 
