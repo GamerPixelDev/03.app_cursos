@@ -12,7 +12,10 @@ from models import export_utils, export_pdf, import_utils
 class MainWindow:
     def __init__(self, usuario, rol):
         self.root = tk.Tk()
-        aplicar_estilo_global()
+        # --- modo inicial ---
+        self.modo = "claro"
+        self.style, self.bg_color = aplicar_estilo_global(self.modo)
+        self.root.configure(bg=self.bg_color)
         self.root.title(f"Gestión de Cursos - Usuario: {usuario} ({rol})")
         self.root.geometry("1000x650")
         self.root.resizable(True, True)
@@ -23,6 +26,14 @@ class MainWindow:
         titulo.pack(side="left", padx=5)
         usuario_label = tk.Label(banner, text=f"👤 {usuario} ({rol})", bg="#3E64FF", fg="white", font=("Segoe UI", 10, "italic"))
         usuario_label.pack(side="right", padx=20)
+        # --- Botón cambio modo ---
+        self.modo = "claro"  # modo inicial
+        self.style, self.bg_color = aplicar_estilo_global(self.modo)
+        self.root.configure(bg=self.bg_color)
+        self.icon_sol = tk.Label(banner, text="🌞", bg="#3E64FF", fg="white", font=("Segoe UI", 14))
+        self.icon_sol.pack(side="right", padx=10)
+        self.icon_sol.bind("<Button-1>", self.toggle_modo)  # clic para cambiar
+        self.icon_sol.config(cursor="hand2")
         separator = ttk.Separator(self.root, orient="horizontal")
         separator.pack(fill="x")
         #Menu principal
@@ -178,3 +189,12 @@ class MainWindow:
             messagebox.showerror("Error en importación", f"No se pudo importar el archivo:\n{e}")
     #--- Menú usuarios ---
     def manage_users(self): messagebox.showinfo("Usuarios", "Gestión de Usuarios (admin)")
+
+    #--- Botón tema Claro/Oscuro
+    def toggle_modo(self, event=None):
+        self.modo = "oscuro" if self.modo == "claro" else "claro"
+        self.style, self.bg_color = aplicar_estilo_global(self.modo)
+        self.root.configure(bg=self.bg_color)
+        # Cambia el icono del botón
+        nuevo_icono = "🌙" if self.modo == "oscuro" else "🌞"
+        self.icon_sol.config(text=nuevo_icono)
