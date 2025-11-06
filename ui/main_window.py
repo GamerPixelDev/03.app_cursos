@@ -9,6 +9,7 @@ from ui.buscar_alumno_window import BuscarAlumnoWindow
 from ui.buscar_curso_window import BuscarCursoWindow
 from ui.usuarios_window import UsuariosWindow
 from ui.mi_cuenta_window import MiCuentaWindow
+from ui.panel_god_window import PanelGodWindow
 from datetime import datetime
 from models import export_utils, export_pdf, import_utils
 
@@ -117,14 +118,15 @@ class MainWindow:
         menu_matriculas.add_cascade(label="Importar", menu=submenu_import_matriculas)
         menu_bar.add_cascade(label="📜 Matrículas", menu=menu_matriculas)
         #=== Menú Cuenta ===
-        menu_cuenta = tk.Menu(menu_bar, tearoff=0)
-        if self.rol == "usuario":
-            menu_cuenta.add_command(label="Cambiar contraseña", command=self.mi_cuenta)
-        elif self.rol == "admin":
-            menu_cuenta.add_command(label="Gestionar usuarios", command=self.manage_users)
-        elif self.rol == "god":
-            menu_cuenta.add_command(label="Gestión completa de usuarios", command=self.manage_users)
-        menu_bar.add_cascade(label="👤 Cuenta", menu=menu_cuenta)        
+        menu_usuarios = tk.Menu(menu_bar, tearoff=0)
+        if self.rol in ("admin", "god", "usuario"):
+            menu_usuarios = tk.Menu(menu_bar, tearoff=0)
+            menu_usuarios.add_command(label="Mi cuenta", command=self.mi_cuenta)
+        if self.rol in ("admin", "god"):
+            menu_usuarios.add_command(label="Gestionar usuarios", command=self.gestion_usuarios)
+        if self.rol == "god":
+            menu_usuarios.add_command(label="Panel GOD", command=self.panel_god)
+        menu_bar.add_cascade(label="Usuarios", menu=menu_usuarios)        
         # === Usuarios (solo admin) ===
         if self.rol == "admin":
             menu_usuarios = tk.Menu(menu_bar, tearoff=0)
@@ -222,13 +224,14 @@ class MainWindow:
         except Exception as e:
             messagebox.showerror("Error en importación", f"No se pudo importar el archivo:\n{e}")
     # -------------------------------------------------
-    # Gestión de usuarios
+    # Cuentas
     # -------------------------------------------------
-    def manage_users(self): UsuariosWindow(self.root, self.modo, rol_actual=self.rol)
-    # -------------------------------------------------
-    # Cuenta
-    # -------------------------------------------------
+    #--- Usuarios ---
     def mi_cuenta(self): MiCuentaWindow(self.root, self.usuario, self.modo)
+    #--- Admins ---
+    def manage_users(self): UsuariosWindow(self.root, self.modo, rol_actual=self.rol)
+    #--- GOD ---
+    def panel_god(self): PanelGodWindow(self.root, self.modo)
     # -------------------------------------------------
     # Tema claro / oscuro
     # -------------------------------------------------
