@@ -9,6 +9,7 @@ from ui.utils_treeview import auto_ajustar_columnas
 class AlumnosWindows(tk.Toplevel):
     def __init__(self, parent, modo="claro"):
         super().__init__(parent)
+        self.modo = modo
         self.style, self.bg_color = aplicar_estilo_global(modo)
         self.configure(bg=self.bg_color)
         self.title("Gestión de alumnos")
@@ -45,7 +46,6 @@ class AlumnosWindows(tk.Toplevel):
         scroll_y = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
         scroll_x = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
         self.tree.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
-
         scroll_y.pack(side="right", fill="y")
         scroll_x.pack(side="bottom", fill="x")
         self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
@@ -117,7 +117,4 @@ class AlumnosWindows(tk.Toplevel):
             return
         item = self.tree.item(selection[0])
         nif = item["values"][0] #asumiendo que la primera columna es NIF
-        DetalleAlumnoWindow(self, nif)
-
-
-
+        DetalleAlumnoWindow(self, nif, modo=self.modo)
