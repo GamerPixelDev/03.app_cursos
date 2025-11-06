@@ -13,12 +13,12 @@ class LoginWindow:
         self.style, self.bg_color = aplicar_estilo_global(modo)
         self.root.configure(bg=self.bg_color)
         self.root.title("Inicio de sesión")
-        self.root.geometry("380x260")
+        self.root.geometry("380x380")
         self.root.resizable(False, False)
         # Centrar ventana en pantalla
         self.root.update_idletasks()
         ancho = 380
-        alto = 260
+        alto = 300
         x = (self.root.winfo_screenwidth() // 2) - (ancho // 2)
         y = (self.root.winfo_screenheight() // 2) - (alto // 2)
         self.root.geometry(f"{ancho}x{alto}+{x}+{y}")
