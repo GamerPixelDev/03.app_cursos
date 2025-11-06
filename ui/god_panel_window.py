@@ -152,7 +152,7 @@ class GodPanelWindow(tk.Toplevel):
     def _guardar_cambio_rol(self, usuario, nuevo_rol, ventana):
         conn = model.get_connection()
         cur = conn.cursor()
-        cur.execute("UPDATE usuarios SET rol = ? WHERE nombre = ?", (nuevo_rol, usuario))
+        cur.execute("UPDATE usuarios SET rol = ? WHERE usuario = ?", (nuevo_rol, usuario))
         conn.commit()
         conn.close()
         ventana.destroy()
@@ -191,7 +191,7 @@ class GodPanelWindow(tk.Toplevel):
         hashed = bcrypt.hashpw(nueva_contra.encode('utf-8'), bcrypt.gensalt())
         conn = model.get_connection()
         cur = conn.cursor()
-        cur.execute("UPDATE usuarios SET contraseña = ? WHERE nombre = ?", (hashed, usuario))
+        cur.execute("UPDATE usuarios SET contrasena = ? WHERE usuario = ?", (hashed, usuario))
         conn.commit()
         conn.close()
         messagebox.showinfo("Hecho", f"Contraseña de '{usuario}' actualizada.")
