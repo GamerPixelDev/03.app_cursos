@@ -14,7 +14,7 @@ class MiCuentaWindow(tk.Toplevel):
         self.configure(bg=self.bg_color)
         self.title("Mi cuenta")
         self.geometry("500x300")
-        self.resizable(False, False)
+        self.resizable(True, False)
         self.transient(parent)
         self.grab_set()
         # === Encabezado ===

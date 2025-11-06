@@ -12,41 +12,59 @@ class GodPanelWindow(tk.Toplevel):
         self.style, self.bg_color = aplicar_estilo_global(modo)
         self.configure(bg=self.bg_color)
         self.title("👑 Panel del usuario GOD")
-        self.geometry("950x550")
-        self.resizable(False, False)
+        self.geometry("950x650")
+        self.minsize(800, 450)
+        self.resizable(True, True)
         self.transient(parent)
         self.grab_set()
-        # === Encabezado ===
-        tk.Label(
+        #=== Encabezado ===
+        titulo = tk.Label(
             self,
             text="⚙️ Administración avanzada del sistema",
             font=("Segoe UI", 13, "bold"),
             fg="#3E64FF",
             bg=self.bg_color
-        ).pack(pady=(15, 10))
-        # === Tabla de usuarios ===
+        )
+        titulo.pack(pady=(10, 5))
+
+        # === Frame principal con tabla + scroll ===
+        frame_principal = tk.Frame(self, bg=self.bg_color)
+        frame_principal.pack(fill="both", expand=True, padx=10, pady=(0, 5))
+
         self.tree = ttk.Treeview(
-            self,
+            frame_principal,
             columns=("usuario", "rol"),
-            show="headings",
-            height=15
+            show="headings"
         )
         self.tree.heading("usuario", text="Usuario", anchor="center")
         self.tree.heading("rol", text="Rol", anchor="center")
         self.tree.column("usuario", width=280, anchor="center")
         self.tree.column("rol", width=120, anchor="center")
-        scroll_y = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+
+        # Scrollbar
+        scroll_y = ttk.Scrollbar(frame_principal, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scroll_y.set)
-        scroll_y.pack(side="right", fill="y")
-        self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-        # === Botones ===
+
+        # Distribución dentro del frame
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        scroll_y.grid(row=0, column=1, sticky="ns")
+
+        frame_principal.grid_rowconfigure(0, weight=1)
+        frame_principal.grid_columnconfigure(0, weight=1)
+
+        # === Frame inferior con botones ===
         frame_btns = tk.Frame(self, bg=self.bg_color)
         frame_btns.pack(pady=10)
-        ttk.Button(frame_btns, text="🔄 Actualizar", command=self.cargar_usuarios).grid(row=0, column=0, padx=5)
-        ttk.Button(frame_btns, text="➕ Crear usuario", command=self.ventana_nuevo_usuario).grid(row=0, column=1, padx=5)
-        ttk.Button(frame_btns, text="🗑️ Eliminar usuario", command=self.eliminar_usuario).grid(row=0, column=2, padx=5)
-        ttk.Button(frame_btns, text="✏️ Cambiar rol", command=self.cambiar_rol).grid(row=0, column=3, padx=5)
-        ttk.Button(frame_btns, text="🔐 Editar contraseña", command=self.cambiar_contrasena).grid(row=0, column=4, padx=5)
+
+        ttk.Button(frame_btns, text="🔄 Actualizar", command=self.cargar_usuarios).pack(side="left", padx=6)
+        ttk.Button(frame_btns, text="➕ Crear usuario", command=self.ventana_nuevo_usuario).pack(side="left", padx=6)
+        ttk.Button(frame_btns, text="🗑️ Eliminar usuario", command=self.eliminar_usuario).pack(side="left", padx=6)
+        ttk.Button(frame_btns, text="✏️ Cambiar rol", command=self.cambiar_rol).pack(side="left", padx=6)
+        ttk.Button(frame_btns, text="🔐 Editar contraseña", command=self.cambiar_contrasena).pack(side="left", padx=6)
+
+        # Centramos todo el grupo
+        frame_btns.pack_configure(anchor="center")
+
         self.cargar_usuarios()
 
     # === Cargar usuarios ===

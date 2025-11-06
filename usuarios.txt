@@ -1,0 +1,5 @@
+("admin", "admin123", "admin")
+("maria", "clave123", "usuario")
+("juan", "curso2025", "usuario")
+("sofia_admin", "admin2025", "admin")
+("root_god", "ultrapass", "god")
