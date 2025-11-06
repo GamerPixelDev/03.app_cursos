@@ -58,6 +58,13 @@ def eliminar_usuario(usuario):
     conn.commit()
     conn.close()
 
+def cambiar_contrasena(usuario, nueva_contrasena):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE usuarios SET contrasena = ? WHERE usuario = ?", (nueva_contrasena, usuario))
+    conn.commit()
+    conn.close()
+
 #=== EJECUCIÓN INICIAL ===
 if __name__ == "__main__":
     iniciar_admin()

@@ -214,9 +214,10 @@ class MainWindow:
                 messagebox.showwarning("Aviso", "Tipo no reconocido.")
         except Exception as e:
             messagebox.showerror("Error en importación", f"No se pudo importar el archivo:\n{e}")
-
-    def manage_users(self): UsuariosWindow(self.root, self.modo)
-
+    # -------------------------------------------------
+    # Gestión de usuarios
+    # -------------------------------------------------
+    def manage_users(self): UsuariosWindow(self.root, self.modo, rol_actual=self.rol)
     # -------------------------------------------------
     # Tema claro / oscuro
     # -------------------------------------------------
