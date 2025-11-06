@@ -91,21 +91,47 @@ class CursosWindow(tk.Toplevel):
     # === Ventana nuevo curso ===
     def ventana_nuevo_curso(self):
         win = tk.Toplevel(self)
-        win.title("Nuevo curso")
-        win.geometry("400x400")
-
+        win.title("➕ Nuevo curso")
+        win.geometry("430x460")
+        win.resizable(False, False)
+        win.configure(bg=self.bg_color)
+        win.transient(self)
+        win.grab_set()
+        # === Encabezado ===
+        tk.Label(
+            win,
+            text="Registro de nuevo curso",
+            font=("Segoe UI", 12, "bold"),
+            fg="#3E64FF",
+            bg=self.bg_color
+        ).pack(pady=(10, 15))
+        # === Contenedor principal ===
+        frame = tk.Frame(win, bg=self.bg_color)
+        frame.pack(padx=15, pady=10, fill="both", expand=True)
         campos = [
-            "codigo_curso", "nombre", "fecha_inicio", "fecha_fin",
-            "lugar", "modalidad", "horas", "responsable"
+            ("Código del curso", "codigo_curso"),
+            ("Nombre del curso", "nombre"),
+            ("Fecha inicio (AAAA-MM-DD)", "fecha_inicio"),
+            ("Fecha fin (AAAA-MM-DD)", "fecha_fin"),
+            ("Lugar", "lugar"),
+            ("Modalidad", "modalidad"),
+            ("Horas", "horas"),
+            ("Responsable", "responsable")
         ]
         self.entries = {}
-        for i, campo in enumerate(campos):
-            ttk.Label(win, text=campo.replace("_", " ").capitalize()).grid(row=i, column=0, sticky="w", padx=10, pady=5)
-            entry = ttk.Entry(win)
-            entry.grid(row=i, column=1, padx=10, pady=5)
-            self.entries[campo] = entry
-
-        ttk.Button(win, text="Guardar", command=lambda: self.guardar_curso(win)).grid(row=len(campos), columnspan=2, pady=10)
+        for i, (etiqueta, clave) in enumerate(campos):
+            ttk.Label(frame, text=etiqueta + ":", background=self.bg_color).grid(
+                row=i, column=0, sticky="w", padx=5, pady=5
+            )
+            entry = ttk.Entry(frame, width=30)
+            entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
+            self.entries[clave] = entry
+        # === Botón de guardar ===
+        ttk.Button(
+            win,
+            text="💾 Guardar curso",
+            command=lambda: self.guardar_curso(win)
+        ).pack(pady=(15, 10))
 
     # === Guardar curso ===
     def guardar_curso(self, ventana):
