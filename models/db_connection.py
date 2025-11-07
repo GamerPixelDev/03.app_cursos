@@ -1,6 +1,7 @@
 # models/db_connection.py
 import psycopg2
-from psycopg2 import sql, OperationalError
+from psycopg2 import OperationalError
+import time
 
 # === CONFIGURACIÓN DE CONEXIÓN ===
 DB_CONFIG = {
@@ -12,16 +13,18 @@ DB_CONFIG = {
 }
 
 # === FUNCIÓN DE CONEXIÓN GLOBAL ===
-def get_connection():
-    """
-    Devuelve una conexión abierta a la base de datos PostgreSQL.
-    """
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        return conn
-    except OperationalError as e:
-        print(f"[ERROR] No se pudo conectar a la base de datos: {e}")
-        raise
+def get_connection(reintentos=2, espera=2):
+    """Devuelve una conexión a PostgreSQL con reintento automático."""
+    for intento in range(reintentos):
+        try:
+            conn = psycopg2.connect(**DB_CONFIG)
+            return conn
+        except OperationalError as e:
+            print(f"⚠️ Fallo al conectar a la base de datos (intento {intento+1}/{reintentos}): {e}")
+            if intento < reintentos - 1:
+                time.sleep(espera)
+            else:
+                raise RuntimeError("❌ No se pudo establecer conexión con el servidor PostgreSQL.")
 
 # === TEST DIRECTO ===
 if __name__ == "__main__":
