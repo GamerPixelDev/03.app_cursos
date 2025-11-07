@@ -1,15 +1,16 @@
-import sqlite3
+#=== Todo el código comentado pertenece a la version SQLite ===
+#import sqlite3
 import bcrypt
-import os
+#import os
 from models.db_connection import get_connection
 
 # === CONEXIÓN A LA BASE DE DATOS ===
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(BASE_DIR)
-DB_PATH = os.path.join(ROOT_DIR, "data", "database.db")
+#BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+#ROOT_DIR = os.path.dirname(BASE_DIR)
+#DB_PATH = os.path.join(ROOT_DIR, "data", "database.db")
 
-def get_connection():
-    return sqlite3.connect(DB_PATH)
+#def get_connection():
+#    return sqlite3.connect(DB_PATH)
 
 # === Crear hash seguro ===
 def _hash_password(contrasena: str) -> bytes:
@@ -27,7 +28,9 @@ def crear_usuario(usuario, contrasena, rol):
         )
         conn.commit()
         print(f"✅ Usuario '{usuario}' creado correctamente ({rol}).")
-    except sqlite3.IntegrityError:
+    except Exception as e:
+        print(f"⚠️  Error al crear el usuario '{usuario}': {e}")
+    #except sqlite3.IntegrityError:
         print(f"⚠️  El usuario '{usuario}' ya existe.")
     finally:
         conn.close()
@@ -128,6 +131,6 @@ if __name__ == "__main__":
     #from db_connection import get_connection
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT NOW();")
+    cur.execute("SELECT version();")
     print("Servidor responde:", cur.fetchone())
     conn.close()
