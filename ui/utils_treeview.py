@@ -32,7 +32,7 @@ def ajustar_tamano_ventana(tree, ventana, margen_extra=40, alto_fijo=500):
     except Exception as e:
         print(f"[ajustar_tamano_ventana] Error ajustando ventana: {e}")
 
-    #=== Funcion usada para comprobar que anchos se dibujaban al mostrar alumnos ===
+    #=== Funcion usada para comprobar que anchos se dibujaban en consola al mostrar alumnos ===
     def ajustar_columnas_debug(self):
         """Versión de depuración: muestra por consola las medidas."""
         self.update_idletasks()
