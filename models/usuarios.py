@@ -1,6 +1,7 @@
 import sqlite3
 import bcrypt
 import os
+from models.db_connection import get_connection
 
 # === CONEXIÓN A LA BASE DE DATOS ===
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -124,5 +125,9 @@ def iniciar_god():
 
 # === Ejecución directa ===
 if __name__ == "__main__":
-    iniciar_admin()
-    iniciar_god()
+    #from db_connection import get_connection
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT NOW();")
+    print("Servidor responde:", cur.fetchone())
+    conn.close()

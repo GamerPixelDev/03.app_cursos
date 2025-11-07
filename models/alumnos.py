@@ -1,5 +1,6 @@
 import sqlite3
 import os
+from models.db_connection import get_connection
 
 #=== RUTA BASE DE DATOS ===#
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
