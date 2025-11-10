@@ -19,12 +19,12 @@ def _hash_password(contrasena: str) -> bytes:
 
 # === Crear usuario ===
 def crear_usuario(usuario, contrasena, rol):
-    conn = get_connection()
-    cur = conn.cursor()
-    hashed = _hash_password(contrasena)
     try:
+        conn = get_connection()
+        cur = conn.cursor()
+        hashed = _hash_password(contrasena)
         cur.execute(
-            "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (?, ?, ?)",
+            "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (%s, %s, %s)",
             (usuario, hashed, rol)
         )
         conn.commit()
@@ -42,7 +42,7 @@ def autenticar_usuario(usuario, contrasena):
     try:
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute("SELECT contrasena, rol FROM usuarios WHERE usuario = ?", (usuario,))
+        cur.execute("SELECT contrasena, rol FROM usuarios WHERE usuario = %s", (usuario,))
         fila = cur.fetchone()
     except Exception as e:
         manejar_error_db(e, "autenticar usuario")
@@ -65,7 +65,7 @@ def verificar_contrasena(usuario, contrasena):
     try:
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute("SELECT contrasena FROM usuarios WHERE usuario = ?", (usuario,))
+        cur.execute("SELECT contrasena FROM usuarios WHERE usuario = %s", (usuario,))
         fila = cur.fetchone()
     except Exception as e:
         manejar_error_db(e, "verificar contraseña")
@@ -81,7 +81,7 @@ def cambiar_contrasena(usuario, nueva_contrasena):
         conn = get_connection()
         cur = conn.cursor()
         hashed = bcrypt.hashpw(nueva_contrasena.encode('utf-8'), bcrypt.gensalt())
-        cur.execute("UPDATE usuarios SET contrasena = ? WHERE usuario = ?", (hashed, usuario))
+        cur.execute("UPDATE usuarios SET contrasena = %s WHERE usuario = %s", (hashed, usuario))
         conn.commit()
     except Exception as e:
         manejar_error_db(e, "cambiar contraseña")
@@ -112,7 +112,7 @@ def eliminar_usuario(usuario):
     try:
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute("DELETE FROM usuarios WHERE usuario = ?", (usuario,))
+        cur.execute("DELETE FROM usuarios WHERE usuario = %s", (usuario,))
         conn.commit()
     except Exception as e:
         manejar_error_db(e, "eliminar usuario")
@@ -145,7 +145,7 @@ def iniciar_god():
         if not existe:
             hashed = _hash_password("root1234")  # puedes cambiar la contraseña aquí
             cur.execute(
-                "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (?, ?, ?)",
+                "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (%s, %s, %s)",
                 ("root_god", hashed, "god")
             )
             conn.commit()
