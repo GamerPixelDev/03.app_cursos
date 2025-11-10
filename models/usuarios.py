@@ -71,7 +71,7 @@ def autenticar_usuario(usuario: str, contrasena: str):
     hashed = _as_bytes(hashed_str_o_bytes)
     print(f"[DEBUG] Intentando validar usuario={usuario}, rol={rol}")  # 👈 Añadido
     try:
-        if bcrypt.checkpw(contrasena.encode("utf-8"), hashed):
+        if bcrypt.checkpw(contrasena.encode("utf-8"), hashed.encode() if isinstance(hashed, str) else hashed):
             print("[DEBUG] Contraseña válida ✅")  # 👈 Añadido
             # blindaje: solo root_god puede ostentar rol god
             if rol == "god" and usuario != "root_god":
@@ -99,7 +99,7 @@ def verificar_contrasena(usuario: str, contrasena: str) -> bool:
     if not fila:
         return False
     hashed = _as_bytes(fila[0])
-    return bcrypt.checkpw(contrasena.encode("utf-8"), hashed)
+    return bcrypt.checkpw(contrasena.encode("utf-8"), hashed.encoded() if isinstance(hashed, str) else hashed)
 
 def cambiar_contrasena(usuario: str, nueva_contrasena: str):
     if not nueva_contrasena:
