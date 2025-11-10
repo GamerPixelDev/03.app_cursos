@@ -152,7 +152,7 @@ def eliminar_usuario(usuario: str):
             conn.close()
 
 def iniciar_admin():
-    """Crea admin/admin123 si no existe."""
+    #Crea admin/admin123 si no existe
     conn = None
     try:
         conn = get_connection()
@@ -171,7 +171,7 @@ def iniciar_admin():
             conn.close()
 
 def iniciar_god():
-    """Crea root_god/root1234 si no existe."""
+    #Crea root_god/root1234 si no existe.
     conn = None
     try:
         conn = get_connection()

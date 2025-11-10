@@ -1,12 +1,19 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from models.usuarios import autenticar_usuario
+from models.usuarios import iniciar_admin, iniciar_god
 from ui.main_window import MainWindow
 from ui.utils_style import aplicar_estilo_global
 
 class LoginWindow:
     def __init__(self, modo="claro"):
         self.modo = modo
+        # === Inicializar usuarios base si no existen ===
+        try:
+            iniciar_admin()
+            iniciar_god()
+        except Exception as e:
+            print(f"[ERROR] No se pudieron crear usuarios base: {e}")
         # === Ventana principal ===
         self.root = tk.Tk()
         self.style, self.bg_color = aplicar_estilo_global(modo)
