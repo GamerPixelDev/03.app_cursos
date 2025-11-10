@@ -59,6 +59,7 @@ def autenticar_usuario(usuario: str, contrasena: str):
         cur = conn.cursor()
         cur.execute("SELECT contrasena, rol FROM usuarios WHERE usuario = %s", (usuario,))
         fila = cur.fetchone()
+        print(f"[DEBUG] Resultado consulta: {fila}")  # 👈 Añadido
     except Exception as e:
         manejar_error_db(e, "autenticar usuario")
     finally:
@@ -68,14 +69,17 @@ def autenticar_usuario(usuario: str, contrasena: str):
         return False, None
     hashed_str_o_bytes, rol = fila
     hashed = _as_bytes(hashed_str_o_bytes)
+    print(f"[DEBUG] Intentando validar usuario={usuario}, rol={rol}")  # 👈 Añadido
     try:
         if bcrypt.checkpw(contrasena.encode("utf-8"), hashed):
+            print("[DEBUG] Contraseña válida ✅")  # 👈 Añadido
             # blindaje: solo root_god puede ostentar rol god
             if rol == "god" and usuario != "root_god":
                 return False, None
             return True, rol
     except Exception as e:
         print("⚠️ Error al verificar hash:", e)
+        print(f"[DEBUG] No se pudo autenticar: usuario={usuario}, fila={fila}") 
     return False, None
 
 def verificar_contrasena(usuario: str, contrasena: str) -> bool:

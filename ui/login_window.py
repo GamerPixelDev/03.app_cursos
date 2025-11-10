@@ -4,7 +4,6 @@ from models.usuarios import autenticar_usuario
 from ui.main_window import MainWindow
 from ui.utils_style import aplicar_estilo_global
 
-
 class LoginWindow:
     def __init__(self, modo="claro"):
         self.modo = modo
