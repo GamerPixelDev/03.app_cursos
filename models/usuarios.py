@@ -1,28 +1,40 @@
-#=== Todo el código comentado pertenece a la version SQLite ===
-#import sqlite3
+# models/usuarios.py
 import bcrypt
-#import os
 from models.db_connection import get_connection
 from models.utils_db import manejar_error_db
 
-# === CONEXIÓN A LA BASE DE DATOS ===
-#BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-#ROOT_DIR = os.path.dirname(BASE_DIR)
-#DB_PATH = os.path.join(ROOT_DIR, "data", "database.db")
+# --- helpers ---
 
-#def get_connection():
-#    return sqlite3.connect(DB_PATH)
+def _hash_password(contrasena: str) -> str:
+    #Devuelve el hash bcrypt como string UTF-8 (ideal para columna TEXT)
+    return bcrypt.hashpw(contrasena.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
-# === Crear hash seguro ===
-def _hash_password(contrasena: str) -> bytes:
-    return bcrypt.hashpw(contrasena.encode("utf-8"), bcrypt.gensalt())
+def _as_bytes(value) -> bytes:
+    #Normaliza el valor leído de la BD (TEXT/BYTEA/memoryview) a bytes para checkpw
+    if value is None:
+        return b""
+    if isinstance(value, bytes):
+        return value
+    if isinstance(value, memoryview):
+        return bytes(value)
+    if isinstance(value, str):
+        return value.encode("utf-8")
+    # último recurso
+    return bytes(str(value), "utf-8")
 
-# === Crear usuario ===
-def crear_usuario(usuario, contrasena, rol):
+def _es_duplicado_pg(err: Exception) -> bool:
+    #Heurística simple para detectar violación de unicidad (sin depender de psycopg2)
+    s = str(err).lower()
+    return "duplicate key" in s or "unique constraint" in s or "ya existe" in s
+
+# --- API ---
+
+def crear_usuario(usuario: str, contrasena: str, rol: str):
+    conn = None
     try:
         conn = get_connection()
         cur = conn.cursor()
-        hashed = _hash_password(contrasena)
+        hashed = _hash_password(contrasena)  # guardamos como TEXT
         cur.execute(
             "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (%s, %s, %s)",
             (usuario, hashed, rol)
@@ -30,15 +42,18 @@ def crear_usuario(usuario, contrasena, rol):
         conn.commit()
         print(f"✅ Usuario '{usuario}' creado correctamente ({rol}).")
     except Exception as e:
-        manejar_error_db(e, "crear usuario")
-        print(f"⚠️  Error al crear el usuario '{usuario}': {e}")
-    #except sqlite3.IntegrityError:
-        print(f"⚠️  El usuario '{usuario}' ya existe.")
+        if _es_duplicado_pg(e):
+            print(f"⚠️  El usuario '{usuario}' ya existe.")
+        else:
+            manejar_error_db(e, "crear usuario")
+            print(f"⚠️  Error al crear el usuario '{usuario}': {e}")
     finally:
-        conn.close()
+        if 'conn' in locals() and conn:
+            conn.close()
 
-# === Autenticar usuario (login) ===
-def autenticar_usuario(usuario, contrasena):
+def autenticar_usuario(usuario: str, contrasena: str):
+    conn = None
+    fila = None
     try:
         conn = get_connection()
         cur = conn.cursor()
@@ -47,21 +62,25 @@ def autenticar_usuario(usuario, contrasena):
     except Exception as e:
         manejar_error_db(e, "autenticar usuario")
     finally:
-        conn.close()
-    if fila:
-        hashed, rol = fila
-        try:
-            if bcrypt.checkpw(contrasena.encode("utf-8"), hashed):
-                # Bloque extra: impide clones del GOD (solo root_god puede tener rol 'god')
-                if rol == "god" and usuario != "root_god":
-                    return False, None
-                return True, rol
-        except Exception:
-            pass
+        if 'conn' in locals() and conn:
+            conn.close()
+    if not fila:
+        return False, None
+    hashed_str_o_bytes, rol = fila
+    hashed = _as_bytes(hashed_str_o_bytes)
+    try:
+        if bcrypt.checkpw(contrasena.encode("utf-8"), hashed):
+            # blindaje: solo root_god puede ostentar rol god
+            if rol == "god" and usuario != "root_god":
+                return False, None
+            return True, rol
+    except Exception as e:
+        print("⚠️ Error al verificar hash:", e)
     return False, None
 
-# === Verificar contraseña actual (para MiCuentaWindow) ===
-def verificar_contrasena(usuario, contrasena):
+def verificar_contrasena(usuario: str, contrasena: str) -> bool:
+    conn = None
+    fila = None
     try:
         conn = get_connection()
         cur = conn.cursor()
@@ -69,46 +88,54 @@ def verificar_contrasena(usuario, contrasena):
         fila = cur.fetchone()
     except Exception as e:
         manejar_error_db(e, "verificar contraseña")
+        return False
     finally:
-        conn.close()
-        return fila and bcrypt.checkpw(contrasena.encode("utf-8"), fila[0])
+        if 'conn' in locals() and conn:
+            conn.close()
+    if not fila:
+        return False
+    hashed = _as_bytes(fila[0])
+    return bcrypt.checkpw(contrasena.encode("utf-8"), hashed)
 
-# === Cambiar contraseña ===
-def cambiar_contrasena(usuario, nueva_contrasena):
+def cambiar_contrasena(usuario: str, nueva_contrasena: str):
     if not nueva_contrasena:
         return
+    conn = None
     try:
         conn = get_connection()
         cur = conn.cursor()
-        hashed = bcrypt.hashpw(nueva_contrasena.encode('utf-8'), bcrypt.gensalt())
+        hashed = _hash_password(nueva_contrasena)  # guardamos como TEXT
         cur.execute("UPDATE usuarios SET contrasena = %s WHERE usuario = %s", (hashed, usuario))
         conn.commit()
     except Exception as e:
         manejar_error_db(e, "cambiar contraseña")
     finally:
-        conn.close()
+        if 'conn' in locals() and conn:
+            conn.close()
 
-# === Obtener usuarios (para ventana admin/GOD) ===
-def obtener_usuarios(incluir_god=False):
+def obtener_usuarios(incluir_god: bool = False):
+    conn = None
+    usuarios = []
     try:
         conn = get_connection()
         cur = conn.cursor()
         if incluir_god:
-            cur.execute("SELECT usuario, rol FROM usuarios ORDER BY rol DESC")
+            cur.execute("SELECT usuario, rol FROM usuarios ORDER BY rol DESC, usuario ASC")
         else:
-            cur.execute("SELECT usuario, rol FROM usuarios WHERE rol != 'god' ORDER BY rol DESC")
+            cur.execute("SELECT usuario, rol FROM usuarios WHERE rol != 'god' ORDER BY rol DESC, usuario ASC")
         usuarios = cur.fetchall()
     except Exception as e:
         manejar_error_db(e, "obtener usuarios")
     finally:
-        conn.close()
-        return usuarios
+        if 'conn' in locals() and conn:
+            conn.close()
+    return usuarios
 
-# === Eliminar usuario ===
-def eliminar_usuario(usuario):
-    if usuario == "root_god":  # Evita que el usuario GOD sea eliminado
-        print("Intento de eliminar root_god bloqueado.")
+def eliminar_usuario(usuario: str):
+    if usuario == "root_god":
+        print("❌ No se puede eliminar el usuario raíz.")
         return
+    conn = None
     try:
         conn = get_connection()
         cur = conn.cursor()
@@ -117,16 +144,17 @@ def eliminar_usuario(usuario):
     except Exception as e:
         manejar_error_db(e, "eliminar usuario")
     finally:
-        conn.close()
+        if 'conn' in locals() and conn:
+            conn.close()
 
-# === Crear admin por defecto si no existe ===
 def iniciar_admin():
+    """Crea admin/admin123 si no existe."""
+    conn = None
     try:
         conn = get_connection()
         cur = conn.cursor()
         cur.execute("SELECT 1 FROM usuarios WHERE usuario = 'admin'")
         existe = cur.fetchone()
-        conn.close()
         if not existe:
             crear_usuario("admin", "admin123", "admin")
             print("🛠️  Usuario 'admin' creado (contraseña: admin123)")
@@ -134,30 +162,34 @@ def iniciar_admin():
             print("Admin ya existe, no se recrea.")
     except Exception as e:
         manejar_error_db(e, "iniciar admin")
+    finally:
+        if 'conn' in locals() and conn:
+            conn.close()
 
-# === Crear usuario GOD si no existe ===
 def iniciar_god():
+    """Crea root_god/root1234 si no existe."""
+    conn = None
     try:
         conn = get_connection()
         cur = conn.cursor()
         cur.execute("SELECT 1 FROM usuarios WHERE rol = 'god'")
         existe = cur.fetchone()
         if not existe:
-            hashed = _hash_password("root1234")  # puedes cambiar la contraseña aquí
             cur.execute(
                 "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (%s, %s, %s)",
-                ("root_god", hashed, "god")
+                ("root_god", _hash_password("root1234"), "god")
             )
             conn.commit()
             print("⚡ Usuario 'root_god' creado automáticamente (contraseña: root1234)")
     except Exception as e:
-        manejar_error_db(e, "crear GOD")
+        manejar_error_db(e, "iniciar god")
     finally:
-        conn.close()
+        if 'conn' in locals() and conn:
+            conn.close()
 
-# === Ejecución directa ===
 if __name__ == "__main__":
-    #from db_connection import get_connection
+    # smoke test rápido
+    conn = None
     try:
         conn = get_connection()
         cur = conn.cursor()
@@ -166,4 +198,5 @@ if __name__ == "__main__":
     except Exception as e:
         manejar_error_db(e, "conectando")
     finally:
-        conn.close()
+        if 'conn' in locals() and conn:
+            conn.close()
