@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkcalendar import DateEntry
 from tkinter import ttk, messagebox
 from datetime import datetime
 from models import matriculas as model
@@ -130,11 +131,18 @@ class MatriculasWindow(tk.Toplevel):
         for i, (label, valor) in enumerate(campos):
             ttk.Label(frame, text=label + ":", background=self.bg_color).grid(row=i, column=0, sticky="w", padx=5, pady=5)         
             # Los primeros cuatro campos son de solo lectura
-            if label != "Fecha matrícula":
-                entry = ttk.Entry(frame, width=28, state="readonly")
-                entry.insert(0, valor)
+            if label == "Fecha matrícula":
+                entry = DateEntry(
+                    frame,
+                    width=25,
+                    date_pattern="yyyy-mm-dd",
+                    background="lightblue",
+                    foreground="black",
+                    borderwidth=2
+                )
+                entry.set_date(valor if valor else "")
             else:
-                entry = ttk.Entry(frame, width=28)
+                entry = ttk.Entry(frame, width=28, state="readonly")
                 entry.insert(0, valor if valor else "")        
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
             self.entries_edit[label] = entry
