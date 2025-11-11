@@ -63,7 +63,7 @@ class AlumnosWindows(tk.Toplevel):
         # === Botones inferiores ===
         frame_btns = tk.Frame(self, bg=self.bg_color)
         frame_btns.pack(pady=10)
-        ttk.Button(frame_btns, text="Actualizar lista", command=self.cargar_datos).grid(row=0, column=0, padx=5)
+        ttk.Button(frame_btns, text="Editar alumno", command=self.editar_seleccionado).grid(row=0, column=0, padx=5)
         ttk.Button(frame_btns, text="Añadir alumno", command=self.ventana_nuevo_alumno).grid(row=0, column=1, padx=5)
         ttk.Button(frame_btns, text="Eliminar seleccionado", command=self.eliminar_seleccionado).grid(row=0, column=2, padx=5)
         # Cargar datos al iniciar
@@ -78,6 +78,20 @@ class AlumnosWindows(tk.Toplevel):
             self.tree.insert("", tk.END, values=a)
         auto_ajustar_columnas(self.tree)
         ajustar_tamano_ventana(self.tree, self)
+
+    #=== Editar alumno ===
+    def editar_seleccionado(self):
+        item = self.tree.selection()
+        if not item:
+            messagebox.showwarning("Aviso", "Selecciona un alumno para editar.")
+            return
+        valores = self.tree.item(item, "values")
+        nif = valores[0]
+        datos = model.obtener_datos_alumno(nif)
+        if not datos:
+            messagebox.showerror("Error", "No se pudieron obtener los datos del alumno.")
+            return
+        self.ventana_editar_alumno(nif, datos)
 
     # === Eliminar alumno seleccionado ===
     def eliminar_seleccionado(self):
@@ -133,7 +147,6 @@ class AlumnosWindows(tk.Toplevel):
                     state="readonly",
                     width=25
                 )
-                entry.set("Mujer")  # Valor por defecto
             elif clave == "estado_laboral":
                 entry = ttk.Combobox(
                     frame,
@@ -141,7 +154,6 @@ class AlumnosWindows(tk.Toplevel):
                     state="readonly",
                     width=25
                 )
-                entry.set("Empleado")  # Valor por defecto
             else:
                 entry = ttk.Entry(frame, width=28)
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
@@ -151,6 +163,44 @@ class AlumnosWindows(tk.Toplevel):
             win,
             text="💾 Guardar alumno",
             command=lambda: self.guardar_alumno(win)
+        ).pack(pady=(15, 10))
+
+    #=== Ventanda editar alumno ===
+    def ventana_editar_alumno(self, nif, datos):
+        win = tk.Toplevel(self)
+        win.title(f"Editar alumno ({nif})")
+        win.geometry("420x560")
+        win.configure(bg=self.bg_color)
+        win.transient(self)
+        win.grab_set()
+        tk.Label(
+            win,
+            text=f"✏️ Editar datos de {datos[0]} {datos[1]}",
+            font=("Segoe UI", 12, "bold"),
+            fg="#3E64FF",
+            bg=self.bg_color
+        ).pack(pady=(10, 15))
+        frame = tk.Frame(win, bg=self.bg_color)
+        frame.pack(padx=15, pady=10, fill="both", expand=True)
+        campos = [
+            "Nombre", "Apellidos", "Localidad", "Código postal", "Teléfono",
+            "Email", "Sexo", "Edad", "Estudios", "Estado laboral"
+        ]
+        claves = [
+            "nombre", "apellidos", "localidad", "codigo_postal", "telefono",
+            "email", "sexo", "edad", "estudios", "estado_laboral"
+        ]
+        self.entries_edit = {}
+        for i, (label, clave, valor) in enumerate(zip(campos, claves, datos)):
+            ttk.Label(frame, text=label + ":", background=self.bg_color).grid(row=i, column=0, sticky="w", padx=5, pady=5)
+            entry = ttk.Entry(frame, width=28)
+            entry.insert(0, valor)
+            entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
+            self.entries_edit[clave] = entry
+        ttk.Button(
+            win,
+            text="💾 Guardar cambios",
+            command=lambda: self.guardar_edicion(nif, win)
         ).pack(pady=(15, 10))
 
     # === Guardar alumno ===
@@ -166,6 +216,15 @@ class AlumnosWindows(tk.Toplevel):
             self.cargar_datos()
         except Exception as e:
             messagebox.showerror("Error", str(e))
+
+    #=== Guardar alumno editado ===
+    def guardar_edicion(self, nif, ventana):
+        for campo, entry in self.entries_edit.items():
+            valor = entry.get().strip()
+            model.actualizar_alumno(nif, campo, valor)
+        messagebox.showinfo("Éxito", "Alumno actualizado correctamente.")
+        ventana.destroy()
+        self.cargar_datos()
 
     # === Doble click: abrir detalle ===
     def ver_detalle_alumno(self, event):
