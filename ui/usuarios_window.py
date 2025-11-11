@@ -90,7 +90,7 @@ class UsuariosWindow(tk.Toplevel):
         entry_contra = ttk.Entry(frame, width=30, show="*")
         entry_contra.grid(row=1, column=1, padx=5, pady=5)
         ttk.Label(frame, text="Rol:").grid(row=2, column=0, padx=5, pady=5, sticky="w")
-        combo_rol = ttk.Combobox(frame, values=["usuario", "admin", "god"], state="readonly", width=28)
+        combo_rol = ttk.Combobox(frame, values=["usuario", "admin"], state="readonly", width=28)
         combo_rol.set("usuario")
         combo_rol.grid(row=2, column=1, padx=5, pady=5)
         ttk.Button(

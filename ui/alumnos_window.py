@@ -125,7 +125,25 @@ class AlumnosWindows(tk.Toplevel):
             ttk.Label(frame, text=label + ":", background=self.bg_color).grid(
                 row=i, column=0, sticky="w", padx=5, pady=5
             )
-            entry = ttk.Entry(frame, width=28)
+            # --- Campos con opciones desplegables ---
+            if clave == "sexo":
+                entry = ttk.Combobox(
+                    frame,
+                    values=["Mujer", "Hombre", "Otro"],
+                    state="readonly",
+                    width=25
+                )
+                entry.set("Mujer")  # Valor por defecto
+            elif clave == "estado_laboral":
+                entry = ttk.Combobox(
+                    frame,
+                    values=["Empleado", "Desempleado", "Estudiante"],
+                    state="readonly",
+                    width=25
+                )
+                entry.set("Empleado")  # Valor por defecto
+            else:
+                entry = ttk.Entry(frame, width=28)
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
             self.entries[clave] = entry
         # === Botón de guardar ===
