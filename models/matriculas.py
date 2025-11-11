@@ -69,21 +69,21 @@ def obtener_matriculas():
             conn.close()
         return datos
 
-#=== Eliminar matrícula ===#
-def eliminar_matricula(id_matricula):
-    #Elimina una matrícula específica según su ID.
-    conn = None
+def eliminar_matricula(nif_alumno, codigo_curso):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM matriculas WHERE id = %s", (id_matricula,))
+        cursor.execute(
+            "DELETE FROM matriculas WHERE nif_alumno = %s AND codigo_curso = %s",
+            (nif_alumno, codigo_curso)
+        )
         conn.commit()
-        print(f"🗑️ Matrícula con ID {id_matricula} eliminada correctamente.")
     except Exception as e:
-        manejar_error_db(e, "eliminar matrícula")
+        manejar_error_db(e, "eliminar matricula")
     finally:
-        if 'conn' in locals() and conn:
-            conn.close()
+        conn.close()
+        print(f"🗑️ Matrícula de {nif_alumno} en {codigo_curso} eliminada.")
+
 
 #=== Buscar cursos por alumno ===#
 def obtener_cursos_por_alumno(nif_alumno):

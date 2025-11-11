@@ -140,6 +140,10 @@ class MatriculasWindow(tk.Toplevel):
                     foreground="black",
                     borderwidth=2
                 )
+                # Abre calendario también haciendo click en el campo
+                entry.bind("<Button-1>", lambda e, de=entry: de.drop_down())
+                # Cierra calendario al hacer click fuera sin obligar a seleccionar
+                entry.bind("<FocusOut>", lambda e, de=entry: de._top_cal.withdraw() if getattr(de, "_top_cal", None) else None)
                 entry.set_date(valor if valor else "")
             else:
                 entry = ttk.Entry(frame, width=28, state="readonly")
@@ -150,7 +154,7 @@ class MatriculasWindow(tk.Toplevel):
             win,
             text="💾 Guardar cambios",
             command=lambda: self.guardar_edicion(datos["nif_alumno"], datos["codigo_curso"], win)
-        ).pack(pady=(15, 10))
+        ).pack(pady=(15, 20))
 
     # === Guardar cambios ===
     def guardar_edicion(self, nif_alumno, codigo_curso, ventana):
@@ -164,6 +168,22 @@ class MatriculasWindow(tk.Toplevel):
             if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
                 messagebox.showwarning("Formato incorrecto", "Usa el formato AAAA-MM-DD para la fecha.")
                 return
+            # Validación contra fechas del curso
+            datos_curso = cursos.obtener_datos_curso(codigo_curso)
+            if datos_curso and len(datos_curso) >= 3:
+                try:
+                    fecha_inicio = datetime.strptime(str(datos_curso[1]), "%Y-%m-%d")
+                    fecha_fin = datetime.strptime(str(datos_curso[2]), "%Y-%m-%d")
+                    fecha_mat = datetime.strptime(fecha, "%Y-%m-%d")
+                    if fecha_mat < fecha_inicio or fecha_mat > fecha_fin:
+                        messagebox.showwarning(
+                            "Fecha no válida",
+                            "La fecha de matrícula debe estar entre la fecha de inicio y la fecha de fin del curso."
+                        )
+                        return
+                except Exception:
+                    messagebox.showwarning("Error de formato", "Verifica las fechas del curso o la matrícula.")
+                    return
             model.actualizar_fecha_matricula(nif_alumno, codigo_curso, fecha)
             messagebox.showinfo("Éxito", "Fecha de matrícula actualizada correctamente.")
             ventana.destroy()

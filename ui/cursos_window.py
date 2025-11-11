@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkcalendar import DateEntry
 from tkinter import ttk, messagebox
+from datetime import datetime
 from models import cursos as model
 from ui.utils_style import aplicar_estilo_global
 from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
@@ -141,6 +142,7 @@ class CursosWindow(tk.Toplevel):
                     foreground="black",
                     borderwidth=2
                 )
+                entry.bind("<FocusOut>", lambda e: entry._top_cal.withdraw() if entry._top_cal else None)
             else:
                 entry = ttk.Entry(frame, width=28)
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
@@ -158,6 +160,16 @@ class CursosWindow(tk.Toplevel):
                 valor = entry.get().strip()
                 if valor == "":
                     messagebox.showwarning("Campo vacío", f"El campo '{campo}' no puede estar vacío.")
+                    return
+                # Validar coherencia de fechas
+                try:
+                    inicio = datetime.strptime(self.entries_edit["fecha_inicio"].get(), "%Y-%m-%d")
+                    fin = datetime.strptime(self.entries_edit["fecha_fin"].get(), "%Y-%m-%d")
+                    if fin < inicio:
+                        messagebox.showwarning("Fechas inválidas", "La fecha de fin no puede ser anterior a la de inicio.")
+                        return
+                except Exception:
+                    messagebox.showwarning("Formato incorrecto", "Las fechas deben tener formato AAAA-MM-DD.")
                     return
                 model.actualizar_curso(codigo, campo, valor)
             messagebox.showinfo("Éxito", "Curso actualizado correctamente.")
@@ -225,6 +237,7 @@ class CursosWindow(tk.Toplevel):
                     foreground="black",
                     borderwidth=2
                 )
+                entry.bind("<FocusOut>", lambda e: entry._top_cal.withdraw() if entry._top_cal else None)
             else:
                 entry = ttk.Entry(frame, width=28)
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
@@ -243,6 +256,16 @@ class CursosWindow(tk.Toplevel):
             messagebox.showerror("Error", "Rellena todos los campos.")
             return
         try:
+            # Validar coherencia de fechas
+            try:
+                inicio = datetime.strptime(self.entries_edit["fecha_inicio"].get(), "%Y-%m-%d")
+                fin = datetime.strptime(self.entries_edit["fecha_fin"].get(), "%Y-%m-%d")
+                if fin < inicio:
+                    messagebox.showwarning("Fechas inválidas", "La fecha de fin no puede ser anterior a la de inicio.")
+                    return
+            except Exception:
+                messagebox.showwarning("Formato incorrecto", "Las fechas deben tener formato AAAA-MM-DD.")
+                return
             model.crear_curso(*datos)
             messagebox.showinfo("Éxito", "Curso añadido correctamente.")
             ventana.destroy()
