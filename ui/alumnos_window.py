@@ -193,8 +193,28 @@ class AlumnosWindows(tk.Toplevel):
         self.entries_edit = {}
         for i, (label, clave, valor) in enumerate(zip(campos, claves, datos)):
             ttk.Label(frame, text=label + ":", background=self.bg_color).grid(row=i, column=0, sticky="w", padx=5, pady=5)
-            entry = ttk.Entry(frame, width=28)
-            entry.insert(0, valor)
+
+            # Campos especiales con Combobox
+            if clave == "sexo":
+                entry = ttk.Combobox(
+                    frame,
+                    values=["Mujer", "Hombre", "Otro"],
+                    state="readonly",
+                    width=25
+                )
+                entry.set(valor if valor in ["Mujer", "Hombre", "Otro"] else "")
+            elif clave == "estado_laboral":
+                entry = ttk.Combobox(
+                    frame,
+                    values=["Empleado/a", "Desempleado/a", "Estudiante"],
+                    state="readonly",
+                    width=25
+                )
+                entry.set(valor if valor in ["Empleado/a", "Desempleado/a", "Estudiante"] else "")
+            else:
+                entry = ttk.Entry(frame, width=28)
+                entry.insert(0, valor if valor is not None else "")
+
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
             self.entries_edit[clave] = entry
         ttk.Button(
