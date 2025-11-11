@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkcalendar import DateEntry
 from tkinter import ttk, messagebox
 from models import cursos as model
 from ui.utils_style import aplicar_estilo_global
@@ -130,6 +131,18 @@ class CursosWindow(tk.Toplevel):
             else:
                 entry = ttk.Entry(frame, width=28)
                 entry.insert(0, valor if valor is not None else "")
+            # Si el campo es de fecha, usamos DateEntry
+            if clave in ("fecha_inicio", "fecha_fin"):
+                entry = DateEntry(
+                    frame,
+                    width=25,
+                    date_pattern="yyyy-mm-dd",
+                    background="lightblue",
+                    foreground="black",
+                    borderwidth=2
+                )
+            else:
+                entry = ttk.Entry(frame, width=28)
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
             self.entries_edit[clave] = entry
         ttk.Button(
@@ -202,6 +215,18 @@ class CursosWindow(tk.Toplevel):
                 row=i, column=0, sticky="w", padx=5, pady=5
             )
             entry = ttk.Entry(frame, width=30)
+            # Si el campo es de fecha, usamos DateEntry
+            if clave in ("fecha_inicio", "fecha_fin"):
+                entry = DateEntry(
+                    frame,
+                    width=25,
+                    date_pattern="yyyy-mm-dd",
+                    background="lightblue",
+                    foreground="black",
+                    borderwidth=2
+                )
+            else:
+                entry = ttk.Entry(frame, width=28)
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
             self.entries[clave] = entry
         # === Botón de guardar ===

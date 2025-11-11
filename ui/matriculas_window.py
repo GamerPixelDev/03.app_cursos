@@ -150,14 +150,12 @@ class MatriculasWindow(tk.Toplevel):
             fecha = self.entries_edit["Fecha matrícula"].get().strip()
             if not fecha:
                 messagebox.showwarning("Campo vacío", "La fecha de matrícula no puede estar vacía.")
-                return
-            
+                return          
             # Validamos formato básico (YYYY-MM-DD)
             import re
             if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
                 messagebox.showwarning("Formato incorrecto", "Usa el formato AAAA-MM-DD para la fecha.")
                 return
-
             model.actualizar_fecha_matricula(nif_alumno, codigo_curso, fecha)
             messagebox.showinfo("Éxito", "Fecha de matrícula actualizada correctamente.")
             ventana.destroy()
