@@ -6,7 +6,6 @@ from models import alumnos, cursos
 from ui.utils_style import aplicar_estilo_global
 from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 
-
 class MatriculasWindow(tk.Toplevel):
     def __init__(self, parent, modo="claro"):
         super().__init__(parent)
@@ -93,7 +92,6 @@ class MatriculasWindow(tk.Toplevel):
         win.configure(bg=self.bg_color)
         win.transient(self)
         win.grab_set()
-
         # === Encabezado ===
         tk.Label(
             win,
@@ -112,7 +110,7 @@ class MatriculasWindow(tk.Toplevel):
         alumno = alumnos.obtener_alumnos()
         self.combo_alumnos = ttk.Combobox(
             frame,
-            values=[f"{a[0]} - {a[1]} {a[2]}" for a in alumno],
+            values=[f"{a[0]} - {a[1]} {a[4]}" for a in alumno],
             width=35,
             state="readonly"
         )
@@ -124,7 +122,7 @@ class MatriculasWindow(tk.Toplevel):
         curso = cursos.obtener_cursos()
         self.combo_cursos = ttk.Combobox(
             frame,
-            values=[f"{c[0]} - {c[2]}" for c in curso],
+            values=[f"{c[0]} - {c[1]}" for c in curso],
             width=35,
             state="readonly"
         )
@@ -140,15 +138,12 @@ class MatriculasWindow(tk.Toplevel):
     def guardar_matricula(self, ventana):
         alumno_sel = self.combo_alumnos.get()
         curso_sel = self.combo_cursos.get()
-
         if not alumno_sel or not curso_sel:
             messagebox.showerror("Error", "Selecciona alumno y curso.")
             return
-
         nif_alumno = alumno_sel.split(" - ")[0]
         codigo_curso = curso_sel.split(" - ")[0]
         fecha_matricula = datetime.now().strftime("%Y-%m-%d")
-
         exito = model.crear_matricula(nif_alumno, codigo_curso, fecha_matricula)
         if exito:
             messagebox.showinfo("Éxito", "Matrícula creada correctamente.")
