@@ -156,3 +156,19 @@ def obtener_alumnos_por_curso(codigo_curso):
         if 'conn' in locals() and conn:
             conn.close()
         return datos
+    
+def actualizar_fecha_matricula(nif_alumno, codigo_curso, nueva_fecha):
+    """Actualiza la fecha de matrícula de un alumno en un curso."""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE matriculas
+            SET fecha_matricula = %s
+            WHERE nif_alumno = %s AND codigo_curso = %s
+        """, (nueva_fecha, nif_alumno, codigo_curso))
+        conn.commit()
+    except Exception as e:
+        manejar_error_db(e, "actualizar fecha de matrícula")
+    finally:
+        conn.close()

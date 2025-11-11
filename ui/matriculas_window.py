@@ -51,7 +51,7 @@ class MatriculasWindow(tk.Toplevel):
         # === Botones ===
         frame_btns = tk.Frame(self, bg=self.bg_color)
         frame_btns.pack(pady=10)
-        ttk.Button(frame_btns, text="Actualizar lista", command=self.cargar_datos).grid(row=0, column=0, padx=5)
+        ttk.Button(frame_btns, text="Editar seleccionado", command=self.editar_seleccionado).grid(row=0, column=0, padx=5)
         ttk.Button(frame_btns, text="Nueva matrícula", command=self.ventana_nueva_matricula).grid(row=0, column=1, padx=5)
         ttk.Button(frame_btns, text="Eliminar seleccionada", command=self.eliminar_seleccionada).grid(row=0, column=2, padx=5)
         self.cargar_datos()
@@ -82,6 +82,88 @@ class MatriculasWindow(tk.Toplevel):
         if confirmar:
             model.eliminar_matricula(nif, codigo_curso)
             self.cargar_datos()
+
+    # === Editar matrícula seleccionada ===
+    def editar_seleccionado(self):
+        item = self.tree.selection()
+        if not item:
+            messagebox.showwarning("Aviso", "Selecciona una matrícula para editar.")
+            return
+        valores = self.tree.item(item, "values")
+        nif_alumno, nombre, codigo_curso, curso, fecha_matricula = valores
+        # Preparamos los datos para mostrar
+        datos = {
+            "nif_alumno": nif_alumno,
+            "nombre": nombre,
+            "codigo_curso": codigo_curso,
+            "curso": curso,
+            "fecha_matricula": fecha_matricula
+        }
+        self.ventana_editar_matricula(datos)
+
+    # === Ventana para editar matrícula ===
+    def ventana_editar_matricula(self, datos):
+        win = tk.Toplevel(self)
+        win.title(f"✏️ Editar matrícula ({datos['nif_alumno']} - {datos['codigo_curso']})")
+        win.geometry("420x300")
+        win.resizable(False, False)
+        win.configure(bg=self.bg_color)
+        win.transient(self)
+        win.grab_set()
+        tk.Label(
+            win,
+            text="Editar matrícula",
+            font=("Segoe UI", 12, "bold"),
+            fg="#3E64FF",
+            bg=self.bg_color
+        ).pack(pady=(10, 15))
+        frame = tk.Frame(win, bg=self.bg_color)
+        frame.pack(padx=15, pady=10, fill="both", expand=True)
+        campos = [
+            ("Alumno (NIF)", datos["nif_alumno"]),
+            ("Nombre", datos["nombre"]),
+            ("Código del curso", datos["codigo_curso"]),
+            ("Curso", datos["curso"]),
+            ("Fecha matrícula", datos["fecha_matricula"])
+        ]
+        self.entries_edit = {}
+        for i, (label, valor) in enumerate(campos):
+            ttk.Label(frame, text=label + ":", background=self.bg_color).grid(row=i, column=0, sticky="w", padx=5, pady=5)         
+            # Los primeros cuatro campos son de solo lectura
+            if label != "Fecha matrícula":
+                entry = ttk.Entry(frame, width=28, state="readonly")
+                entry.insert(0, valor)
+            else:
+                entry = ttk.Entry(frame, width=28)
+                entry.insert(0, valor if valor else "")        
+            entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
+            self.entries_edit[label] = entry
+        ttk.Button(
+            win,
+            text="💾 Guardar cambios",
+            command=lambda: self.guardar_edicion(datos["nif_alumno"], datos["codigo_curso"], win)
+        ).pack(pady=(15, 10))
+
+    # === Guardar cambios ===
+    def guardar_edicion(self, nif_alumno, codigo_curso, ventana):
+        try:
+            fecha = self.entries_edit["Fecha matrícula"].get().strip()
+            if not fecha:
+                messagebox.showwarning("Campo vacío", "La fecha de matrícula no puede estar vacía.")
+                return
+            
+            # Validamos formato básico (YYYY-MM-DD)
+            import re
+            if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+                messagebox.showwarning("Formato incorrecto", "Usa el formato AAAA-MM-DD para la fecha.")
+                return
+
+            model.actualizar_fecha_matricula(nif_alumno, codigo_curso, fecha)
+            messagebox.showinfo("Éxito", "Fecha de matrícula actualizada correctamente.")
+            ventana.destroy()
+            self.cargar_datos()
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo actualizar la matrícula:\n{e}")
 
     # === Ventana nueva matrícula ===
     def ventana_nueva_matricula(self):
