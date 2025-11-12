@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from ui.utils_style import aplicar_estilo_global
-
-
 class MainMenuWindow(tk.Frame):
     def __init__(self, parent, usuario, rol, modo, callbacks, logout_callback):
         super().__init__(parent, bg=aplicar_estilo_global(modo)[1])
@@ -21,7 +19,7 @@ class MainMenuWindow(tk.Frame):
         header = tk.Frame(self, bg=bg_color)
         header.pack(fill="x", pady=(10, 20))
         # Título principal
-        tk.Label(
+        """tk.Label(
             header,
             text="💼 Gestor de Cursos",
             font=("Segoe UI", 18, "bold"),
@@ -41,7 +39,7 @@ class MainMenuWindow(tk.Frame):
             style="Custom.TMenubutton"
         )
         self.btn_usuario["menu"] = self.menu_usuario
-        self.btn_usuario.pack(side="right", padx=20)
+        self.btn_usuario.pack(side="right", padx=20)"""
         # === BOTONES PRINCIPALES ===
         frame_botones = tk.Frame(self, bg=bg_color)
         frame_botones.pack(expand=True)

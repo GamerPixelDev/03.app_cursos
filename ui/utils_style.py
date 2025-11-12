@@ -1,5 +1,9 @@
 from tkinter import ttk
 
+CLARO_BG = "#F5F7FB"
+OSC_BG   = "#121417"
+PRIMARIO = "#3E64FF"
+
 #--- Aplica un estilo visual coherente a toda la app (modo claro u oscuro) ---
 def aplicar_estilo_global(modo="claro"):
     style = ttk.Style()
@@ -7,54 +11,37 @@ def aplicar_estilo_global(modo="claro"):
         style.theme_use("clam")
     except Exception:
         pass
-    # --- Paleta de colores según modo ---
-    if modo.lower() == "oscuro":
-        fondo = "#1E1E1E"          # fondo general
-        fondo_widget = "#2A2A2A"   # fondo de campos/frames
-        texto = "#FFFFFF"          # texto principal
-        texto_invertido = "#000000"
-        principal = "#4A90E2"      # azul acento
-        seleccion = "#4A90E2"
-    else:  # modo claro (por defecto)
-        fondo = "#F5F6FA"
-        fondo_widget = "#FFFFFF"
-        texto = "#222222"
-        texto_invertido = "#FFFFFF"
-        principal = "#3E64FF"
-        seleccion = "#4A90E2"
-    # --- Estilo de Treeview (tablas) ---
-    style.configure(
-        "Treeview",
-        background=fondo_widget,
-        fieldbackground=fondo_widget,
-        foreground=texto,
-        rowheight=24,
-        font=("Segoe UI", 10)
-    )
-    style.configure(
-        "Treeview.Heading",
-        background=principal,
-        foreground=texto_invertido,
-        font=("Segoe UI", 10, "bold")
-    )
-    style.map(
-        "Treeview",
-        background=[("selected", seleccion)]
-    )
-    # --- Botones ---
+    bg = CLARO_BG if modo == "claro" else OSC_BG
+    fg = "#1a1a1a" if modo == "claro" else "#E8E8E8"
+    card = "#FFFFFF" if modo == "claro" else "#1b1f24"
+    # Botón básico
     style.configure(
         "TButton",
-        font=("Segoe UI", 10),
         padding=6,
-        background=principal,
-        foreground=texto_invertido
+        font=("Segoe UI", 10),
+        background=PRIMARIO,
+        foreground="white"
     )
-    style.map(
-        "TButton",
-        background=[("active", seleccion)]
-    )
-    # --- Labels (sin fondo marrón) ---
-    style.configure("TLabel", font=("Segoe UI", 10), foreground=texto, background=fondo)
-    # --- Frames y fondo general ---
-    style.configure("TFrame", background=fondo)
-    return style, fondo
+    style.map("TButton", background=[("active", "#2f53e8")])
+    # Label y Frame “card”
+    style.configure("TLabel", background=bg, foreground=fg)
+    style.configure("Card.TFrame", background=card)
+    # Treeview
+    tv_bg  = "#FFFFFF" if modo == "claro" else "#101318"
+    tv_fg  = "#222"    if modo == "claro" else "#E8E8E8"
+    th_bg  = "#e6e9f2" if modo == "claro" else "#20242b"
+    style.configure("Treeview", background=tv_bg, foreground=tv_fg, fieldbackground=tv_bg)
+    style.configure("Treeview.Heading", background=th_bg, foreground=tv_fg)
+    return style, bg
+
+def pintar_fondo_recursivo(widget, bg):
+    #Aplica bg a frames/labels descendientes y fuerza redraw
+    import tkinter as tk
+    tipos = (tk.Frame, tk.Label, tk.LabelFrame, tk.Toplevel, tk.Canvas)
+    if isinstance(widget, tipos):
+        try:
+            widget.configure(bg=bg)
+        except Exception:
+            pass
+    for child in widget.winfo_children():
+        pintar_fondo_recursivo(child, bg)
