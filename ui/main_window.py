@@ -10,6 +10,7 @@ from ui.usuarios_window import UsuariosWindow
 from ui.mi_cuenta_window import MiCuentaWindow
 from ui.god_panel_window import GodPanelWindow
 from ui.main_menu_window import MainMenuWindow
+from ui.login_window import LoginWindow
 from datetime import datetime
 from models import export_utils, export_pdf, import_utils
 
@@ -31,7 +32,7 @@ class MainWindow:
         self._crear_menus()
         # === Separador ===
         ttk.Separator(self.root, orient="horizontal").pack(fill="x")
-        #=== Menú de botones ===
+        # Menú visual principal
         self.menu_principal = MainMenuWindow(
             self.root,
             usuario=self.usuario,
@@ -43,11 +44,11 @@ class MainWindow:
                 "matriculas": lambda: self.ver_matriculas(),
                 "usuarios": lambda: self.gestion_usuarios(),
                 "god": lambda: self.panel_god(),
-                "cuenta": lambda: self.mi_cuenta(),
-                "salir": self.root.quit
-            }
-)
-
+                "editar_nombre": lambda: messagebox.showinfo("En desarrollo", "Funcionalidad para cambiar nombre próximamente."),
+                "cambiar_contra": lambda: self.mi_cuenta(),
+            },
+            logout_callback=self.logout
+        )
         # === Footer ===
         self._crear_footer()
         self.root.mainloop()
@@ -210,3 +211,8 @@ class MainWindow:
         self.style, self.bg_color = aplicar_estilo_global(self.modo)
         self.root.configure(bg=self.bg_color)
         self.icon_modo.config(text="🌙" if self.modo == "oscuro" else "🌞")
+
+    # === Cerrar sesión (logout) ===
+    def logout(self):
+        self.root.destroy()
+        LoginWindow()  # vuelve a la ventana de login
