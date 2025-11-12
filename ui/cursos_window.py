@@ -110,30 +110,22 @@ class CursosWindow(tk.Toplevel):
         frame = tk.Frame(win, bg=self.bg_color)
         frame.pack(padx=15, pady=10, fill="both", expand=True)
         campos = [
-            "Nombre", "Fecha inicio", "Fecha fin", "Lugar",
-            "Modalidad", "Horas", "Responsable"
-        ]
-        claves = [
-            "nombre", "fecha_inicio", "fecha_fin", "lugar",
-            "modalidad", "horas", "responsable"
+            ("Nombre", "nombre"),
+            ("Fecha inicio", "fecha_inicio"),
+            ("Fecha fin", "fecha_fin"),
+            ("Lugar", "lugar"),
+            ("Modalidad", "modalidad"),
+            ("Horas", "horas"),
+            ("Responsable", "responsable")
         ]
         self.entries_edit = {}
-        for i, (label, clave, valor) in enumerate(zip(campos, claves, datos)):
+        for i, (label, clave) in enumerate(campos):
             ttk.Label(frame, text=label + ":", background=self.bg_color).grid(row=i, column=0, sticky="w", padx=5, pady=5)
-            # Campos con opciones desplegables
+            valor = datos[i] if i < len(datos) else ""
             if clave == "modalidad":
-                entry = ttk.Combobox(
-                    frame,
-                    values=["Presencial", "Online", "Mixta"],
-                    state="readonly",
-                    width=25
-                )
-                entry.set(valor if valor in ["Presencial", "Online", "Mixta"] else "")
-            else:
-                entry = ttk.Entry(frame, width=28)
-                entry.insert(0, valor if valor is not None else "")
-            # Si el campo es de fecha, usamos DateEntry
-            if clave in ("fecha_inicio", "fecha_fin"):
+                entry = ttk.Combobox(frame, values=["Presencial", "Online", "Mixta"], state="readonly", width=25)
+                entry.set(valor if valor else "")
+            elif clave in ("fecha_inicio", "fecha_fin"):
                 entry = DateEntry(
                     frame,
                     width=25,
@@ -142,34 +134,38 @@ class CursosWindow(tk.Toplevel):
                     foreground="black",
                     borderwidth=2
                 )
-                entry.bind("<FocusOut>", lambda e: entry._top_cal.withdraw() if entry._top_cal else None)
+                if valor:
+                    try:
+                        entry.set_date(datetime.strptime(str(valor), "%Y-%m-%d"))
+                    except Exception:
+                        pass
+                entry.bind("<Button-1>", lambda e, de=entry: de.drop_down())
+                entry.bind("<FocusOut>", lambda e, de=entry: de._top_cal.withdraw() if getattr(de, "_top_cal", None) else None)
             else:
                 entry = ttk.Entry(frame, width=28)
+                entry.insert(0, valor if valor else "")
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
             self.entries_edit[clave] = entry
         ttk.Button(
             win,
             text="💾 Guardar cambios",
             command=lambda: self.guardar_edicion(codigo, win)
-        ).pack(pady=(15, 10))
+        ).pack(pady=(15, 20))
 
     # === Guardar cambios del curso ===
     def guardar_edicion(self, codigo, ventana):
         try:
+            # Validar coherencia de fechas
+            inicio = datetime.strptime(self.entries_edit["fecha_inicio"].get(), "%Y-%m-%d")
+            fin = datetime.strptime(self.entries_edit["fecha_fin"].get(), "%Y-%m-%d")
+            if fin < inicio:
+                messagebox.showwarning("Fechas inválidas", "La fecha de fin no puede ser anterior a la de inicio.")
+                return
+            # Actualizar cada campo
             for campo, entry in self.entries_edit.items():
                 valor = entry.get().strip()
                 if valor == "":
                     messagebox.showwarning("Campo vacío", f"El campo '{campo}' no puede estar vacío.")
-                    return
-                # Validar coherencia de fechas
-                try:
-                    inicio = datetime.strptime(self.entries_edit["fecha_inicio"].get(), "%Y-%m-%d")
-                    fin = datetime.strptime(self.entries_edit["fecha_fin"].get(), "%Y-%m-%d")
-                    if fin < inicio:
-                        messagebox.showwarning("Fechas inválidas", "La fecha de fin no puede ser anterior a la de inicio.")
-                        return
-                except Exception:
-                    messagebox.showwarning("Formato incorrecto", "Las fechas deben tener formato AAAA-MM-DD.")
                     return
                 model.actualizar_curso(codigo, campo, valor)
             messagebox.showinfo("Éxito", "Curso actualizado correctamente.")
@@ -200,7 +196,6 @@ class CursosWindow(tk.Toplevel):
         win.configure(bg=self.bg_color)
         win.transient(self)
         win.grab_set()
-        # === Encabezado ===
         tk.Label(
             win,
             text="Registro de nuevo curso",
@@ -208,14 +203,13 @@ class CursosWindow(tk.Toplevel):
             fg="#3E64FF",
             bg=self.bg_color
         ).pack(pady=(10, 15))
-        # === Contenedor principal ===
         frame = tk.Frame(win, bg=self.bg_color)
         frame.pack(padx=15, pady=10, fill="both", expand=True)
         campos = [
             ("Código del curso", "codigo_curso"),
             ("Nombre del curso", "nombre"),
-            ("Fecha inicio (AAAA-MM-DD)", "fecha_inicio"),
-            ("Fecha fin (AAAA-MM-DD)", "fecha_fin"),
+            ("Fecha inicio", "fecha_inicio"),
+            ("Fecha fin", "fecha_fin"),
             ("Lugar", "lugar"),
             ("Modalidad", "modalidad"),
             ("Horas", "horas"),
@@ -223,12 +217,10 @@ class CursosWindow(tk.Toplevel):
         ]
         self.entries = {}
         for i, (etiqueta, clave) in enumerate(campos):
-            ttk.Label(frame, text=etiqueta + ":", background=self.bg_color).grid(
-                row=i, column=0, sticky="w", padx=5, pady=5
-            )
-            entry = ttk.Entry(frame, width=30)
-            # Si el campo es de fecha, usamos DateEntry
-            if clave in ("fecha_inicio", "fecha_fin"):
+            ttk.Label(frame, text=etiqueta + ":", background=self.bg_color).grid(row=i, column=0, sticky="w", padx=5, pady=5)
+            if clave == "modalidad":
+                entry = ttk.Combobox(frame, values=["Presencial", "Online", "Mixta"], state="readonly", width=25)
+            elif clave in ("fecha_inicio", "fecha_fin"):
                 entry = DateEntry(
                     frame,
                     width=25,
@@ -237,34 +229,26 @@ class CursosWindow(tk.Toplevel):
                     foreground="black",
                     borderwidth=2
                 )
-                entry.bind("<FocusOut>", lambda e: entry._top_cal.withdraw() if entry._top_cal else None)
+                entry.bind("<Button-1>", lambda e, de=entry: de.drop_down())
+                entry.bind("<FocusOut>", lambda e, de=entry: de._top_cal.withdraw() if getattr(de, "_top_cal", None) else None)
             else:
                 entry = ttk.Entry(frame, width=28)
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
             self.entries[clave] = entry
-        # === Botón de guardar ===
-        ttk.Button(
-            win,
-            text="💾 Guardar curso",
-            command=lambda: self.guardar_curso(win)
-        ).pack(pady=(15, 10))
+        ttk.Button(win, text="💾 Guardar curso", command=lambda: self.guardar_curso(win)).pack(pady=(15, 20))
 
     # === Guardar curso ===
     def guardar_curso(self, ventana):
-        datos = [self.entries[c].get() for c in self.entries]
-        if not all(datos):
-            messagebox.showerror("Error", "Rellena todos los campos.")
-            return
         try:
+            datos = [self.entries[c].get() for c in self.entries]
+            if not all(datos):
+                messagebox.showerror("Error", "Rellena todos los campos.")
+                return
             # Validar coherencia de fechas
-            try:
-                inicio = datetime.strptime(self.entries_edit["fecha_inicio"].get(), "%Y-%m-%d")
-                fin = datetime.strptime(self.entries_edit["fecha_fin"].get(), "%Y-%m-%d")
-                if fin < inicio:
-                    messagebox.showwarning("Fechas inválidas", "La fecha de fin no puede ser anterior a la de inicio.")
-                    return
-            except Exception:
-                messagebox.showwarning("Formato incorrecto", "Las fechas deben tener formato AAAA-MM-DD.")
+            inicio = datetime.strptime(self.entries["fecha_inicio"].get(), "%Y-%m-%d")
+            fin = datetime.strptime(self.entries["fecha_fin"].get(), "%Y-%m-%d")
+            if fin < inicio:
+                messagebox.showwarning("Fechas inválidas", "La fecha de fin no puede ser anterior a la de inicio.")
                 return
             model.crear_curso(*datos)
             messagebox.showinfo("Éxito", "Curso añadido correctamente.")
