@@ -96,7 +96,7 @@ class BuscarAlumnoWindow(tk.Toplevel):
         texto_info = (
             f"Nombre: {nombre} {apellidos}\n"
             f"Localidad: {localidad} ({codigo_postal})\n"
-            f"Email: {email} | Tel: {telefono}\n"
+            f"Email: {telefono} | Tel: {email}\n"
             f"Sexo: {sexo} | Edad: {edad}\n"
             f"Estudios: {estudios}\n"
             f"Estado laboral: {estado_laboral}"
