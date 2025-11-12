@@ -228,11 +228,16 @@ class MainWindow:
     # Modo claro / oscuro
     # -------------------------------------------------
     def toggle_modo(self, event=None):
+        """Alterna entre modo claro y oscuro sin tocar el banner azul."""
         self.modo = "oscuro" if self.modo == "claro" else "claro"
         self.style, self.bg_color = aplicar_estilo_global(self.modo)
-        self.root.configure(bg=self.bg_color)
+        # 1️⃣ Recoloreamos solo el contenido (sin banner)
+        from ui.utils_style import pintar_fondo_recursivo
+        for child in self.root.winfo_children():
+            if str(child) != ".!frame":  # el primer frame es el banner azul
+                pintar_fondo_recursivo(child, self.bg_color)
+        # 2️⃣ Actualizamos solo el icono de sol/luna
         self.icon_modo.config(text="🌙" if self.modo == "oscuro" else "🌞")
-        self._retheme()  # <-- clave
 
     # === Cerrar sesión (logout) ===
     def logout(self):
