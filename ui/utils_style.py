@@ -38,6 +38,13 @@ def pintar_fondo_recursivo(widget, bg):
     #Aplica bg a frames/labels descendientes y fuerza redraw
     import tkinter as tk
     tipos = (tk.Frame, tk.Label, tk.LabelFrame, tk.Toplevel, tk.Canvas)
+    # Si el widget tiene el color azul del banner, lo saltamos
+    try:
+        actual_bg = widget.cget("bg")
+        if actual_bg == "#3E64FF":
+            return  # no lo tocamos, preserva el banner azul
+    except Exception:
+        pass
     if isinstance(widget, tipos):
         try:
             widget.configure(bg=bg)

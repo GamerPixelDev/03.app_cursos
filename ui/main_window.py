@@ -56,7 +56,8 @@ class MainWindow:
     # Banner superior
     # -------------------------------------------------
     def _crear_banner_superior(self):
-        banner = tk.Frame(self.root, bg="#3E64FF", height=60)
+        color_banner = "#3E64FF" if self.modo == "claro" else "#2b3b80"
+        banner = tk.Frame(self.root, bg=color_banner, height=60)
         banner.pack(fill="x", side="top")
         # === Título de la app ===
         tk.Label(
@@ -250,13 +251,11 @@ class MainWindow:
             self.menu_usuario.grab_release()
 
     def _retheme(self):
-        """Vuelve a aplicar el color de fondo y estilos a toda la ventana."""
+        #Vuelve a aplicar el color de fondo y estilos a toda la ventana
         from ui.utils_style import pintar_fondo_recursivo
         pintar_fondo_recursivo(self.root, self.bg_color)
-
         import tkinter.ttk as ttk
         import tkinter as tk
-
         def _retocar_tv(widget):
             # Recorre recursivamente los widgets
             for child in widget.winfo_children():
@@ -273,7 +272,6 @@ class MainWindow:
                     pass
                 except Exception:
                     pass
-
         _retocar_tv(self.root)
 
     def _hover_usuario_on(self, _e=None):
