@@ -9,7 +9,7 @@ from ui.buscar_curso_window import BuscarCursoWindow
 from ui.usuarios_window import UsuariosWindow
 from ui.mi_cuenta_window import MiCuentaWindow
 from ui.god_panel_window import GodPanelWindow
-from ui.dashboard_window import DashboardWindow
+from ui.main_menu_window import MainMenuWindow
 from datetime import datetime
 from models import export_utils, export_pdf, import_utils
 
@@ -31,8 +31,23 @@ class MainWindow:
         self._crear_menus()
         # === Separador ===
         ttk.Separator(self.root, orient="horizontal").pack(fill="x")
-        #=== Dashboard ===
-        self.dashboard = DashboardWindow(self.root, modo=self.modo)
+        #=== Menú de botones ===
+        self.menu_principal = MainMenuWindow(
+            self.root,
+            usuario=self.usuario,
+            rol=self.rol,
+            modo=self.modo,
+            callbacks={
+                "alumnos": lambda: self.ver_alumnos(),
+                "cursos": lambda: self.ver_cursos(),
+                "matriculas": lambda: self.ver_matriculas(),
+                "usuarios": lambda: self.gestion_usuarios(),
+                "god": lambda: self.panel_god(),
+                "cuenta": lambda: self.mi_cuenta(),
+                "salir": self.root.quit
+            }
+)
+
         # === Footer ===
         self._crear_footer()
         self.root.mainloop()
