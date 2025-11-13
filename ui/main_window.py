@@ -56,10 +56,9 @@ class MainWindow:
     # Banner superior
     # -------------------------------------------------
     def _crear_banner_superior(self):
-        color_banner = "#3E64FF" if self.modo == "claro" else "#2b3b80"
-        banner = tk.Frame(self.root, bg=color_banner, height=60)
+        banner = tk.Frame(self.root, bg="#3E64FF", height=60)
         banner.pack(fill="x", side="top")
-        # === Título de la app ===
+        # Título
         tk.Label(
             banner,
             text="💼 Gestor de Cursos",
@@ -67,40 +66,19 @@ class MainWindow:
             fg="white",
             font=("Segoe UI", 14, "bold")
         ).pack(side="left", padx=10)
-        # === Menú desplegable de usuario ===
-        self.menu_usuario = tk.Menu(self.root, tearoff=0)
-        self.menu_usuario.add_command(
-            label="✏️ Cambiar nombre de usuario",
-            command=lambda: messagebox.showinfo("En desarrollo", "Funcionalidad disponible próximamente.")
-        )
-        self.menu_usuario.add_command(
-            label="🔑 Cambiar contraseña",
-            command=self.mi_cuenta
-        )
-        self.menu_usuario.add_separator()
-        self.menu_usuario.add_command(
-            label="🚪 Cerrar sesión",
-            command=self.logout
-        )
-        # === Etiqueta del usuario (clickable) ===
-        self.lbl_usuario = tk.Label(
+        # Usuario
+        tk.Label(
             banner,
             text=f"👤 {self.usuario} ({self.rol})",
             bg="#3E64FF",
             fg="white",
-            font=("Segoe UI", 10, "italic"),
-            cursor="hand2"
-        )
-        self.lbl_usuario.pack(side="right", padx=15)
-        self.lbl_usuario.bind("<Button-1>", self._mostrar_menu_usuario)
-        self.lbl_usuario.bind("<Enter>", self._hover_usuario_on)
-        self.lbl_usuario.bind("<Leave>", self._hover_usuario_off)
-        # === Icono modo claro/oscuro ===
+            font=("Segoe UI", 10, "italic")
+        ).pack(side="right", padx=15)
+        # Botón modo claro/oscuro
         self.icon_modo = tk.Label(banner, text="🌞", bg="#3E64FF", fg="white", font=("Segoe UI", 16))
         self.icon_modo.pack(side="right", padx=10)
         self.icon_modo.bind("<Button-1>", self.toggle_modo)
         self.icon_modo.config(cursor="hand2")
-
     # -------------------------------------------------
     # Menús principales
     # -------------------------------------------------
@@ -151,6 +129,8 @@ class MainWindow:
             menu_usuarios.add_separator()
             menu_usuarios.add_command(label="Panel GOD", command=self.panel_god)
         menu_bar.add_cascade(label="👥 Usuarios", menu=menu_usuarios)
+        # === SALIR ===
+        menu_bar.add_command(label="Salir", command=self.root.quit)
         self.root.config(menu=menu_bar)
     # -------------------------------------------------
     # Footer
@@ -191,7 +171,6 @@ class MainWindow:
             messagebox.showinfo("Exportar a Excel", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
             messagebox.showerror("Error al exportar", str(e))
-
     def export_pdf(self, tipo):
         try:
             rutas = {
@@ -203,7 +182,6 @@ class MainWindow:
             messagebox.showinfo("Exportar a PDF", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
             messagebox.showerror("Error al exportar", str(e))
-
     def import_excel(self, tipo):
         ruta = filedialog.askopenfilename(title="Seleccionar archivo Excel", filetypes=[("Archivos Excel", "*.xlsx")])
         if not ruta:
@@ -228,15 +206,9 @@ class MainWindow:
     # Modo claro / oscuro
     # -------------------------------------------------
     def toggle_modo(self, event=None):
-        """Alterna entre modo claro y oscuro sin tocar el banner azul."""
         self.modo = "oscuro" if self.modo == "claro" else "claro"
         self.style, self.bg_color = aplicar_estilo_global(self.modo)
-        # 1️⃣ Recoloreamos solo el contenido (sin banner)
-        from ui.utils_style import pintar_fondo_recursivo
-        for child in self.root.winfo_children():
-            if str(child) != ".!frame":  # el primer frame es el banner azul
-                pintar_fondo_recursivo(child, self.bg_color)
-        # 2️⃣ Actualizamos solo el icono de sol/luna
+        self.root.configure(bg=self.bg_color)
         self.icon_modo.config(text="🌙" if self.modo == "oscuro" else "🌞")
 
     # === Cerrar sesión (logout) ===
@@ -244,61 +216,3 @@ class MainWindow:
         from ui.login_window import LoginWindow
         self.root.destroy()
         LoginWindow()  # vuelve a la ventana de login
-
-    # === Mostrar menú de usuario (arriba a la derecha) ===
-    def _mostrar_menu_usuario(self, event):
-        try:
-            # Calcula la posición del cursor
-            x = event.x_root
-            y = event.y_root
-            self.menu_usuario.tk_popup(x, y)
-        finally:
-            self.menu_usuario.grab_release()
-
-    def _retheme(self):
-        #Vuelve a aplicar el color de fondo y estilos a toda la ventana
-        from ui.utils_style import pintar_fondo_recursivo
-        pintar_fondo_recursivo(self.root, self.bg_color)
-        import tkinter.ttk as ttk
-        import tkinter as tk
-        def _retocar_tv(widget):
-            # Recorre recursivamente los widgets
-            for child in widget.winfo_children():
-                _retocar_tv(child)
-            # Si encuentra un Treeview, aplica un refresco visual seguro
-            if isinstance(widget, ttk.Treeview):
-                try:
-                    # crea una etiqueta temporal para forzar el redibujado
-                    widget.tag_configure("refresh", background="", foreground="")
-                    for iid in widget.get_children():
-                        widget.item(iid, tags=("refresh",))
-                except tk.TclError:
-                    # Si el widget no está listo o fue destruido, lo ignoramos
-                    pass
-                except Exception:
-                    pass
-        _retocar_tv(self.root)
-
-    def _hover_usuario_on(self, _e=None):
-        # resalta sutilmente y subraya
-        self.lbl_usuario.config(fg="#FFD76A")  # dorado suave
-        f = self.lbl_usuario.cget("font")
-        try:
-            import tkinter.font as tkf
-            font = tkf.Font(font=f)
-            font.configure(underline=1)
-            self.lbl_usuario.configure(font=font)
-        except Exception:
-            pass
-
-    def _hover_usuario_off(self, _e=None):
-        # vuelve a blanco sin subrayado
-        self.lbl_usuario.config(fg="white")
-        try:
-            import tkinter.font as tkf
-            f = self.lbl_usuario.cget("font")
-            font = tkf.Font(font=f)
-            font.configure(underline=0)
-            self.lbl_usuario.configure(font=font)
-        except Exception:
-            pass

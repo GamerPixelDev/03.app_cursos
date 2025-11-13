@@ -4,17 +4,20 @@ CLARO_BG = "#F5F7FB"
 OSC_BG   = "#121417"
 PRIMARIO = "#3E64FF"
 
-#--- Aplica un estilo visual coherente a toda la app (modo claro u oscuro) ---
+# =============================
+#  ESTILO GLOBAL ESTABLE
+# =============================
 def aplicar_estilo_global(modo="claro"):
     style = ttk.Style()
+    # Asegura un tema estable (clam no toca demasiado nada)
     try:
         style.theme_use("clam")
     except Exception:
         pass
+    # Colores principales
     bg = CLARO_BG if modo == "claro" else OSC_BG
     fg = "#1a1a1a" if modo == "claro" else "#E8E8E8"
-    card = "#FFFFFF" if modo == "claro" else "#1b1f24"
-    # Botón básico
+    # BOTONES
     style.configure(
         "TButton",
         padding=6,
@@ -23,26 +26,35 @@ def aplicar_estilo_global(modo="claro"):
         foreground="white"
     )
     style.map("TButton", background=[("active", "#2f53e8")])
-    # Label y Frame “card”
+    # LABELS BÁSICOS
     style.configure("TLabel", background=bg, foreground=fg)
-    style.configure("Card.TFrame", background=card)
-    # Treeview
-    tv_bg  = "#FFFFFF" if modo == "claro" else "#101318"
+    # TREEVIEW (Restaurado como antes)
+    tv_bg  = "#FFFFFF" if modo == "claro" else "#1A1D21"
     tv_fg  = "#222"    if modo == "claro" else "#E8E8E8"
-    th_bg  = "#e6e9f2" if modo == "claro" else "#20242b"
-    style.configure("Treeview", background=tv_bg, foreground=tv_fg, fieldbackground=tv_bg)
-    style.configure("Treeview.Heading", background=th_bg, foreground=tv_fg)
+    th_bg  = "#dfe3eb" if modo == "claro" else "#2A2F36"
+    style.configure(
+        "Treeview",
+        background=tv_bg,
+        fieldbackground=tv_bg,
+        foreground=tv_fg,
+        rowheight=22
+    )
+    style.configure(
+        "Treeview.Heading",
+        background=th_bg,
+        foreground="#1a1a1a" if modo == "claro" else "#FFFFFF",
+        font=("Segoe UI", 10, "bold")
+    )
     return style, bg
 
+#  REPINTADO SUAVE — no toca el banner azul (#3E64FF)
 def pintar_fondo_recursivo(widget, bg):
-    #Aplica bg a frames/labels descendientes y fuerza redraw
     import tkinter as tk
-    tipos = (tk.Frame, tk.Label, tk.LabelFrame, tk.Toplevel, tk.Canvas)
-    # Si el widget tiene el color azul del banner, lo saltamos
+    tipos = (tk.Frame, tk.Label, tk.LabelFrame, tk.Toplevel)
+    # No tocamos el banner azul ni Treeviews
     try:
-        actual_bg = widget.cget("bg")
-        if actual_bg == "#3E64FF":
-            return  # no lo tocamos, preserva el banner azul
+        if widget.cget("bg") == PRIMARIO:
+            return
     except Exception:
         pass
     if isinstance(widget, tipos):
