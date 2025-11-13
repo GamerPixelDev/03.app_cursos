@@ -25,6 +25,8 @@ class MainWindow:
         self.root.title(f"Gestión de Cursos - Usuario: {usuario} ({rol})")
         self.root.geometry("1100x700")
         self.root.resizable(True, True)
+        # === Menú del usuario (Mi cuenta / Cerrar sesión) ===
+        self._crear_menu_usuario()
         # === Banner ===
         self._crear_banner_superior()
         # === Menús ===
@@ -52,6 +54,31 @@ class MainWindow:
         self._crear_footer()
         self.root.mainloop()
 
+    # === Menú desplegable del usuario (Mi cuenta / Cerrar sesión) ===
+    def _crear_menu_usuario(self):
+        self.menu_usuario = tk.Menu(self.root, tearoff=0)
+        self.menu_usuario.add_command(label="Mi cuenta", command=self.mi_cuenta)
+        self.menu_usuario.add_separator()
+        self.menu_usuario.add_command(label="Cerrar sesión", command=self.logout)
+
+    def _mostrar_menu_usuario(self, event=None):
+        # Mostrar el menú justo debajo de la etiqueta del usuario
+        x = self.lbl_usuario.winfo_rootx()
+        y = self.lbl_usuario.winfo_rooty() + self.lbl_usuario.winfo_height()
+        try:
+            self.menu_usuario.tk_popup(x, y)
+        finally:
+            self.menu_usuario.grab_release()
+
+    def _hover_usuario(self, entrar: bool):
+        # Efecto visual al pasar el ratón por encima del usuario
+        base_bg = "#3E64FF"
+        hover_bg = "#2f53e8"
+        self.lbl_usuario.config(
+            bg=hover_bg if entrar else base_bg,
+            fg="white"
+        )
+
     # Banner superior
     def _crear_banner_superior(self):
         banner = tk.Frame(self.root, bg="#3E64FF", height=60)
@@ -64,7 +91,7 @@ class MainWindow:
             fg="white",
             font=("Segoe UI", 14, "bold")
         ).pack(side="left", padx=10)
-        # === Label del usuario (clicable + hover + menú emergente) ===
+        # Etiqueta de usuario con menú desplegable
         self.lbl_usuario = tk.Label(
             banner,
             text=f"👤 {self.usuario} ({self.rol})",
@@ -74,28 +101,21 @@ class MainWindow:
             cursor="hand2"
         )
         self.lbl_usuario.pack(side="right", padx=15)
-        # === Crear menú emergente del usuario ===
-        self.menu_usuario = tk.Menu(self.root, tearoff=0)
-        self.menu_usuario.add_command(label="Mi cuenta", command=self.mi_cuenta)
-        self.menu_usuario.add_command(label="Cambiar contraseña", command=self.mi_cuenta)
-        self.menu_usuario.add_separator()
-        self.menu_usuario.add_command(label="Cerrar sesión", command=self.logout)
-        # Mostrar menú al hacer clic
-        self.lbl_usuario.bind("<Button-1>", lambda e: self.menu_usuario.tk_popup(e.x_root, e.y_root))
-        # Hover
-        self.lbl_usuario.bind("<Enter>", _hover_in)
-        self.lbl_usuario.bind("<Leave>", _hover_out)
+        # Eventos: click para mostrar menú, hover para resaltar
+        self.lbl_usuario.bind("<Button-1>", self._mostrar_menu_usuario)
+        self.lbl_usuario.bind("<Enter>", lambda e: self._hover_usuario(True))
+        self.lbl_usuario.bind("<Leave>", lambda e: self._hover_usuario(False))
         # Botón modo claro/oscuro
-        self.icon_modo = tk.Label(banner, text="🌞", bg="#3E64FF", fg="white", font=("Segoe UI", 16))
+        self.icon_modo = tk.Label(
+            banner,
+            text="🌞",
+            bg="#3E64FF",
+            fg="white",
+            font=("Segoe UI", 16),
+            cursor="hand2"
+        )
         self.icon_modo.pack(side="right", padx=10)
         self.icon_modo.bind("<Button-1>", self.toggle_modo)
-        self.icon_modo.config(cursor="hand2")
-
-        # === Hover (resaltar al pasar el ratón) ===
-        def _hover_in(e):
-            self.lbl_usuario.config(bg="#587cff")  # más clarito y visible
-        def _hover_out(e):
-            self.lbl_usuario.config(bg="#3E64FF")  # color original
 
     # Menús principales
     def _crear_menus(self):
@@ -137,16 +157,17 @@ class MainWindow:
         menu_bar.add_cascade(label="📜 Matrículas", menu=menu_matriculas)
         # === USUARIOS / CUENTA ===
         menu_usuarios = tk.Menu(menu_bar, tearoff=0)
-        menu_usuarios.add_command(label="Mi cuenta", command=self.mi_cuenta)
         if self.rol in ("admin", "god"):
-            menu_usuarios.add_separator()
             menu_usuarios.add_command(label="Gestionar usuarios", command=self.gestion_usuarios)
         if self.rol == "god":
             menu_usuarios.add_separator()
             menu_usuarios.add_command(label="Panel GOD", command=self.panel_god)
-        menu_bar.add_cascade(label="👥 Usuarios", menu=menu_usuarios)
-        # === SALIR ===
-        menu_bar.add_command(label="Salir", command=self.root.quit)
+        # Solo añadimos el menú si tiene algo
+        if menu_usuarios.index("end") is not None:
+            menu_bar.add_cascade(label="👥 Usuarios", menu=menu_usuarios)
+        # === SALIR === -> ahora hace logout
+        menu_bar.add_command(label="Salir", command=self.logout)
+
         self.root.config(menu=menu_bar)
 
     # Footer
@@ -234,3 +255,8 @@ class MainWindow:
         from ui.login_window import LoginWindow
         self.root.destroy()
         LoginWindow()  # vuelve a la ventana de login
+
+    # Menú abrir Mi cuenta
+    def abrir_mi_cuenta(self):
+        from ui.mi_cuenta_window import MiCuentaWindow
+        MiCuentaWindow(self.root, self.usuario, self.modo)

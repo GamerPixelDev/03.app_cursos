@@ -4,7 +4,6 @@ from models.db_connection import get_connection
 from models.utils_db import manejar_error_db
 
 # --- helpers ---
-
 def _hash_password(contrasena: str) -> str:
     #Devuelve el hash bcrypt como string UTF-8 (ideal para columna TEXT)
     return bcrypt.hashpw(contrasena.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -190,6 +189,39 @@ def iniciar_god():
     finally:
         if 'conn' in locals() and conn:
             conn.close()
+
+"""def obtener_carpeta_exportacion(usuario):
+    from models.conexion import conectar
+    conn = conectar()
+    cur = conn.cursor()
+    cur.execute("SELECT carpeta_export FROM usuarios WHERE usuario=%s", (usuario,))
+    fila = cur.fetchone()
+    conn.close()
+    return fila[0] if fila and fila[0] else ""
+
+
+def guardar_carpeta_exportacion(usuario, ruta):
+    from models.conexion import conectar
+    conn = conectar()
+    cur = conn.cursor()
+    cur.execute("UPDATE usuarios SET carpeta_export=%s WHERE usuario=%s", (ruta, usuario))
+    conn.commit()
+    conn.close()
+
+
+def cambiar_nombre(usuario_actual, nuevo_nombre):
+    from models.conexion import conectar
+    conn = conectar()
+    cur = conn.cursor()
+    try:
+        cur.execute("UPDATE usuarios SET usuario=%s WHERE usuario=%s", (nuevo_nombre, usuario_actual))
+        conn.commit()
+        return True
+    except:
+        return False
+    finally:
+        conn.close()"""
+
 
 if __name__ == "__main__":
     # smoke test rápido
