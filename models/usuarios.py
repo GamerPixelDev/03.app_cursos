@@ -190,38 +190,35 @@ def iniciar_god():
         if 'conn' in locals() and conn:
             conn.close()
 
-"""def obtener_carpeta_exportacion(usuario):
-    from models.conexion import conectar
-    conn = conectar()
+def obtener_datos_usuario(usuario):
+    conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT carpeta_export FROM usuarios WHERE usuario=%s", (usuario,))
+    cur.execute("""
+        SELECT nombre, email, rol, ruta_export
+        FROM usuarios
+        WHERE usuario = %s
+    """, (usuario,))
     fila = cur.fetchone()
     conn.close()
-    return fila[0] if fila and fila[0] else ""
+    if not fila:
+        return None
+    return {
+        "nombre": fila[0],
+        "email": fila[1],
+        "rol": fila[2],
+        "ruta_export": fila[3]
+    }
 
-
-def guardar_carpeta_exportacion(usuario, ruta):
-    from models.conexion import conectar
-    conn = conectar()
+def actualizar_datos_usuario(usuario, nombre, email, ruta_export):
+    conn = get_connection()
     cur = conn.cursor()
-    cur.execute("UPDATE usuarios SET carpeta_export=%s WHERE usuario=%s", (ruta, usuario))
+    cur.execute("""
+        UPDATE usuarios
+        SET nombre=%s, email=%s, ruta_export=%s
+        WHERE usuario=%s
+    """, (nombre, email, ruta_export, usuario))
     conn.commit()
     conn.close()
-
-
-def cambiar_nombre(usuario_actual, nuevo_nombre):
-    from models.conexion import conectar
-    conn = conectar()
-    cur = conn.cursor()
-    try:
-        cur.execute("UPDATE usuarios SET usuario=%s WHERE usuario=%s", (nuevo_nombre, usuario_actual))
-        conn.commit()
-        return True
-    except:
-        return False
-    finally:
-        conn.close()"""
-
 
 if __name__ == "__main__":
     # smoke test rápido
