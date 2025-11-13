@@ -52,9 +52,7 @@ class MainWindow:
         self._crear_footer()
         self.root.mainloop()
 
-    # -------------------------------------------------
     # Banner superior
-    # -------------------------------------------------
     def _crear_banner_superior(self):
         banner = tk.Frame(self.root, bg="#3E64FF", height=60)
         banner.pack(fill="x", side="top")
@@ -79,9 +77,8 @@ class MainWindow:
         self.icon_modo.pack(side="right", padx=10)
         self.icon_modo.bind("<Button-1>", self.toggle_modo)
         self.icon_modo.config(cursor="hand2")
-    # -------------------------------------------------
+
     # Menús principales
-    # -------------------------------------------------
     def _crear_menus(self):
         menu_bar = tk.Menu(self.root)
         # === ALUMNOS ===
@@ -132,9 +129,8 @@ class MainWindow:
         # === SALIR ===
         menu_bar.add_command(label="Salir", command=self.root.quit)
         self.root.config(menu=menu_bar)
-    # -------------------------------------------------
+
     # Footer
-    # -------------------------------------------------
     def _crear_footer(self):
         footer = tk.Frame(self.root, bg="#E9ECEF", height=25)
         footer.pack(fill="x", side="bottom")
@@ -145,9 +141,8 @@ class MainWindow:
             fg="#555555",
             font=("Segoe UI", 9)
         ).pack(side="right", padx=10)
-    # -------------------------------------------------
+
     # Métodos de acción
-    # -------------------------------------------------
     def ver_alumnos(self): AlumnosWindows(self.root, self.modo)
     def buscar_alumno(self): BuscarAlumnoWindow(self.root, self.modo)
     def ver_cursos(self): CursosWindow(self.root, self.modo)
@@ -157,9 +152,8 @@ class MainWindow:
     def mi_cuenta(self): MiCuentaWindow(self.root, self.usuario, self.modo)
     def gestion_usuarios(self): UsuariosWindow(self.root, self.modo, rol_actual=self.rol)
     def panel_god(self): GodPanelWindow(self.root, self.modo)
-    # -------------------------------------------------
+
     # Exportar / Importar
-    # -------------------------------------------------
     def export_excel(self, tipo):
         try:
             rutas = {
@@ -202,9 +196,8 @@ class MainWindow:
             messagebox.showinfo("Importación completada", mensaje)
         except Exception as e:
             messagebox.showerror("Error en importación", str(e))
-    # -------------------------------------------------
+
     # Modo claro / oscuro
-    # -------------------------------------------------
     def toggle_modo(self, event=None):
         self.modo = "oscuro" if self.modo == "claro" else "claro"
         self.style, self.bg_color = aplicar_estilo_global(self.modo)

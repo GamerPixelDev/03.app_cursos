@@ -1,59 +1,68 @@
 from tkinter import ttk
 
+# Colores base
 CLARO_BG = "#F5F7FB"
-OSC_BG   = "#121417"
+OSC_BG   = "#171A1C"
 PRIMARIO = "#3E64FF"
+PRIMARIO_OSCURO = "#2F53E8"
 
-# =============================
-#  ESTILO GLOBAL ESTABLE
-# =============================
 def aplicar_estilo_global(modo="claro"):
     style = ttk.Style()
-    # Asegura un tema estable (clam no toca demasiado nada)
     try:
         style.theme_use("clam")
     except Exception:
         pass
-    # Colores principales
+    # --- Fondos generales ---
     bg = CLARO_BG if modo == "claro" else OSC_BG
-    fg = "#1a1a1a" if modo == "claro" else "#E8E8E8"
-    # BOTONES
+    fg = "#1d1d1d" if modo == "claro" else "#E8E8E8"
+    # --- Botones ---
     style.configure(
         "TButton",
-        padding=6,
         font=("Segoe UI", 10),
+        padding=6,
         background=PRIMARIO,
-        foreground="white"
+        foreground="white",
+        relief="flat",
+        borderwidth=0
     )
-    style.map("TButton", background=[("active", "#2f53e8")])
-    # LABELS BÁSICOS
+    style.map("TButton", background=[("active", PRIMARIO_OSCURO)])
+    # --- Labels ---
     style.configure("TLabel", background=bg, foreground=fg)
-    # TREEVIEW (Restaurado como antes)
-    tv_bg  = "#FFFFFF" if modo == "claro" else "#1A1D21"
-    tv_fg  = "#222"    if modo == "claro" else "#E8E8E8"
-    th_bg  = "#dfe3eb" if modo == "claro" else "#2A2F36"
+    # --- Frames “card” ---
+    card = "#FFFFFF" if modo == "claro" else "#1F2326"
+    style.configure("Card.TFrame", background=card)
+    #   🌟 TREEVIEW RESTAURADO CON CABECERA AZUL
+    tv_bg  = "#FFFFFF" if modo == "claro" else "#0F1113"
+    tv_fg  = "#1d1d1d" if modo == "claro" else "#E8E8E8"
     style.configure(
         "Treeview",
         background=tv_bg,
-        fieldbackground=tv_bg,
         foreground=tv_fg,
+        fieldbackground=tv_bg,
+        borderwidth=0,
         rowheight=22
     )
+    # --- Header AZUL como antes ---
     style.configure(
         "Treeview.Heading",
-        background=th_bg,
-        foreground="#1a1a1a" if modo == "claro" else "#FFFFFF",
-        font=("Segoe UI", 10, "bold")
+        background=PRIMARIO,
+        foreground="white",
+        font=("Segoe UI", 10, "bold"),
+        borderwidth=0,
+        relief="flat"
+    )
+    style.map(
+        "Treeview.Heading",
+        background=[("active", PRIMARIO_OSCURO)]
     )
     return style, bg
 
-#  REPINTADO SUAVE — no toca el banner azul (#3E64FF)
+#   REPINTAR FONDOS (sin tocar el banner azul)
 def pintar_fondo_recursivo(widget, bg):
     import tkinter as tk
-    tipos = (tk.Frame, tk.Label, tk.LabelFrame, tk.Toplevel)
-    # No tocamos el banner azul ni Treeviews
+    tipos = (tk.Frame, tk.Label, tk.LabelFrame, tk.Toplevel, tk.Canvas)
     try:
-        if widget.cget("bg") == PRIMARIO:
+        if widget.cget("bg") == "#3E64FF":  # Banner azul → NO TOCAR
             return
     except Exception:
         pass
