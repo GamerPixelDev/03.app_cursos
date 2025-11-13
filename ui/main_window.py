@@ -256,7 +256,3 @@ class MainWindow:
         self.root.destroy()
         LoginWindow()  # vuelve a la ventana de login
 
-    # Menú abrir Mi cuenta
-    def abrir_mi_cuenta(self):
-        from ui.mi_cuenta_window import MiCuentaWindow
-        MiCuentaWindow(self.root, self.usuario, self.modo)
