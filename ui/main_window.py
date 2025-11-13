@@ -199,9 +199,15 @@ class MainWindow:
 
     # Modo claro / oscuro
     def toggle_modo(self, event=None):
+        # Cambiar modo
         self.modo = "oscuro" if self.modo == "claro" else "claro"
         self.style, self.bg_color = aplicar_estilo_global(self.modo)
+        # Repintar fondo general
         self.root.configure(bg=self.bg_color)
+        # Repintar todos los frames/labels sin tocar banner azul
+        from ui.utils_style import pintar_fondo_recursivo
+        pintar_fondo_recursivo(self.root, self.bg_color)
+        # Actualizar icono
         self.icon_modo.config(text="🌙" if self.modo == "oscuro" else "🌞")
 
     # === Cerrar sesión (logout) ===
