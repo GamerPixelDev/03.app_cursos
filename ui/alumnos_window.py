@@ -5,7 +5,6 @@ from ui.detalle_alumno_window import DetalleAlumnoWindow
 from ui.utils_style import aplicar_estilo_global
 from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 
-
 class AlumnosWindows(tk.Toplevel):
     def __init__(self, parent, modo="claro"):
         super().__init__(parent)
@@ -18,10 +17,10 @@ class AlumnosWindows(tk.Toplevel):
         self.transient(parent)
         self.grab_set()
         self.focus_set()
-        # === Frame contenedor de la tabla ===
+        # === Frame contenedor de tabla ===
         frame_tabla = tk.Frame(self, bg=self.bg_color)
         frame_tabla.pack(fill="both", expand=True, padx=10, pady=10)
-        # === Tabla (Treeview) ===
+        # === Tabla ===
         self.tree = ttk.Treeview(
             frame_tabla,
             columns=(
@@ -49,15 +48,13 @@ class AlumnosWindows(tk.Toplevel):
             self.tree.heading(col, text=texto)
             anchor = "center" if col in ("nif", "codigo_postal", "telefono", "sexo", "edad") else "w"
             self.tree.column(col, width=ancho, anchor=anchor)
-        # === Barras de desplazamiento (grid para mejor control) ===
+        # Scrollbars
         scroll_y = ttk.Scrollbar(frame_tabla, orient="vertical", command=self.tree.yview)
         scroll_x = ttk.Scrollbar(frame_tabla, orient="horizontal", command=self.tree.xview)
         self.tree.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
-        # Posicionamiento con grid
         self.tree.grid(row=0, column=0, sticky="nsew")
         scroll_y.grid(row=0, column=1, sticky="ns")
         scroll_x.grid(row=1, column=0, sticky="ew")
-        # Permitir expansión
         frame_tabla.grid_rowconfigure(0, weight=1)
         frame_tabla.grid_columnconfigure(0, weight=1)
         # === Botones inferiores ===
@@ -66,10 +63,9 @@ class AlumnosWindows(tk.Toplevel):
         ttk.Button(frame_btns, text="Editar alumno", command=self.editar_seleccionado).grid(row=0, column=0, padx=5)
         ttk.Button(frame_btns, text="Añadir alumno", command=self.ventana_nuevo_alumno).grid(row=0, column=1, padx=5)
         ttk.Button(frame_btns, text="Eliminar seleccionado", command=self.eliminar_seleccionado).grid(row=0, column=2, padx=5)
-        # Cargar datos al iniciar
         self.cargar_datos()
 
-    # === Cargar datos en tabla ===
+    #   Cargar datos
     def cargar_datos(self):
         for row in self.tree.get_children():
             self.tree.delete(row)
@@ -79,7 +75,7 @@ class AlumnosWindows(tk.Toplevel):
         auto_ajustar_columnas(self.tree)
         ajustar_tamano_ventana(self.tree, self)
 
-    #=== Editar alumno ===
+    #   Editar
     def editar_seleccionado(self):
         item = self.tree.selection()
         if not item:
@@ -93,7 +89,7 @@ class AlumnosWindows(tk.Toplevel):
             return
         self.ventana_editar_alumno(nif, datos)
 
-    # === Eliminar alumno seleccionado ===
+    #   Eliminar
     def eliminar_seleccionado(self):
         item = self.tree.selection()
         if not item:
@@ -101,12 +97,12 @@ class AlumnosWindows(tk.Toplevel):
             return
         alumno = self.tree.item(item, "values")
         nif_alumno = alumno[0]
-        confirmar = messagebox.askyesno("Confirmar", f"¿Eliminar al alumno {alumno[2]} {alumno[3]}?")
+        confirmar = messagebox.askyesno("Confirmar", f"¿Eliminar al alumno {alumno[2]} {alumno[1]}?")
         if confirmar:
             model.eliminar_alumno(nif_alumno)
             self.cargar_datos()
 
-    # === Ventana para añadir alumno ===
+    #   Nuevo alumno
     def ventana_nuevo_alumno(self):
         win = tk.Toplevel(self)
         win.title("➕ Nuevo alumno")
@@ -115,7 +111,6 @@ class AlumnosWindows(tk.Toplevel):
         win.configure(bg=self.bg_color)
         win.transient(self)
         win.grab_set()
-        # === Encabezado ===
         tk.Label(
             win,
             text="Registro de nuevo alumno",
@@ -123,7 +118,6 @@ class AlumnosWindows(tk.Toplevel):
             fg="#3E64FF",
             bg=self.bg_color
         ).pack(pady=(10, 15))
-        # === Contenedor principal ===
         frame = tk.Frame(win, bg=self.bg_color)
         frame.pack(padx=15, pady=10, fill="both", expand=True)
         campos = [
@@ -136,10 +130,7 @@ class AlumnosWindows(tk.Toplevel):
         ]
         self.entries = {}
         for i, (label, clave) in enumerate(zip(campos, claves)):
-            ttk.Label(frame, text=label + ":", background=self.bg_color).grid(
-                row=i, column=0, sticky="w", padx=5, pady=5
-            )
-            # --- Campos con opciones desplegables ---
+            ttk.Label(frame, text=label + ":", background=self.bg_color).grid(row=i, column=0, sticky="w", padx=5, pady=5)
             if clave == "sexo":
                 entry = ttk.Combobox(
                     frame,
@@ -150,7 +141,7 @@ class AlumnosWindows(tk.Toplevel):
             elif clave == "estado_laboral":
                 entry = ttk.Combobox(
                     frame,
-                    values=["Empleado", "Desempleado", "Estudiante"],
+                    values=["Empleado/a", "Desempleado/a", "Estudiante"],
                     state="readonly",
                     width=25
                 )
@@ -158,14 +149,9 @@ class AlumnosWindows(tk.Toplevel):
                 entry = ttk.Entry(frame, width=28)
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
             self.entries[clave] = entry
-        # === Botón de guardar ===
-        ttk.Button(
-            win,
-            text="💾 Guardar alumno",
-            command=lambda: self.guardar_alumno(win)
-        ).pack(pady=(15, 10))
+        ttk.Button(win, text="💾 Guardar alumno", command=lambda: self.guardar_alumno(win)).pack(pady=(15, 10))
 
-    #=== Ventanda editar alumno ===
+    #   Editar alumno ventana
     def ventana_editar_alumno(self, nif, datos):
         win = tk.Toplevel(self)
         win.title(f"Editar alumno ({nif})")
@@ -193,37 +179,20 @@ class AlumnosWindows(tk.Toplevel):
         self.entries_edit = {}
         for i, (label, clave, valor) in enumerate(zip(campos, claves, datos)):
             ttk.Label(frame, text=label + ":", background=self.bg_color).grid(row=i, column=0, sticky="w", padx=5, pady=5)
-
-            # Campos especiales con Combobox
             if clave == "sexo":
-                entry = ttk.Combobox(
-                    frame,
-                    values=["Mujer", "Hombre", "Otro"],
-                    state="readonly",
-                    width=25
-                )
+                entry = ttk.Combobox(frame, values=["Mujer", "Hombre", "Otro"], state="readonly", width=25)
                 entry.set(valor if valor in ["Mujer", "Hombre", "Otro"] else "")
             elif clave == "estado_laboral":
-                entry = ttk.Combobox(
-                    frame,
-                    values=["Empleado/a", "Desempleado/a", "Estudiante"],
-                    state="readonly",
-                    width=25
-                )
+                entry = ttk.Combobox(frame, values=["Empleado/a", "Desempleado/a", "Estudiante"], state="readonly", width=25)
                 entry.set(valor if valor in ["Empleado/a", "Desempleado/a", "Estudiante"] else "")
             else:
                 entry = ttk.Entry(frame, width=28)
                 entry.insert(0, valor if valor is not None else "")
-
             entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
             self.entries_edit[clave] = entry
-        ttk.Button(
-            win,
-            text="💾 Guardar cambios",
-            command=lambda: self.guardar_edicion(nif, win)
-        ).pack(pady=(15, 10))
+        ttk.Button(win, text="💾 Guardar cambios", command=lambda: self.guardar_edicion(nif, win)).pack(pady=(15, 10))
 
-    # === Guardar alumno ===
+    #   Guardar nuevo alumno
     def guardar_alumno(self, ventana):
         datos = [self.entries[c].get() for c in self.entries]
         if not all(datos):
@@ -237,16 +206,15 @@ class AlumnosWindows(tk.Toplevel):
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
-    #=== Guardar alumno editado ===
+    #   Guardar edición alumno
     def guardar_edicion(self, nif, ventana):
         for campo, entry in self.entries_edit.items():
-            valor = entry.get().strip()
-            model.actualizar_alumno(nif, campo, valor)
+            model.actualizar_alumno(nif, campo, entry.get().strip())
         messagebox.showinfo("Éxito", "Alumno actualizado correctamente.")
         ventana.destroy()
         self.cargar_datos()
 
-    # === Doble click: abrir detalle ===
+    #   Doble click → detalle
     def ver_detalle_alumno(self, event):
         selection = self.tree.selection()
         if not selection:
