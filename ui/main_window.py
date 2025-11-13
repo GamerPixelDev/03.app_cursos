@@ -200,25 +200,27 @@ class MainWindow:
     def export_excel(self, tipo):
         try:
             rutas = {
-                "alumnos": export_utils.exportar_alumnos_excel,
-                "cursos": export_utils.exportar_cursos_excel,
-                "matriculas": export_utils.exportar_matriculas_excel
+                "alumnos": lambda: export_utils.exportar_alumnos_excel(self.usuario),
+                "cursos": lambda: export_utils.exportar_cursos_excel(self.usuario),
+                "matriculas": lambda: export_utils.exportar_matriculas_excel(self.usuario)
             }
             ruta = rutas[tipo]()
             messagebox.showinfo("Exportar a Excel", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
             messagebox.showerror("Error al exportar", str(e))
+
     def export_pdf(self, tipo):
         try:
             rutas = {
-                "alumnos": export_pdf.exportar_alumnos_pdf,
-                "cursos": export_pdf.exportar_cursos_pdf,
-                "matriculas": export_pdf.exportar_matriculas_pdf
+                "alumnos": lambda: export_pdf.exportar_alumnos_pdf(self.usuario),
+                "cursos": lambda: export_pdf.exportar_cursos_pdf(self.usuario),
+                "matriculas": lambda: export_pdf.exportar_matriculas_pdf(self.usuario)
             }
             ruta = rutas[tipo]()
             messagebox.showinfo("Exportar a PDF", f"Archivo generado correctamente:\n{ruta}")
         except Exception as e:
             messagebox.showerror("Error al exportar", str(e))
+
     def import_excel(self, tipo):
         ruta = filedialog.askopenfilename(title="Seleccionar archivo Excel", filetypes=[("Archivos Excel", "*.xlsx")])
         if not ruta:

@@ -1,48 +1,57 @@
 import os
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
-from models import alumnos, cursos, matriculas
+from models import alumnos, cursos, matriculas, usuarios
 
-# Carpeta de salida
-EXPORT_DIR = os.path.join(os.path.dirname(__file__), "..", "exports")
-os.makedirs(EXPORT_DIR, exist_ok=True)
+# Carpeta de salida por defecto
+EXPORT_DIR_DEFAULT = os.path.join(os.path.dirname(__file__), "..", "exports")
+os.makedirs(EXPORT_DIR_DEFAULT, exist_ok=True)
 
-#=== ALUMNOS ===
-def exportar_alumnos_excel():
+# FUNCIÓN AUXILIAR PARA ELEGIR RUTA REAL
+def _resolver_ruta(ruta_usuario):
+    """
+    Si ruta_usuario existe → usarla.
+    Si es None o no existe → usar ruta por defecto.
+    """
+    if ruta_usuario and os.path.isdir(ruta_usuario):
+        return ruta_usuario
+    return EXPORT_DIR_DEFAULT
+
+# ALUMNOS
+def exportar_alumnos_excel(ruta_destino=None):
     datos = alumnos.obtener_alumnos()
+    carpeta = _resolver_ruta(ruta_destino)
+    archivo = os.path.join(carpeta, "alumnos.xlsx")
     wb = Workbook()
     ws = wb.active
     ws.title = "Alumnos"
-    # Encabezados
     columnas = [
         "NIF", "Nombre", "Apellidos", "Localidad", "Código Postal",
         "Teléfono", "Email", "Sexo", "Edad", "Estudios", "Estado Laboral"
     ]
     ws.append(columnas)
-    # Estilos de encabezado
+    # Estilo cabecera
     for col in ws[1]:
         col.font = Font(bold=True, color="FFFFFF")
         col.alignment = Alignment(horizontal="center")
-    ws.row_dimensions[1].height = 20
-    for i, cell in enumerate(ws[1], start=1):
-        ws.cell(row=1, column=i).fill = PatternFill("solid", fgColor="3E64FF")
+        col.fill = PatternFill("solid", fgColor="3E64FF")
     # Datos
     for fila in datos:
         ws.append(fila)
-    # Ajustar anchos de columna
+    # Ajustar ancho columnas
     for col in ws.columns:
         max_len = max(len(str(cell.value or "")) for cell in col)
         ws.column_dimensions[col[0].column_letter].width = max_len + 2
-    # Guardar archivo
-    ruta = os.path.join(EXPORT_DIR, "alumnos.xlsx")
-    wb.save(ruta)
-    return ruta
+    wb.save(archivo)
+    return archivo
 
-#=== CURSOS ===
-def exportar_cursos_excel():
+# CURSOS
+def exportar_cursos_excel(ruta_destino=None):
     datos = cursos.obtener_cursos()
     if not datos:
         raise ValueError("No hay cursos para exportar.")
+    carpeta = _resolver_ruta(ruta_destino)
+    archivo = os.path.join(carpeta, "cursos.xlsx")
     wb = Workbook()
     ws = wb.active
     ws.title = "Cursos"
@@ -51,27 +60,25 @@ def exportar_cursos_excel():
         "Lugar", "Modalidad", "Horas", "Responsable"
     ]
     ws.append(columnas)
-    # --- formato de cabecera ---
     for col in ws[1]:
         col.font = Font(bold=True, color="FFFFFF")
         col.alignment = Alignment(horizontal="center")
         col.fill = PatternFill("solid", fgColor="3E64FF")
-    # --- datos ---
     for fila in datos:
         ws.append(fila)
-    # --- ajustar anchos ---
     for col in ws.columns:
         max_len = max(len(str(cell.value or "")) for cell in col)
         ws.column_dimensions[col[0].column_letter].width = max_len + 2
-    ruta = os.path.join(EXPORT_DIR, "cursos.xlsx")
-    wb.save(ruta)
-    return ruta
+    wb.save(archivo)
+    return archivo
 
-#=== MATRÍCULAS ===
-def exportar_matriculas_excel():
+# MATRÍCULAS
+def exportar_matriculas_excel(ruta_destino=None):
     datos = matriculas.obtener_matriculas()
     if not datos:
         raise ValueError("No hay matrículas para exportar.")
+    carpeta = _resolver_ruta(ruta_destino)
+    archivo = os.path.join(carpeta, "matriculas.xlsx")
     wb = Workbook()
     ws = wb.active
     ws.title = "Matrículas"
@@ -88,6 +95,5 @@ def exportar_matriculas_excel():
     for col in ws.columns:
         max_len = max(len(str(cell.value or "")) for cell in col)
         ws.column_dimensions[col[0].column_letter].width = max_len + 2
-    ruta = os.path.join(EXPORT_DIR, "matriculas.xlsx")
-    wb.save(ruta)
-    return ruta
+    wb.save(archivo)
+    return archivo
