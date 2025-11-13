@@ -64,19 +64,38 @@ class MainWindow:
             fg="white",
             font=("Segoe UI", 14, "bold")
         ).pack(side="left", padx=10)
-        # Usuario
-        tk.Label(
+        # === Label del usuario (clicable + hover + menú emergente) ===
+        self.lbl_usuario = tk.Label(
             banner,
             text=f"👤 {self.usuario} ({self.rol})",
             bg="#3E64FF",
             fg="white",
-            font=("Segoe UI", 10, "italic")
-        ).pack(side="right", padx=15)
+            font=("Segoe UI", 10, "italic"),
+            cursor="hand2"
+        )
+        self.lbl_usuario.pack(side="right", padx=15)
+        # === Crear menú emergente del usuario ===
+        self.menu_usuario = tk.Menu(self.root, tearoff=0)
+        self.menu_usuario.add_command(label="Mi cuenta", command=self.mi_cuenta)
+        self.menu_usuario.add_command(label="Cambiar contraseña", command=self.mi_cuenta)
+        self.menu_usuario.add_separator()
+        self.menu_usuario.add_command(label="Cerrar sesión", command=self.logout)
+        # Mostrar menú al hacer clic
+        self.lbl_usuario.bind("<Button-1>", lambda e: self.menu_usuario.tk_popup(e.x_root, e.y_root))
+        # Hover
+        self.lbl_usuario.bind("<Enter>", _hover_in)
+        self.lbl_usuario.bind("<Leave>", _hover_out)
         # Botón modo claro/oscuro
         self.icon_modo = tk.Label(banner, text="🌞", bg="#3E64FF", fg="white", font=("Segoe UI", 16))
         self.icon_modo.pack(side="right", padx=10)
         self.icon_modo.bind("<Button-1>", self.toggle_modo)
         self.icon_modo.config(cursor="hand2")
+
+        # === Hover (resaltar al pasar el ratón) ===
+        def _hover_in(e):
+            self.lbl_usuario.config(bg="#587cff")  # más clarito y visible
+        def _hover_out(e):
+            self.lbl_usuario.config(bg="#3E64FF")  # color original
 
     # Menús principales
     def _crear_menus(self):
