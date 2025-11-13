@@ -107,23 +107,26 @@ class MiCuentaWindow(tk.Toplevel):
         email_actual = self.datos["email"] or ""
         ruta_actual = self.datos["ruta_export"] or ""
         email_nuevo = self.entry_email.get().strip()
-        ruta_nueva = self.datos["ruta_export"]
-        pass_nueva = self.pass_nueva.get().strip()
-        pass_actual = self.pass_actual.get().strip()
-        hay_email = (email_nuevo != email_actual)
-        hay_ruta  = (ruta_nueva != ruta_actual)
-        hay_pass  = bool(pass_nueva)
-        if not (hay_email or hay_ruta or hay_pass):
+        ruta_nueva = self.datos["ruta_export"]  # ya actualizada al usar Cambiar ruta
+        hay_cambio_email = (email_nuevo != email_actual)
+        hay_cambio_ruta  = (ruta_nueva != ruta_actual)
+        hay_cambio_pass  = bool(self.pass_nueva.get().strip())
+        # Si NO hay nada que guardar
+        if not (hay_cambio_email or hay_cambio_ruta or hay_cambio_pass):
             messagebox.showinfo("Sin cambios", "No hay datos nuevos que guardar.")
             return
-        # Email o ruta
-        if hay_email or hay_ruta:
-            actualizar_datos_usuario(self.usuario, email_nuevo, ruta_nueva)
-        # Contraseña
-        if hay_pass:
-            if not verificar_contrasena(self.usuario, pass_actual):
-                messagebox.showerror("Error", "Contraseña actual incorrecta.")
+        # --- Guardar email o ruta si cambia CUALQUIERA de los dos ---
+        if hay_cambio_email or hay_cambio_ruta:
+            actualizar_datos_usuario(
+                self.usuario,
+                email_nuevo,
+                ruta_nueva
+            )
+        # --- Guardar contraseña si procede ---
+        if hay_cambio_pass:
+            if not verificar_contrasena(self.usuario, self.pass_actual.get().strip()):
+                messagebox.showerror("Error", "La contraseña actual es incorrecta.")
                 return
-            cambiar_contrasena(self.usuario, pass_nueva)
+            cambiar_contrasena(self.usuario, self.pass_nueva.get().strip())
         messagebox.showinfo("Éxito", "Datos actualizados correctamente.")
         self.destroy()

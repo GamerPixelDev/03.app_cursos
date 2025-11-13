@@ -21,27 +21,27 @@ class MainMenuWindow(tk.Frame):
         header = tk.Frame(self, bg=bg_color)
         header.pack(fill="x", pady=(10, 20))
         # Título principal
-        tk.Label(
-            header,
-            text="💼 Gestor de Cursos",
-            font=("Segoe UI", 18, "bold"),
-            bg=bg_color,
-            fg="#3E64FF"
-        ).pack(side="left", padx=20)
+        #tk.Label(
+        #    header,
+        #    text="💼 Gestor de Cursos",
+        #    font=("Segoe UI", 18, "bold"),
+        #    bg=bg_color,
+        #    fg="#3E64FF"
+        #).pack(side="left", padx=20)
         # === Menú desplegable de usuario ===
-        self.menu_usuario = tk.Menu(self, tearoff=0)
-        self.menu_usuario.add_command(label="✏️ Cambiar nombre de usuario", command=self.callbacks["editar_nombre"])
-        self.menu_usuario.add_command(label="🔑 Cambiar contraseña", command=self.callbacks["cambiar_contra"])
-        self.menu_usuario.add_separator()
-        self.menu_usuario.add_command(label="🚪 Cerrar sesión", command=self.logout_callback)
-        self.btn_usuario = ttk.Menubutton(
-            header,
-            text=f"👤 {self.usuario} ({self.rol})",
-            direction="below",
-            style="Custom.TMenubutton"
-        )
-        self.btn_usuario["menu"] = self.menu_usuario
-        self.btn_usuario.pack(side="right", padx=20)
+        #self.menu_usuario = tk.Menu(self, tearoff=0)
+        #self.menu_usuario.add_command(label="✏️ Cambiar nombre de usuario", command=self.callbacks["editar_nombre"])
+        #self.menu_usuario.add_command(label="🔑 Cambiar contraseña", command=self.callbacks["cambiar_contra"])
+        #self.menu_usuario.add_separator()
+        #self.menu_usuario.add_command(label="🚪 Cerrar sesión", command=self.logout_callback)
+        #self.btn_usuario = ttk.Menubutton(
+        #    header,
+        #    text=f"👤 {self.usuario} ({self.rol})",
+        #    direction="below",
+        #    style="Custom.TMenubutton"
+        #)
+        #self.btn_usuario["menu"] = self.menu_usuario
+        #self.btn_usuario.pack(side="right", padx=20)
         # === BOTONES PRINCIPALES ===
         frame_botones = tk.Frame(self, bg=bg_color)
         frame_botones.pack(expand=True)
