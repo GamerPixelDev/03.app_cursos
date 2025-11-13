@@ -27,7 +27,6 @@ def _es_duplicado_pg(err: Exception) -> bool:
     return "duplicate key" in s or "unique constraint" in s or "ya existe" in s
 
 # --- API ---
-
 def crear_usuario(usuario: str, contrasena: str, rol: str):
     conn = None
     try:
@@ -78,7 +77,8 @@ def autenticar_usuario(usuario: str, contrasena: str):
             return True, rol
     except Exception as e:
         print("⚠️ Error al verificar hash:", e)
-        print(f"[DEBUG] No se pudo autenticar: usuario={usuario}, fila={fila}") 
+        print(f"[DEBUG] No se pudo autenticar: usuario={usuario}, fila={fila}")
+        manejar_error_db(e, "autenticar usuario")
     return False, None
 
 def verificar_contrasena(usuario: str, contrasena: str) -> bool:
@@ -209,16 +209,40 @@ def obtener_datos_usuario(usuario):
         "ruta_export": fila[3]
     }
 
-def actualizar_datos_usuario(usuario, email, ruta_export):
+def actualizar_datos_usuario(email, ruta_export):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
         UPDATE usuarios
-        SET usuario=%s, email=%s, ruta_export=%s
+        SET email=%s, ruta_export=%s
         WHERE usuario=%s
-    """, (usuario, email, ruta_export))
+    """, (email, ruta_export))
     conn.commit()
     conn.close()
+
+def obtener_ruta_export(usuario):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT ruta_export
+        FROM usuarios
+        WHERE usuario=%s
+    """, (usuario,))
+    fila = cur.fetchone()
+    conn.close()
+    return fila[0] if fila else ""
+
+def actualizar_ruta_export(usuario, nueva_ruta):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE usuarios
+        SET ruta_export = %s
+        WHERE usuario = %s
+    """, (nueva_ruta, usuario))
+    conn.commit()
+    conn.close()
+
 
 if __name__ == "__main__":
     # smoke test rápido
