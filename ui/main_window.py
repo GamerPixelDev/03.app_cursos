@@ -63,12 +63,15 @@ class MainWindow:
 
     def _mostrar_menu_usuario(self, event=None):
         # Mostrar el menú justo debajo de la etiqueta del usuario
-        x = self.lbl_usuario.winfo_rootx()
-        y = self.lbl_usuario.winfo_rooty() + self.lbl_usuario.winfo_height()
+        menu = tk.Menu(self.root, tearoff=0)
+        menu.add_command(label="Mi cuenta", command=self.mi_cuenta)
+        menu.add_separator()
+        menu.add_command(label="Cerrar sesión", command=self.logout)
+            # Mostrar menú debajo del ratón
         try:
-            self.menu_usuario.tk_popup(x, y)
+            menu.tk_popup(event.x_root, event.y_root)
         finally:
-            self.menu_usuario.grab_release()
+            menu.grab_release()
 
     def _hover_usuario(self, entrar: bool):
         # Efecto visual al pasar el ratón por encima del usuario

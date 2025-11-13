@@ -194,7 +194,7 @@ def obtener_datos_usuario(usuario):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        SELECT nombre, email, rol, ruta_export
+        SELECT usuario, email, rol, ruta_export
         FROM usuarios
         WHERE usuario = %s
     """, (usuario,))
@@ -203,20 +203,20 @@ def obtener_datos_usuario(usuario):
     if not fila:
         return None
     return {
-        "nombre": fila[0],
+        "usuario": fila[0],
         "email": fila[1],
         "rol": fila[2],
         "ruta_export": fila[3]
     }
 
-def actualizar_datos_usuario(usuario, nombre, email, ruta_export):
+def actualizar_datos_usuario(usuario, email, ruta_export):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
         UPDATE usuarios
-        SET nombre=%s, email=%s, ruta_export=%s
+        SET usuario=%s, email=%s, ruta_export=%s
         WHERE usuario=%s
-    """, (nombre, email, ruta_export, usuario))
+    """, (usuario, email, ruta_export))
     conn.commit()
     conn.close()
 

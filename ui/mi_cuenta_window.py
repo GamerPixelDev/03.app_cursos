@@ -38,10 +38,6 @@ class MiCuentaWindow(tk.Toplevel):
         self.entry_usuario = ttk.Entry(frame, width=30, state="readonly")
         self.entry_usuario.insert(0, self.usuario)
         self.entry_usuario.grid(row=1, column=1, padx=10, pady=5)
-        ttk.Label(frame, text="Nombre completo:").grid(row=2, column=0, sticky="w", padx=10, pady=5)
-        self.entry_nombre = ttk.Entry(frame, width=30)
-        self.entry_nombre.insert(0, self.nombre_actual)
-        self.entry_nombre.grid(row=2, column=1, padx=10, pady=5)
         ttk.Label(frame, text="Email:").grid(row=3, column=0, sticky="w", padx=10, pady=5)
         self.entry_email = ttk.Entry(frame, width=30)
         self.entry_email.insert(0, self.email_actual)
@@ -77,12 +73,12 @@ class MiCuentaWindow(tk.Toplevel):
     def _cargar_datos_usuario(self):
         datos = model_usuarios.obtener_datos_usuario(self.usuario)
         if datos:
-            self.nombre_actual = datos.get("nombre", "")
+            self.usuario_actual = datos.get("usuario", "")
             self.email_actual = datos.get("email", "")
             self.rol_actual = datos.get("rol", "")
             self.ruta_export = datos.get("ruta_export", os.getcwd())
         else:
-            self.nombre_actual = ""
+            self.usuario_actual = ""
             self.email_actual = ""
             self.rol_actual = ""
             self.ruta_export = os.getcwd()
@@ -96,16 +92,16 @@ class MiCuentaWindow(tk.Toplevel):
 
     #   GUARDAR CAMBIOS EN DB
     def _guardar_cambios(self):
-        nombre_nuevo = self.entry_nombre.get().strip()
+        usuario_nuevo = self.entry_usuario.get().strip()
         email_nuevo = self.entry_email.get().strip()
         ruta_nueva = self.entry_ruta.get().strip()
         # Validación básica
-        if not nombre_nuevo:
-            messagebox.showerror("Error", "El nombre no puede estar vacío.")
+        if not usuario_nuevo:
+            messagebox.showerror("Error", "El nombre de usuario no puede estar vacío.")
             return
         model_usuarios.actualizar_datos_usuario(
             self.usuario,
-            nombre_nuevo,
+            usuario_nuevo,
             email_nuevo,
             ruta_nueva
         )
