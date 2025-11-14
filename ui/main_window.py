@@ -200,9 +200,9 @@ class MainWindow:
     def export_excel(self, tipo):
         try:
             rutas = {
-                "alumnos": lambda: export_utils.exportar_alumnos_excel(self.usuario),
-                "cursos": lambda: export_utils.exportar_cursos_excel(self.usuario),
-                "matriculas": lambda: export_utils.exportar_matriculas_excel(self.usuario)
+                "alumnos": lambda: export_utils.exportar_alumnos_excel(usuario=self.usuario),
+                "cursos": lambda: export_utils.exportar_cursos_excel(usuario=self.usuario),
+                "matriculas": lambda: export_utils.exportar_matriculas_excel(usuario=self.usuario)
             }
             ruta = rutas[tipo]()
             messagebox.showinfo("Exportar a Excel", f"Archivo generado correctamente:\n{ruta}")
@@ -212,9 +212,9 @@ class MainWindow:
     def export_pdf(self, tipo):
         try:
             rutas = {
-                "alumnos": lambda: export_pdf.exportar_alumnos_pdf(self.usuario),
-                "cursos": lambda: export_pdf.exportar_cursos_pdf(self.usuario),
-                "matriculas": lambda: export_pdf.exportar_matriculas_pdf(self.usuario)
+                "alumnos": lambda: export_pdf.exportar_alumnos_pdf(usuario=self.usuario),
+                "cursos": lambda: export_pdf.exportar_cursos_pdf(usuario=self.usuario),
+                "matriculas": lambda: export_pdf.exportar_matriculas_pdf(usuario=self.usuario)
             }
             ruta = rutas[tipo]()
             messagebox.showinfo("Exportar a PDF", f"Archivo generado correctamente:\n{ruta}")
@@ -235,7 +235,8 @@ class MainWindow:
             mensaje = (
                 f"Importación completada.\n\n"
                 f"📥 Nuevos: {resumen['nuevos']}\n"
-                f"⚠️ Duplicados: {resumen['duplicados']}\n\n"
+                f"⚠️ Duplicados: {resumen['duplicados']}\n"
+                f"❗ Errores: {resumen['errores']}\n\n"
                 f"Origen: {ruta}"
             )
             messagebox.showinfo("Importación completada", mensaje)

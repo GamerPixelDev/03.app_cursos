@@ -38,6 +38,21 @@ def obtener_datos_usuario(usuario):
         "ruta_export": fila[3]
     }
 
+def crear_usuario(usuario: str, contrasena: str, rol: str):
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        hashed = _hash_password(contrasena)
+        cur.execute(
+            "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (%s, %s, %s)",
+            (usuario, hashed, rol)
+        )
+        conn.commit()
+    except Exception as e:
+        manejar_error_db(e, "crear usuario")
+    finally:
+        conn.close()
+
 def actualizar_datos_usuario(usuario, email, ruta_export):
     conn = get_connection()
     cur = conn.cursor()
@@ -51,26 +66,33 @@ def actualizar_datos_usuario(usuario, email, ruta_export):
 
 #                   CONTRASEÑA
 def verificar_contrasena(usuario: str, contrasena: str) -> bool:
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT contrasena FROM usuarios WHERE usuario = %s", (usuario,))
-    fila = cur.fetchone()
-    conn.close()
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT contrasena FROM usuarios WHERE usuario = %s", (usuario,))
+        fila = cur.fetchone()
+    except Exception:
+        return False
+    finally:
+        conn.close()
     if not fila:
         return False
     hashed = _as_bytes(fila[0])
     return bcrypt.checkpw(contrasena.encode("utf-8"), hashed)
 
 def autenticar_usuario(usuario: str, contrasena: str):
-
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT contrasena, rol FROM usuarios WHERE usuario = %s",
-        (usuario,)
-    )
-    fila = cur.fetchone()
-    conn.close()
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT contrasena, rol FROM usuarios WHERE usuario = %s",(usuario,)
+        )
+        fila = cur.fetchone()
+    except Exception as e:
+        manejar_error_db(e, "autenticar usuario")
+        return False, None
+    finally:
+        conn.close()
     # Usuario no existe
     if not fila:
         return False, None
@@ -80,7 +102,6 @@ def autenticar_usuario(usuario: str, contrasena: str):
     if bcrypt.checkpw(contrasena.encode("utf-8"), hashed):
         return True, rol
     return False, None
-
 
 def cambiar_contrasena(usuario: str, nueva_contrasena: str):
     if not nueva_contrasena:
@@ -93,3 +114,18 @@ def cambiar_contrasena(usuario: str, nueva_contrasena: str):
     conn.commit()
     conn.close()
     return True
+
+def obtener_ruta_export(usuario):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT ruta_export FROM usuarios WHERE usuario=%s", (usuario,))
+    fila = cur.fetchone()
+    conn.close()
+    return fila[0] if fila else ""
+
+def actualizar_ruta_export(usuario, ruta):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE usuarios SET ruta_export=%s WHERE usuario=%s", (ruta, usuario))
+    conn.commit()
+    conn.close()
