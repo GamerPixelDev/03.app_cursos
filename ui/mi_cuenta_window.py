@@ -14,8 +14,10 @@ class MiCuentaWindow(tk.Toplevel):
         self.usuario = usuario
         self.modo = modo
         self.style, self.bg_color = aplicar_estilo_global(modo)
-        # Datos desde BD
+        # Datos actuales desde BD
         self.datos = obtener_datos_usuario(usuario)
+        self.ruta_original = self.datos["ruta_export"] or ""
+        self.ruta_seleccionada = None
         self.configure(bg=self.bg_color)
         self.title("Mi cuenta")
         self.geometry("470x600")
@@ -47,9 +49,11 @@ class MiCuentaWindow(tk.Toplevel):
         card = tk.Frame(self, bg="white", bd=1, relief="solid")
         card.pack(padx=20, pady=10, fill="both")
         # ===== Datos personales =====
-        tk.Label(card, text="Datos personales",
-                font=("Segoe UI", 11, "bold"),
-                bg="white", fg="#3E64FF").pack(pady=(10, 5))
+        tk.Label(
+            card, text="Datos personales",
+            font=("Segoe UI", 11, "bold"),
+            bg="white", fg="#3E64FF"
+        ).pack(pady=(10, 5))
         form = tk.Frame(card, bg="white")
         form.pack(padx=15, pady=5)
         tk.Label(form, text="Email:", bg="white").grid(row=0, column=0, sticky="w")
@@ -57,9 +61,11 @@ class MiCuentaWindow(tk.Toplevel):
         self.entry_email.grid(row=0, column=1, pady=5)
         self.entry_email.insert(0, self.datos["email"] or "")
         # ===== Contraseña =====
-        tk.Label(card, text="Cambiar contraseña",
-                font=("Segoe UI", 11, "bold"),
-                bg="white", fg="#3E64FF").pack(pady=(15, 5))
+        tk.Label(
+            card, text="Cambiar contraseña",
+            font=("Segoe UI", 11, "bold"),
+            bg="white", fg="#3E64FF"
+        ).pack(pady=(15, 5))
         form_pass = tk.Frame(card, bg="white")
         form_pass.pack(padx=15, pady=5)
         tk.Label(form_pass, text="Contraseña actual:", bg="white").grid(row=0, column=0, sticky="w")
@@ -68,16 +74,18 @@ class MiCuentaWindow(tk.Toplevel):
         tk.Label(form_pass, text="Nueva contraseña:", bg="white").grid(row=1, column=0, sticky="w")
         self.pass_nueva = ttk.Entry(form_pass, width=30, show="•")
         self.pass_nueva.grid(row=1, column=1, pady=5)
-        # ===== Rutas =====
-        tk.Label(card, text="Ruta exportaciones",
-                font=("Segoe UI", 11, "bold"),
-                bg="white", fg="#3E64FF").pack(pady=(15, 5))
+        # ===== RUTA EXPORTACIONES =====
+        tk.Label(
+            card, text="Ruta exportaciones",
+            font=("Segoe UI", 11, "bold"),
+            bg="white", fg="#3E64FF"
+        ).pack(pady=(15, 5))
         ruta_frame = tk.Frame(card, bg="white")
         ruta_frame.pack(padx=10, pady=5)
         ttk.Button(ruta_frame, text="Cambiar ruta", command=self._cambiar_ruta).pack(pady=(5, 10))
         self.lbl_ruta_actual = tk.Label(
             ruta_frame,
-            text=f"Actual: {self.datos['ruta_export']}",
+            text=f"Actual: {self.ruta_original}",
             bg="white", fg="#555"
         )
         self.lbl_ruta_actual.pack(fill="x")
@@ -87,7 +95,7 @@ class MiCuentaWindow(tk.Toplevel):
             bg="white", fg="#555"
         )
         self.lbl_ruta_nueva.pack(fill="x", pady=(5, 5))
-        # -------- BOTONES GUARDAR + CANCELAR ----------
+        # ===== BOTONES =====
         btn_frame = tk.Frame(self, bg=self.bg_color)
         btn_frame.pack(pady=25)
         ttk.Button(btn_frame, text="💾 Guardar cambios",
@@ -95,34 +103,28 @@ class MiCuentaWindow(tk.Toplevel):
         ttk.Button(btn_frame, text="Cancelar",
                     command=self.destroy).grid(row=0, column=1, padx=10)
 
-    # =======================================================
     def _cambiar_ruta(self):
         carpeta = filedialog.askdirectory(title="Seleccionar carpeta de exportación")
         if carpeta:
-            self.datos["ruta_export"] = carpeta
+            self.ruta_seleccionada = carpeta
             self.lbl_ruta_nueva.config(text=f"Nueva: {carpeta}")
 
-    # =======================================================
     def _guardar(self):
         email_actual = self.datos["email"] or ""
-        ruta_actual = self.datos["ruta_export"] or ""
+        ruta_actual = self.ruta_original
         email_nuevo = self.entry_email.get().strip()
-        ruta_nueva = self.datos["ruta_export"]  # ya actualizada al usar Cambiar ruta
+        ruta_nueva = self.ruta_seleccionada if self.ruta_seleccionada is not None else ruta_actual
         hay_cambio_email = (email_nuevo != email_actual)
         hay_cambio_ruta  = (ruta_nueva != ruta_actual)
         hay_cambio_pass  = bool(self.pass_nueva.get().strip())
-        # Si NO hay nada que guardar
+        # Nada que guardar
         if not (hay_cambio_email or hay_cambio_ruta or hay_cambio_pass):
             messagebox.showinfo("Sin cambios", "No hay datos nuevos que guardar.")
             return
-        # --- Guardar email o ruta si cambia CUALQUIERA de los dos ---
+        # Guardar email o ruta
         if hay_cambio_email or hay_cambio_ruta:
-            actualizar_datos_usuario(
-                self.usuario,
-                email_nuevo,
-                ruta_nueva
-            )
-        # --- Guardar contraseña si procede ---
+            actualizar_datos_usuario(self.usuario, email_nuevo, ruta_nueva)
+        # Guardar contraseña
         if hay_cambio_pass:
             if not verificar_contrasena(self.usuario, self.pass_actual.get().strip()):
                 messagebox.showerror("Error", "La contraseña actual es incorrecta.")

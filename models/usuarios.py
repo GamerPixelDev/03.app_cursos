@@ -19,6 +19,26 @@ def _as_bytes(value) -> bytes:
     return bytes(str(value), "utf-8")
 
 #                    CRUD BÁSICO
+def obtener_usuarios(incluir_god=False):
+    conn = get_connection()
+    cur = conn.cursor()
+    consulta = "SELECT usuario, rol FROM usuarios"
+    parametros = []
+    if not incluir_god:
+        consulta += " WHERE LOWER(BTRIM(usuario, E' \\t\\n\\r')) <> %s"
+        parametros.append("god")
+    consulta += " ORDER BY usuario"
+    cur.execute(consulta, tuple(parametros))
+    filas = cur.fetchall()
+    conn.close()
+    usuarios = []
+    for usuario, rol in filas:
+        nombre_normalizado = (usuario or "").strip().lower()
+        if not incluir_god and nombre_normalizado == "god":
+            continue
+        usuarios.append((usuario, rol))
+    return usuarios
+
 def obtener_datos_usuario(usuario):
     conn = get_connection()
     cur = conn.cursor()
@@ -38,6 +58,36 @@ def obtener_datos_usuario(usuario):
         "ruta_export": fila[3]
     }
 
+def crear_usuario(usuario: str, contrasena: str, rol: str):
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("SELECT 1 FROM usuarios WHERE usuario = %s", (usuario,))
+        if cur.fetchone():
+            raise ValueError(f"El usuario '{usuario}' ya existe.")
+        hashed = _hash_password(contrasena)
+        cur.execute(
+            "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (%s, %s, %s)",
+            (usuario, hashed, rol)
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+def eliminar_usuario(usuario: str):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM usuarios WHERE usuario = %s", (usuario,))
+    conn.commit()
+    conn.close()
+
+def actualizar_rol(usuario: str, nuevo_rol: str):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE usuarios SET rol = %s WHERE usuario = %s", (nuevo_rol, usuario))
+    conn.commit()
+    conn.close()
+
 def actualizar_datos_usuario(usuario, email, ruta_export):
     conn = get_connection()
     cur = conn.cursor()
@@ -51,26 +101,33 @@ def actualizar_datos_usuario(usuario, email, ruta_export):
 
 #                   CONTRASEÑA
 def verificar_contrasena(usuario: str, contrasena: str) -> bool:
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT contrasena FROM usuarios WHERE usuario = %s", (usuario,))
-    fila = cur.fetchone()
-    conn.close()
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT contrasena FROM usuarios WHERE usuario = %s", (usuario,))
+        fila = cur.fetchone()
+    except Exception:
+        return False
+    finally:
+        conn.close()
     if not fila:
         return False
     hashed = _as_bytes(fila[0])
     return bcrypt.checkpw(contrasena.encode("utf-8"), hashed)
 
 def autenticar_usuario(usuario: str, contrasena: str):
-
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT contrasena, rol FROM usuarios WHERE usuario = %s",
-        (usuario,)
-    )
-    fila = cur.fetchone()
-    conn.close()
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT contrasena, rol FROM usuarios WHERE usuario = %s",(usuario,)
+        )
+        fila = cur.fetchone()
+    except Exception as e:
+        manejar_error_db(e, "autenticar usuario")
+        return False, None
+    finally:
+        conn.close()
     # Usuario no existe
     if not fila:
         return False, None
@@ -80,7 +137,6 @@ def autenticar_usuario(usuario: str, contrasena: str):
     if bcrypt.checkpw(contrasena.encode("utf-8"), hashed):
         return True, rol
     return False, None
-
 
 def cambiar_contrasena(usuario: str, nueva_contrasena: str):
     if not nueva_contrasena:
@@ -93,3 +149,18 @@ def cambiar_contrasena(usuario: str, nueva_contrasena: str):
     conn.commit()
     conn.close()
     return True
+
+def obtener_ruta_export(usuario):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT ruta_export FROM usuarios WHERE usuario=%s", (usuario,))
+    fila = cur.fetchone()
+    conn.close()
+    return fila[0] if fila else ""
+
+def actualizar_ruta_export(usuario, ruta):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE usuarios SET ruta_export=%s WHERE usuario=%s", (ruta, usuario))
+    conn.commit()
+    conn.close()
