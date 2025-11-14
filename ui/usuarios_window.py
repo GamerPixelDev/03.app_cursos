@@ -7,7 +7,7 @@ from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 class UsuariosWindow(tk.Toplevel):
     def __init__(self, parent, modo="claro", rol_actual="usuario"):
         super().__init__(parent)
-        self.rol_actual = rol_actual
+        self.rol_actual = (rol_actual or "").strip().lower()
         self.modo = modo
         self.style, self.bg_color = aplicar_estilo_global(modo)
         self.configure(bg=self.bg_color)
@@ -66,6 +66,9 @@ class UsuariosWindow(tk.Toplevel):
         incluir_god = self.rol_actual == "god"
         usuarios = model.obtener_usuarios(incluir_god=incluir_god)
         for u in usuarios:
+            nombre = (u[0] or "").strip().lower()
+            if nombre == "god" and not incluir_god:
+                continue
             self.tree.insert("", "end", values=u)
         auto_ajustar_columnas(self.tree)
         ajustar_tamano_ventana(self.tree, self)

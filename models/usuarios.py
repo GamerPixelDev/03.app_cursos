@@ -25,7 +25,7 @@ def obtener_usuarios(incluir_god=False):
     consulta = "SELECT usuario, rol FROM usuarios"
     parametros = []
     if not incluir_god:
-        consulta += " WHERE TRIM(LOWER(usuario)) <> %s"
+        consulta += " WHERE LOWER(BTRIM(usuario, E' \\t\\n\\r')) <> %s"
         parametros.append("god")
     consulta += " ORDER BY usuario"
     cur.execute(consulta, tuple(parametros))
@@ -37,7 +37,7 @@ def obtener_usuarios(incluir_god=False):
         if not incluir_god and nombre_normalizado == "god":
             continue
         usuarios.append((usuario, rol))
-    return usuario
+    return usuarios
 
 def obtener_datos_usuario(usuario):
     conn = get_connection()
