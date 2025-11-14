@@ -16,6 +16,8 @@ class MiCuentaWindow(tk.Toplevel):
         self.style, self.bg_color = aplicar_estilo_global(modo)
         # Datos actuales desde BD
         self.datos = obtener_datos_usuario(usuario)
+        self.ruta_original = self.datos["ruta_export"] or ""
+        self.ruta_seleccionada = None
         self.configure(bg=self.bg_color)
         self.title("Mi cuenta")
         self.geometry("470x600")
@@ -83,7 +85,7 @@ class MiCuentaWindow(tk.Toplevel):
         ttk.Button(ruta_frame, text="Cambiar ruta", command=self._cambiar_ruta).pack(pady=(5, 10))
         self.lbl_ruta_actual = tk.Label(
             ruta_frame,
-            text=f"Actual: {self.datos['ruta_export']}",
+            text=f"Actual: {self.ruta_original}",
             bg="white", fg="#555"
         )
         self.lbl_ruta_actual.pack(fill="x")
@@ -104,14 +106,14 @@ class MiCuentaWindow(tk.Toplevel):
     def _cambiar_ruta(self):
         carpeta = filedialog.askdirectory(title="Seleccionar carpeta de exportación")
         if carpeta:
-            self.datos["ruta_export"] = carpeta
+            self.ruta_seleccionada = carpeta
             self.lbl_ruta_nueva.config(text=f"Nueva: {carpeta}")
 
     def _guardar(self):
         email_actual = self.datos["email"] or ""
-        ruta_actual = self.datos["ruta_export"] or ""
+        ruta_actual = self.ruta_original
         email_nuevo = self.entry_email.get().strip()
-        ruta_nueva = self.datos["ruta_export"]
+        ruta_nueva = self.ruta_seleccionada if self.ruta_seleccionada is not None else ruta_actual
         hay_cambio_email = (email_nuevo != email_actual)
         hay_cambio_ruta  = (ruta_nueva != ruta_actual)
         hay_cambio_pass  = bool(self.pass_nueva.get().strip())

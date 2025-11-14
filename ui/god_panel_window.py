@@ -3,7 +3,6 @@ from tkinter import ttk, messagebox
 from models import usuarios as model
 from ui.utils_style import aplicar_estilo_global
 from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
-import bcrypt
 
 class GodPanelWindow(tk.Toplevel):
     def __init__(self, parent, modo="claro"):
@@ -150,11 +149,7 @@ class GodPanelWindow(tk.Toplevel):
         ).pack(pady=15)
 
     def _guardar_cambio_rol(self, usuario, nuevo_rol, ventana):
-        conn = model.get_connection()
-        cur = conn.cursor()
-        cur.execute("UPDATE usuarios SET rol = ? WHERE usuario = ?", (nuevo_rol, usuario))
-        conn.commit()
-        conn.close()
+        model.actualizar_rol(usuario, nuevo_rol)
         ventana.destroy()
         self.cargar_usuarios()
         messagebox.showinfo("Hecho", f"Rol de '{usuario}' actualizado a '{nuevo_rol}'.")
@@ -188,11 +183,8 @@ class GodPanelWindow(tk.Toplevel):
         if not nueva_contra:
             messagebox.showwarning("Aviso", "Introduce una contraseña válida.")
             return
-        hashed = bcrypt.hashpw(nueva_contra.encode('utf-8'), bcrypt.gensalt())
-        conn = model.get_connection()
-        cur = conn.cursor()
-        cur.execute("UPDATE usuarios SET contrasena = ? WHERE usuario = ?", (hashed, usuario))
-        conn.commit()
-        conn.close()
-        messagebox.showinfo("Hecho", f"Contraseña de '{usuario}' actualizada.")
-        ventana.destroy()
+        if model.cambiar_contrasena(usuario, nueva_contra):
+            messagebox.showinfo("Hecho", f"Contraseña de '{usuario}' actualizada.")
+            ventana.destroy()
+        else:
+            messagebox.showwarning("Aviso", "No se pudo actualizar la contraseña.")

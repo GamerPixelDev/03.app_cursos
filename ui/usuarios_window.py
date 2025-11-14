@@ -3,7 +3,6 @@ from tkinter import ttk, messagebox
 from models import usuarios as model
 from ui.utils_style import aplicar_estilo_global
 from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
-import bcrypt
 
 class UsuariosWindow(tk.Toplevel):
     def __init__(self, parent, modo="claro", rol_actual="usuario"):
@@ -155,11 +154,8 @@ class UsuariosWindow(tk.Toplevel):
         if not nueva_contra:
             messagebox.showwarning("Aviso", "Introduce una contraseña válida.")
             return
-        hashed = bcrypt.hashpw(nueva_contra.encode('utf-8'), bcrypt.gensalt())
-        conn = model.get_connection()
-        cur = conn.cursor()
-        cur.execute("UPDATE usuarios SET contraseña = ? WHERE nombre = ?", (hashed, usuario))
-        conn.commit()
-        conn.close()
-        messagebox.showinfo("Hecho", f"Contraseña de '{usuario}' actualizada.")
-        ventana.destroy()
+        if model.cambiar_contrasena(usuario, nueva_contra):
+            messagebox.showinfo("Hecho", f"Contraseña de '{usuario}' actualizada.")
+            ventana.destroy()
+        else:
+            messagebox.showwarning("Aviso", "No se pudo actualizar la contraseña.")

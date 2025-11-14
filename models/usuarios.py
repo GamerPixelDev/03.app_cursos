@@ -19,6 +19,20 @@ def _as_bytes(value) -> bytes:
     return bytes(str(value), "utf-8")
 
 #                    CRUD BÁSICO
+def obtener_usuarios(incluir_god=False):
+    conn = get_connection()
+    cur = conn.cursor()
+    consulta = "SELECT usuario, rol FROM usuarios"
+    parametros = []
+    if not incluir_god:
+        consulta += " WHERE LOWER(usuario) <> %s"
+        parametros.append("god")
+    consulta += " ORDER BY usuario"
+    cur.execute(consulta, tuple(parametros))
+    filas = cur.fetchall()
+    conn.close()
+    return [(fila[0], fila[1]) for fila in filas]
+
 def obtener_datos_usuario(usuario):
     conn = get_connection()
     cur = conn.cursor()
@@ -39,19 +53,35 @@ def obtener_datos_usuario(usuario):
     }
 
 def crear_usuario(usuario: str, contrasena: str, rol: str):
+    conn = get_connection()
+    cur = conn.cursor()
     try:
-        conn = get_connection()
-        cur = conn.cursor()
+        cur.execute("SELECT 1 FROM usuarios WHERE usuario = %s", (usuario,))
+        if cur.fetchone():
+            raise ValueError(f"El usuario '{usuario}' ya existe.")
         hashed = _hash_password(contrasena)
         cur.execute(
             "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (%s, %s, %s)",
             (usuario, hashed, rol)
         )
         conn.commit()
-    except Exception as e:
-        manejar_error_db(e, "crear usuario")
     finally:
         conn.close()
+
+def eliminar_usuario(usuario: str):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM usuarios WHERE usuario = %s", (usuario,))
+    conn.commit()
+    conn.close()
+
+
+def actualizar_rol(usuario: str, nuevo_rol: str):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE usuarios SET rol = %s WHERE usuario = %s", (nuevo_rol, usuario))
+    conn.commit()
+    conn.close()
 
 def actualizar_datos_usuario(usuario, email, ruta_export):
     conn = get_connection()
