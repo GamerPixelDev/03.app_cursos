@@ -25,13 +25,19 @@ def obtener_usuarios(incluir_god=False):
     consulta = "SELECT usuario, rol FROM usuarios"
     parametros = []
     if not incluir_god:
-        consulta += " WHERE LOWER(usuario) <> %s"
+        consulta += " WHERE TRIM(LOWER(usuario)) <> %s"
         parametros.append("god")
     consulta += " ORDER BY usuario"
     cur.execute(consulta, tuple(parametros))
     filas = cur.fetchall()
     conn.close()
-    return [(fila[0], fila[1]) for fila in filas]
+    usuarios = []
+    for usuario, rol in filas:
+        nombre_normalizado = (usuario or "").strip().lower()
+        if not incluir_god and nombre_normalizado == "god":
+            continue
+        usuarios.append((usuario, rol))
+    return usuario
 
 def obtener_datos_usuario(usuario):
     conn = get_connection()
@@ -74,7 +80,6 @@ def eliminar_usuario(usuario: str):
     cur.execute("DELETE FROM usuarios WHERE usuario = %s", (usuario,))
     conn.commit()
     conn.close()
-
 
 def actualizar_rol(usuario: str, nuevo_rol: str):
     conn = get_connection()
