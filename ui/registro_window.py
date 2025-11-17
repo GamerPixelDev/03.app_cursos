@@ -27,19 +27,24 @@ class RegistroWindow(tk.Toplevel):
         frame = tk.Frame(self, bg=self.bg_color)
         frame.pack(padx=20, pady=10, fill="both")
         # Campos
-        labels = ["Usuario", "Contraseña", "Confirmar contraseña"]
+        campos = [
+            ("Usuario", False),
+            ("Contraseña", True),
+            ("Confirmar contraseña", True),
+            ("Email", False)
+        ]
         self.entries = {}
-        for i, lab in enumerate(labels):
+        for i, (label, ocultar) in enumerate(campos):
             tk.Label(
                 frame,
-                text=lab + ":",
+                text=label + ":",
                 bg=self.bg_color,
                 font=("Segoe UI", 10)
             ).grid(row=i, column=0, sticky="w", pady=8)
-            show = "•" if "Contraseña" or "Confirmar contraseña" in lab else None
-            entry = ttk.Entry(frame, width=30, show=show)
+            entry = ttk.Entry(frame, width=30, show="•" if ocultar else "")
             entry.grid(row=i, column=1, pady=8)
-            self.entries[lab.lower().replace(" ", "_")] = entry
+            clave = label.lower().replace(" ", "_")
+            self.entries[clave] = entry
         # --------- Botón registrar ---------
         ttk.Button(
             self,
@@ -52,8 +57,9 @@ class RegistroWindow(tk.Toplevel):
         usuario = self.entries["usuario"].get().strip()
         password = self.entries["contraseña"].get().strip()
         confirm = self.entries["confirmar_contraseña"].get().strip()
+        email = self.entries["email"].get().strip()
         # Validaciones básicas
-        if not usuario or not password or not confirm:
+        if not usuario or not password or not confirm or not email:
             messagebox.showerror("Error", "Rellena todos los campos.")
             return
         if password != confirm:
@@ -61,7 +67,7 @@ class RegistroWindow(tk.Toplevel):
             return
         # Crear usuario con rol por defecto
         try:
-            crear_usuario(usuario, password, "usuario")
+            crear_usuario(usuario, password, "usuario", email=email)
             messagebox.showinfo("Éxito", "Usuario creado correctamente.")
             self.destroy()
         except Exception as e:
