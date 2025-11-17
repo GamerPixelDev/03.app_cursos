@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 from models.usuarios import autenticar_usuario
 #from models.usuarios import iniciar_admin, iniciar_god
 from ui.main_window import MainWindow
+from ui.registro_window import RegistroWindow
 from ui.utils_style import aplicar_estilo_global
 
 class LoginWindow:
@@ -66,6 +67,11 @@ class LoginWindow:
             text="Iniciar sesión",
             command=self.iniciar_sesion
         ).pack(pady=5)
+        ttk.Button(
+            frame,
+            text="Crear nueva cuenta",
+            command=self.abrir_registro
+        ).pack(pady=5)
         # === Pie de ventana ===
         lbl_pie = tk.Label(
             self.root,
@@ -91,3 +97,6 @@ class LoginWindow:
             MainWindow(usuario, rol)
         else:
             messagebox.showerror("Acceso denegado", "Usuario o contraseña incorrectos.")
+
+    def abrir_registro(self):
+        RegistroWindow(self.root, modo=self.modo)
