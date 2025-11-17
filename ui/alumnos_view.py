@@ -91,7 +91,7 @@ class AlumnosView(tk.Frame):
         if not datos:
             messagebox.showerror("Error", "No se pudieron obtener los datos.")
             return
-        DetalleAlumnoWindow(self, nif, modo=self.modo)
+        self.ventana_editar_alumno(nif, datos)
 
     def eliminar_seleccionado(self):
         item = self.tree.selection()
@@ -166,6 +166,46 @@ class AlumnosView(tk.Frame):
             self.cargar_datos()
         except Exception as e:
             messagebox.showerror("Error", str(e))
+
+    def ventana_editar_alumno(self, nif, datos):
+        win = tk.Toplevel(self)
+        win.title(f"Editar alumno ({nif})")
+        win.geometry("420x560")
+        win.configure(bg=self.bg_color)
+        win.transient(self)
+        win.grab_set()
+        tk.Label(
+            win,
+            text=f"✏️ Editar datos de {datos[0]} {datos[1]}",
+            font=("Segoe UI", 12, "bold"),
+            fg="#3E64FF",
+            bg=self.bg_color
+        ).pack(pady=(10, 15))
+        frame = tk.Frame(win, bg=self.bg_color)
+        frame.pack(padx=15, pady=10, fill="both", expand=True)
+        campos = [
+            "Nombre", "Apellidos", "Localidad", "Código postal", "Teléfono",
+            "Email", "Sexo", "Edad", "Estudios", "Estado laboral"
+        ]
+        claves = [
+            "nombre", "apellidos", "localidad", "codigo_postal", "telefono",
+            "email", "sexo", "edad", "estudios", "estado_laboral"
+        ]
+        self.entries_edit = {}
+        for i, (label, clave, valor) in enumerate(zip(campos, claves, datos)):
+            ttk.Label(frame, text=label + ":", background=self.bg_color).grid(row=i, column=0, sticky="w", padx=5, pady=5)
+            if clave == "sexo":
+                entry = ttk.Combobox(frame, values=["Mujer", "Hombre", "Otro"], state="readonly", width=25)
+                entry.set(valor if valor in ["Mujer", "Hombre", "Otro"] else "")
+            elif clave == "estado_laboral":
+                entry = ttk.Combobox(frame, values=["Empleado/a", "Desempleado/a", "Estudiante"], state="readonly", width=25)
+                entry.set(valor if valor in ["Empleado/a", "Desempleado/a", "Estudiante"] else "")
+            else:
+                entry = ttk.Entry(frame, width=28)
+                entry.insert(0, valor if valor is not None else "")
+            entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
+            self.entries_edit[clave] = entry
+        ttk.Button(win, text="💾 Guardar cambios", command=lambda: self.guardar_edicion(nif, win)).pack(pady=(15, 10))
 
     # DETALLE
     def ver_detalle_alumno(self, event):

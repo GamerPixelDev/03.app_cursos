@@ -92,6 +92,66 @@ class CursosView(tk.Frame):
             return
         self.ventana_editar_curso(codigo, datos)
 
+    def ventana_editar_curso(self, codigo, datos):
+        win = tk.Toplevel(self)
+        win.title(f"✏️ Editar curso ({codigo})")
+        win.geometry("420x520")
+        win.resizable(False, False)
+        win.configure(bg=self.bg_color)
+        win.transient(self)
+        win.grab_set()
+        tk.Label(
+            win,
+            text=f"Editar datos del curso {codigo}",
+            font=("Segoe UI", 12, "bold"),
+            fg="#3E64FF",
+            bg=self.bg_color
+        ).pack(pady=(10, 15))
+        frame = tk.Frame(win, bg=self.bg_color)
+        frame.pack(padx=15, pady=10, fill="both", expand=True)
+        campos = [
+            ("Nombre", "nombre"),
+            ("Fecha inicio", "fecha_inicio"),
+            ("Fecha fin", "fecha_fin"),
+            ("Lugar", "lugar"),
+            ("Modalidad", "modalidad"),
+            ("Horas", "horas"),
+            ("Responsable", "responsable")
+        ]
+        self.entries_edit = {}
+        for i, (label, clave) in enumerate(campos):
+            ttk.Label(frame, text=label + ":", background=self.bg_color).grid(row=i, column=0, sticky="w", padx=5, pady=5)
+            valor = datos[i] if i < len(datos) else ""
+            if clave == "modalidad":
+                entry = ttk.Combobox(frame, values=["Presencial", "Online", "Mixta"], state="readonly", width=25)
+                entry.set(valor if valor else "")
+            elif clave in ("fecha_inicio", "fecha_fin"):
+                entry = DateEntry(
+                    frame,
+                    width=25,
+                    date_pattern="yyyy-mm-dd",
+                    background="lightblue",
+                    foreground="black",
+                    borderwidth=2
+                )
+                if valor:
+                    try:
+                        entry.set_date(datetime.strptime(str(valor), "%Y-%m-%d"))
+                    except Exception:
+                        pass
+                entry.bind("<Button-1>", lambda e, de=entry: de.drop_down())
+                entry.bind("<FocusOut>", lambda e, de=entry: de._top_cal.withdraw() if getattr(de, "_top_cal", None) else None)
+            else:
+                entry = ttk.Entry(frame, width=28)
+                entry.insert(0, valor if valor else "")
+            entry.grid(row=i, column=1, padx=5, pady=5, sticky="w")
+            self.entries_edit[clave] = entry
+        ttk.Button(
+            win,
+            text="💾 Guardar cambios",
+            command=lambda: self.guardar_edicion(codigo, win)
+        ).pack(pady=(15, 20))
+
     def eliminar_seleccionado(self):
         item = self.tree.selection()
         if not item:
