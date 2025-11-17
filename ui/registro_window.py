@@ -36,7 +36,7 @@ class RegistroWindow(tk.Toplevel):
                 bg=self.bg_color,
                 font=("Segoe UI", 10)
             ).grid(row=i, column=0, sticky="w", pady=8)
-            show = "•" if "Contraseña" in lab else None
+            show = "•" if "Contraseña" or "Confirmar contraseña" in lab else None
             entry = ttk.Entry(frame, width=30, show=show)
             entry.grid(row=i, column=1, pady=8)
             self.entries[lab.lower().replace(" ", "_")] = entry
