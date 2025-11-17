@@ -245,7 +245,9 @@ class MainWindow:
     def buscar_curso(self):
         from ui.buscar_curso_view import BuscarCursoView
         self._cargar_vista(BuscarCursoView)
-    def ver_matriculas(self): MatriculasWindow(self.root, self.modo)
+    def ver_matriculas(self):
+        from ui.matriculas_view import MatriculasView
+        self._cargar_vista(MatriculasView)
     # --- Usuarios / Roles ---
     def mi_cuenta(self): MiCuentaWindow(self.root, self.usuario, self.modo)
     def gestion_usuarios(self): UsuariosWindow(self.root, self.modo, rol_actual=self.rol)
