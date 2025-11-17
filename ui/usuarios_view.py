@@ -4,20 +4,13 @@ from models import usuarios as model
 from ui.utils_style import aplicar_estilo_global
 from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 
-class UsuariosWindow(tk.Toplevel):
-    def __init__(self, parent, modo="claro", rol_actual="usuario"):
+class UsuariosView(tk.Frame):
+    def __init__(self, parent, modo="claro", rol_actual="rol"):
         super().__init__(parent)
         self.rol_actual = (rol_actual or "").strip().lower()
         self.modo = modo
         self.style, self.bg_color = aplicar_estilo_global(modo)
         self.configure(bg=self.bg_color)
-        self.title("Gestión de usuarios")
-        self.geometry("900x500")
-        self.minsize(750, 400)
-        self.resizable(True, True)
-        self.resizable(False, False)
-        self.transient(parent)
-        self.grab_set()
         # === Encabezado ===
         tk.Label(
             self,
@@ -31,13 +24,17 @@ class UsuariosWindow(tk.Toplevel):
         frame_tabla.pack(fill="both", expand=True, padx=10, pady=(0, 10))
         self.tree = ttk.Treeview(
             frame_tabla,
-            columns=("usuario", "rol"),
+            columns=("usuario", "rol", "email", "ruta_export"),
             show="headings"
         )
         self.tree.heading("usuario", text="Usuario", anchor="center")
         self.tree.heading("rol", text="Rol", anchor="center")
+        self.tree.heading("email", text="Email", anchor="center")
+        self.tree.heading("ruta_export", text="Ruta de descarga", anchor="center")
         self.tree.column("usuario", width=280, anchor="center")
         self.tree.column("rol", width=150, anchor="center")
+        self.tree.column("email", width=250, anchor="center")
+        self.tree.column("ruta_export", width=300, anchor="center")
         # Scrollbar vertical
         scroll_y = ttk.Scrollbar(frame_tabla, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scroll_y.set)
@@ -66,12 +63,11 @@ class UsuariosWindow(tk.Toplevel):
         incluir_god = self.rol_actual == "god"
         usuarios = model.obtener_usuarios(incluir_god=incluir_god)
         for u in usuarios:
-            rol = (u[2] or "").strip().lower()
-            if rol == "god" and not incluir_god:
+            nombre = (u[1] or "").strip().lower()
+            if nombre == "god" and not incluir_god:
                 continue
             self.tree.insert("", "end", values=u)
         auto_ajustar_columnas(self.tree)
-        ajustar_tamano_ventana(self.tree, self)
 
     # --- Nueva ventana para añadir usuario ---
     def ventana_nuevo_usuario(self):

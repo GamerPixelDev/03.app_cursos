@@ -250,7 +250,9 @@ class MainWindow:
         self._cargar_vista(MatriculasView)
     # --- Usuarios / Roles ---
     def mi_cuenta(self): MiCuentaWindow(self.root, self.usuario, self.modo)
-    def gestion_usuarios(self): UsuariosWindow(self.root, self.modo, rol_actual=self.rol)
+    def gestion_usuarios(self):
+        from ui.usuarios_view import UsuariosView
+        self._cargar_vista(UsuariosView)
     def panel_god(self): GodPanelWindow(self.root, self.modo)
 
     # Exportar / Importar

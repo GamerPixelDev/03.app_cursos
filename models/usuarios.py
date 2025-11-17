@@ -22,7 +22,7 @@ def _as_bytes(value) -> bytes:
 def obtener_usuarios(incluir_god=False):
     conn = get_connection()
     cur = conn.cursor()
-    consulta = "SELECT usuario, rol FROM usuarios"
+    consulta = "SELECT usuario, rol, email, ruta_export FROM usuarios"
     parametros = []
     if not incluir_god:
         consulta += " WHERE LOWER(BTRIM(usuario, E' \\t\\n\\r')) <> %s"
@@ -32,11 +32,11 @@ def obtener_usuarios(incluir_god=False):
     filas = cur.fetchall()
     conn.close()
     usuarios = []
-    for usuario, rol in filas:
+    for usuario, rol, email, ruta in filas:
         nombre_normalizado = (usuario or "").strip().lower()
         if not incluir_god and nombre_normalizado == "god":
             continue
-        usuarios.append((usuario, rol))
+        usuarios.append((usuario, rol, email, ruta))
     return usuarios
 
 def obtener_datos_usuario(usuario):
