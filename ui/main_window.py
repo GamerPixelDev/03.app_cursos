@@ -25,31 +25,21 @@ class MainWindow:
         self.root.title(f"Gestión de Cursos - Usuario: {usuario} ({rol})")
         self.root.geometry("1100x700")
         self.root.resizable(True, True)
-        # === Menú del usuario (Mi cuenta / Cerrar sesión) ===
-        self._crear_menu_usuario()
-        # === Banner ===
+        # === Banner superior ===
         self._crear_banner_superior()
-        # === Menús ===
-        self._crear_menus()
-        # === Separador ===
-        ttk.Separator(self.root, orient="horizontal").pack(fill="x")
-        # Menú visual principal
-        self.menu_principal = MainMenuWindow(
-            self.root,
-            usuario=self.usuario,
-            rol=self.rol,
-            modo=self.modo,
-            callbacks={
-                "alumnos": lambda: self.ver_alumnos(),
-                "cursos": lambda: self.ver_cursos(),
-                "matriculas": lambda: self.ver_matriculas(),
-                "usuarios": lambda: self.gestion_usuarios(),
-                "god": lambda: self.panel_god(),
-                "editar_nombre": lambda: messagebox.showinfo("En desarrollo", "Funcionalidad para cambiar nombre próximamente."),
-                "cambiar_contra": lambda: self.mi_cuenta(),
-            },
-            logout_callback=self.logout
-        )
+        # === Contenedor principal ===
+        contenedor = tk.Frame(self.root, bg=self.bg_color)
+        contenedor.pack(fill="both", expand=True)
+        # === Sidebar izquierda ===
+        self.sidebar = tk.Frame(contenedor, width=220, bg="#2f53e8")
+        self.sidebar.pack(side="left", fill="y")
+        # Contenido principal (zona morada)
+        self.content_frame = tk.Frame(contenedor, bg=self.bg_color)
+        self.content_frame.pack(side="right", fill="both", expand=True)
+        # Crear menú lateral
+        self._crear_sidebar()  
+        # Cargar vista por defecto
+        self._cargar_vista_inicial()
         # === Footer ===
         self._crear_footer()
         self.root.mainloop()
@@ -170,8 +160,58 @@ class MainWindow:
             menu_bar.add_cascade(label="👥 Usuarios", menu=menu_usuarios)
         # === SALIR === -> ahora hace logout
         menu_bar.add_command(label="Salir", command=self.logout)
-
         self.root.config(menu=menu_bar)
+
+    def _crear_sidebar(self):
+        # Estilo base del botón lateral
+        btn_style = {
+            "font": ("Segoe UI", 10, "bold"),
+            "bd": 0,
+            "bg": "#2f53e8",
+            "fg": "white",
+            "activebackground": "#3E64FF",
+            "activeforeground": "white",
+            "anchor": "w",
+            "height": 2,
+            "padx": 20,
+            "cursor": "hand2"
+        }
+        # Inicio
+        tk.Button(self.sidebar, text="🏠  Inicio", command=self._cargar_vista_inicial, **btn_style).pack(fill="x")
+        # Alumnos
+        tk.Button(self.sidebar, text="🎓  Ver alumnos", command=self.ver_alumnos, **btn_style).pack(fill="x")
+        tk.Button(self.sidebar, text="🔍  Buscar alumno", command=self.buscar_alumno, **btn_style).pack(fill="x")
+        tk.Button(self.sidebar, text="⬆️  Importar alumnos", command=lambda: self.import_excel("alumnos"), **btn_style).pack(fill="x")
+        tk.Button(self.sidebar, text="⬇️  Exportar alumnos", command=lambda: self.export_excel("alumnos"), **btn_style).pack(fill="x")
+        # Cursos
+        tk.Label(self.sidebar, text="", bg="#2f53e8").pack()  # Separador
+        tk.Button(self.sidebar, text="📚  Ver cursos", command=self.ver_cursos, **btn_style).pack(fill="x")
+        tk.Button(self.sidebar, text="🔍  Buscar curso", command=self.buscar_curso, **btn_style).pack(fill="x")
+        tk.Button(self.sidebar, text="⬆️  Importar cursos", command=lambda: self.import_excel("cursos"), **btn_style).pack(fill="x")
+        tk.Button(self.sidebar, text="⬇️  Exportar cursos", command=lambda: self.export_excel("cursos"), **btn_style).pack(fill="x")
+        # Matrículas
+        tk.Label(self.sidebar, text="", bg="#2f53e8").pack()
+        tk.Button(self.sidebar, text="📜  Ver matrículas", command=self.ver_matriculas, **btn_style).pack(fill="x")
+        tk.Button(self.sidebar, text="⬇️  Exportar matrículas", command=lambda: self.export_excel("matriculas"), **btn_style).pack(fill="x")
+        # Usuarios según rol
+        if self.rol in ("admin", "god"):
+            tk.Label(self.sidebar, text="", bg="#2f53e8").pack()
+            tk.Button(self.sidebar, text="👥  Gestionar usuarios", command=self.gestion_usuarios, **btn_style).pack(fill="x")
+        if self.rol == "god":
+            tk.Button(self.sidebar, text="⚡  Panel GOD", command=self.panel_god, **btn_style).pack(fill="x")
+
+    def _cargar_vista_inicial(self):
+        for widget in self.content_frame.winfo_children():
+            widget.destroy()
+
+        lbl = tk.Label(
+            self.content_frame,
+            text="Bienvenido al Gestor de Cursos",
+            font=("Segoe UI", 18, "bold"),
+            bg=self.bg_color,
+            fg="#3E64FF"
+        )
+        lbl.pack(pady=40)
 
     # Footer
     def _crear_footer(self):
