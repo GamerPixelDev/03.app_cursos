@@ -5,7 +5,6 @@ from models import matriculas as model
 from models import alumnos
 from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 
-
 class BuscarAlumnoWindow(tk.Toplevel):
     def __init__(self, parent, modo="claro"):
         super().__init__(parent)

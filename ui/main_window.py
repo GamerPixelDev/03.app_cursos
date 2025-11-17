@@ -203,7 +203,6 @@ class MainWindow:
     def _cargar_vista_inicial(self):
         for widget in self.content_frame.winfo_children():
             widget.destroy()
-
         lbl = tk.Label(
             self.content_frame,
             text="Bienvenido al Gestor de Cursos",
@@ -212,6 +211,15 @@ class MainWindow:
             fg="#3E64FF"
         )
         lbl.pack(pady=40)
+
+    def _cargar_vista(self, vista_clase):
+        # Limpia panel derecho
+        for w in self.content_frame.winfo_children():
+            w.destroy()
+
+        # Carga vista nueva
+        vista = vista_clase(self.content_frame, modo=self.modo)
+        vista.pack(fill="both", expand=True)
 
     # Footer
     def _crear_footer(self):
@@ -226,7 +234,9 @@ class MainWindow:
         ).pack(side="right", padx=10)
 
     # Métodos de acción
-    def ver_alumnos(self): AlumnosWindows(self.root, self.modo)
+    def ver_alumnos(self):
+        from ui.alumnos_view import AlumnosView
+        self._cargar_vista(AlumnosView)
     def buscar_alumno(self): BuscarAlumnoWindow(self.root, self.modo)
     def ver_cursos(self): CursosWindow(self.root, self.modo)
     def buscar_curso(self): BuscarCursoWindow(self.root, self.modo)
