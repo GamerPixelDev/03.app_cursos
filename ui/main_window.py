@@ -216,7 +216,6 @@ class MainWindow:
         # Limpia panel derecho
         for w in self.content_frame.winfo_children():
             w.destroy()
-
         # Carga vista nueva
         vista = vista_clase(self.content_frame, modo=self.modo)
         vista.pack(fill="both", expand=True)
@@ -243,7 +242,9 @@ class MainWindow:
     def ver_cursos(self):
         from ui.cursos_view import CursosView
         self._cargar_vista(CursosView)
-    def buscar_curso(self): BuscarCursoWindow(self.root, self.modo)
+    def buscar_curso(self):
+        from ui.buscar_curso_view import BuscarCursoView
+        self._cargar_vista(BuscarCursoView)
     def ver_matriculas(self): MatriculasWindow(self.root, self.modo)
     # --- Usuarios / Roles ---
     def mi_cuenta(self): MiCuentaWindow(self.root, self.usuario, self.modo)

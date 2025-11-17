@@ -4,7 +4,6 @@ from models import alumnos
 from ui.utils_style import aplicar_estilo_global
 from ui.utils_treeview import auto_ajustar_columnas
 
-
 class BuscarAlumnoView(tk.Frame):
     def __init__(self, parent, modo="claro"):
         super().__init__(parent)
@@ -19,7 +18,7 @@ class BuscarAlumnoView(tk.Frame):
             fg="#3E64FF",
             font=("Segoe UI", 16, "bold")
         ).pack(pady=10)
-        # ==== CAMPO DE BUSQUEDA ====
+        # ==== CAMPO DE BÚSQUEDA ====
         frame_buscar = tk.Frame(self, bg=self.bg_color)
         frame_buscar.pack(pady=10)
         tk.Label(

@@ -1,15 +1,13 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+from models import cursos
+from models import matriculas as model
 from ui.utils_style import aplicar_estilo_global
 from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
-from models import matriculas as model
-from models import cursos
 
 
-class BuscarCursoWindow(tk.Toplevel):
+class BuscarCursoView(tk.Frame):
     def __init__(self, parent, modo="claro"):
-        super().__init__(parent)
-        # === Estilo y configuración ===
         self.modo = modo
         self.style, self.bg_color = aplicar_estilo_global(modo)
         self.configure(bg=self.bg_color)
@@ -77,7 +75,7 @@ class BuscarCursoWindow(tk.Toplevel):
         frame_tabla.grid_rowconfigure(0, weight=1)
         frame_tabla.grid_columnconfigure(0, weight=1)
 
-    # === Buscar curso ===
+    # ==== BUSCAR ====
     def buscar(self):
         codigo = self.entry_codigo.get().strip()
         if not codigo:
@@ -111,4 +109,3 @@ class BuscarCursoWindow(tk.Toplevel):
             self.tree.insert("", tk.END, values=alumno)
         auto_ajustar_columnas(self.tree)
         ajustar_tamano_ventana(self.tree, self)
-        
