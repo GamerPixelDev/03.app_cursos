@@ -58,7 +58,10 @@ def obtener_datos_usuario(usuario):
         "ruta_export": fila[3]
     }
 
-def crear_usuario(usuario: str, contrasena: str, rol: str):
+def crear_usuario(usuario: str, contrasena: str, rol: str, email: str, ruta_export: str = None):
+    if ruta_export is None:
+        from pathlib import Path
+        ruta_export = str(Path.home() / "Downloads")
     conn = get_connection()
     cur = conn.cursor()
     try:
@@ -67,8 +70,8 @@ def crear_usuario(usuario: str, contrasena: str, rol: str):
             raise ValueError(f"El usuario '{usuario}' ya existe.")
         hashed = _hash_password(contrasena)
         cur.execute(
-            "INSERT INTO usuarios (usuario, contrasena, rol) VALUES (%s, %s, %s)",
-            (usuario, hashed, rol)
+            "INSERT INTO usuarios (usuario, contrasena, rol, email, ruta_export) VALUES (%s, %s, %s, %s, %s)",
+            (usuario, hashed, rol, email, ruta_export)
         )
         conn.commit()
     finally:
