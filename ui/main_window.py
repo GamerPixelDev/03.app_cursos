@@ -1,15 +1,15 @@
 import tkinter as tk
 from tkinter import messagebox, ttk, filedialog
 from ui.utils_style import aplicar_estilo_global
-from ui.alumnos_window import AlumnosWindows
-from ui.cursos_window import CursosWindow
-from ui.matriculas_window import MatriculasWindow
-from ui.buscar_alumno_window import BuscarAlumnoWindow
-from ui.buscar_curso_window import BuscarCursoWindow
-from ui.usuarios_window import UsuariosWindow
+#from ui.alumnos_window import AlumnosWindows
+#from ui.cursos_window import CursosWindow
+#from ui.matriculas_window import MatriculasWindow
+#from ui.buscar_alumno_window import BuscarAlumnoWindow
+#from ui.buscar_curso_window import BuscarCursoWindow
+#from ui.usuarios_window import UsuariosWindow
 from ui.mi_cuenta_window import MiCuentaWindow
 from ui.god_panel_window import GodPanelWindow
-from ui.main_menu_window import MainMenuWindow
+#from ui.main_menu_window import MainMenuWindow
 from datetime import datetime
 from models import export_utils, export_pdf, import_utils
 
@@ -253,7 +253,9 @@ class MainWindow:
     def gestion_usuarios(self):
         from ui.usuarios_view import UsuariosView
         self._cargar_vista(UsuariosView)
-    def panel_god(self): GodPanelWindow(self.root, self.modo)
+    def panel_god(self):
+        from ui.god_panel_view import GodPanelView
+        self._cargar_vista(GodPanelView)
 
     # Exportar / Importar
     def export_excel(self, tipo):
