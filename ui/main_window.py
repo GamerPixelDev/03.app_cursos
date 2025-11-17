@@ -237,7 +237,9 @@ class MainWindow:
     def ver_alumnos(self):
         from ui.alumnos_view import AlumnosView
         self._cargar_vista(AlumnosView)
-    def buscar_alumno(self): BuscarAlumnoWindow(self.root, self.modo)
+    def buscar_alumno(self):
+        from ui.buscar_alumno_view import BuscarAlumnoView
+        self._cargar_vista(BuscarAlumnoView)
     def ver_cursos(self): CursosWindow(self.root, self.modo)
     def buscar_curso(self): BuscarCursoWindow(self.root, self.modo)
     def ver_matriculas(self): MatriculasWindow(self.root, self.modo)
