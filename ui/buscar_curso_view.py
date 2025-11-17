@@ -8,15 +8,18 @@ from ui.utils_treeview import auto_ajustar_columnas, ajustar_tamano_ventana
 
 class BuscarCursoView(tk.Frame):
     def __init__(self, parent, modo="claro"):
+        super().__init__(parent)
         self.modo = modo
         self.style, self.bg_color = aplicar_estilo_global(modo)
         self.configure(bg=self.bg_color)
-        self.title("Buscar curso")
-        self.geometry("900x500")
-        self.resizable(True, True)
-        self.transient(parent)
-        self.grab_set()
-        self.focus_set()
+        # ==== TITULO ====
+        tk.Label(
+            self,
+            text="🔎 Buscar curso",
+            bg=self.bg_color,
+            fg="#3E64FF",
+            font=("Segoe UI", 16, "bold")
+        ).pack(pady=10)
         # === Frame de búsqueda ===
         frame_buscar = tk.Frame(self, bg=self.bg_color)
         frame_buscar.pack(pady=10)
