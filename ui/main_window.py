@@ -1,15 +1,7 @@
 import tkinter as tk
-from tkinter import messagebox, ttk, filedialog
+from tkinter import messagebox, filedialog
 from ui.utils_style import aplicar_estilo_global
-#from ui.alumnos_window import AlumnosWindows
-#from ui.cursos_window import CursosWindow
-#from ui.matriculas_window import MatriculasWindow
-#from ui.buscar_alumno_window import BuscarAlumnoWindow
-#from ui.buscar_curso_window import BuscarCursoWindow
-#from ui.usuarios_window import UsuariosWindow
 from ui.mi_cuenta_window import MiCuentaWindow
-#from ui.god_panel_window import GodPanelWindow
-#from ui.main_menu_window import MainMenuWindow
 from datetime import datetime
 from models import export_utils, export_pdf, import_utils
 
